@@ -8,15 +8,9 @@ const { routeTo } = usePageStore()
 
 <template>
 	<div class="view-page start-page">
-		<div class="start-page__head">
-			<div class="logo start-page__logo">
-				Math Puzzles
-			</div>
-			<button class="start-page__btn" @click="routeTo(PAGES.LEVELTYPES)">
-				<img src="@/assets/img/start.png" alt="start" />
-			</button>
+		<div class="logo start-page__logo">
+			Math Puzzles
 		</div>
-
 		<div class="privacy">
 			<a
 				href="https://docs.google.com/document/d/1Hk88865_6yvWeWvi25jErXQOD6Oi5-h2qEHW5d8P25Y"
@@ -24,6 +18,9 @@ const { routeTo } = usePageStore()
 				>Privacy Policy</a
 			>
 		</div>
+		<button class="start-page__btn" @click="routeTo(PAGES.LEVELTYPES)">
+			<span>Start</span>
+		</button>
 	</div>
 </template>
 
@@ -36,44 +33,53 @@ const { routeTo } = usePageStore()
 	height: 100dvh;
 
 	&__head {
-		margin-top: 15vh;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 	}
 
 	&__logo {
-		max-width: 200px;
-		align-items: center;
+		position: absolute;
+		top: 29%;
+		left: 36%;
 	}
 
 	&__btn {
-		padding: 0.8rem 1.3rem;
+		position: absolute;
+		bottom: 0;
+		right: 0;
+		z-index: 1;
 		text-align: center;
 		cursor: pointer;
-		background: transparent;
 		padding: 0;
 		border: 0;
 		outline: 0;
-		max-width: 70%;
+		width: 66px;
+		height: 66px;
+		background: url('@/assets/img/paper-green-color.jpg') no-repeat center;
+		background-size: 100% 100%;
+		box-shadow: -5px -5px 10px 0 rgba(0, 0, 0, 0.1);
 
-		img {
-			width: 12rem;
-			max-width: 100%;
+		span {
+			display: block;
+			transform-origin: center;
+			transform: translate(-13px, -13px) rotateZ(-45deg);
 		}
 	}
 
 	.privacy {
-		margin-bottom: 35px;
+		position: absolute;
+		left: 28%;
+		bottom: 43%;
 
 		a {
-			color: #fff;
+			color: #020202;
 			text-decoration: none;
 			font-size: 12px;
 
 			&:visited,
 			&:active {
-				color: #fff;
+				color: #020202;
 			}
 		}
 	}

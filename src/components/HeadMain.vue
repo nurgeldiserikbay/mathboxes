@@ -1,6 +1,5 @@
 <template>
 	<div class="head-main">
-		<BackTo />
 		<ScoreTable
 			v-if="pageStore.currentPage === PAGES.PLAYGROUND"
 			:isGameEnd="isGameEnd"
@@ -11,7 +10,6 @@
 </template>
 
 <script lang="ts" setup>
-import BackTo from '@/components/BackTo.vue'
 import SettingsMenu from '@/components/SettingsMenu.vue'
 import ScoreTable from '@/components/ScoreTable.vue'
 

@@ -19,10 +19,10 @@ export const PAGES: { [key in PagesType]: PagesType } = {
 }
 
 export const PAGES_CONST: { [key in PagesType]: number } = {
-	START: 0,
-	LEVELTYPES: 2,
-	LEVELS: 4,
-	PLAYGROUND: 6,
+	START: 1,
+	LEVELTYPES: 3,
+	LEVELS: 5,
+	PLAYGROUND: 7,
 }
 
 export const SIGNS: SIGNS_TYPES[] = [

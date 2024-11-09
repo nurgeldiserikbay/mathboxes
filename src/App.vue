@@ -9,6 +9,8 @@ import RatioResize from '@/components/RatioResize.vue'
 
 import Admob from '@/utils/admob'
 
+import BackTo from '@/components/BackTo.vue'
+
 import StartPage from '@/pages/StartPage.vue'
 import LevelTypes from '@/pages/LevelTypes.vue'
 import LevelsPage from '@/pages/LevelsPage.vue'
@@ -24,6 +26,7 @@ const notebookHeight = Math.floor(height * 0.8)
 const settings = {
 	width: noteBookWidth,
 	height: notebookHeight,
+	flippingTime: 1000,
 	startZIndex: 0,
 	usePortrait: true,
 	autoSize: true,
@@ -35,20 +38,20 @@ const settings = {
 const wrapElem = ref()
 let pageFlip: PageFlip
 
-const notebookStyle = computed(() => {
-	return {
-		width: `${noteBookWidth}px`,
-		height: `${notebookHeight}px`,
-	}
-})
+const getSide = (page: number): FlipCorner => {
+	if (page === 3) return 'bottom' as FlipCorner
+
+	return (Math.random() > 0.5 ? 'top' : 'bottom') as FlipCorner
+}
 
 watch(
 	() => pageStore.currentPageIndex,
 	() => {
 		if (pageFlip) {
+			console.log(getSide(pageStore.currentPageIndex), pageStore.currentPageIndex)
 			pageFlip.flip(
 				pageStore.currentPageIndex,
-				(Math.random() > 0.5 ? 'top' : 'bottom') as FlipCorner
+				getSide(pageStore.currentPageIndex)
 			)
 		}
 	}
@@ -71,21 +74,22 @@ onMounted(() => {
 <template>
 	<RatioResize :width="width" :height="height">
 		<div class="wrapper" :style="{ width: `${2 * noteBookWidth}px`, height: `${notebookHeight}px` }">
-			<div ref="wrapElem" class="wrapElem" :style="notebookStyle">
+			<div ref="wrapElem" class="wrapElem">
+				<div class="page-wrap" data-density="soft"></div>
 				<div class="page-wrap" data-density="soft">
 					<StartPage />
 				</div>
-				<div class="page-wrap" data-density="soft"></div>
+				<div class="page-wrap" data-density="soft"><BackTo /></div>
 				<div class="page-wrap" data-density="soft">
 					<LevelTypes />
 				</div>
-				<div class="page-wrap" data-density="soft"></div>
+				<div class="page-wrap" data-density="soft"><BackTo /></div>
 				<div class="page-wrap" data-density="soft">
 					<LevelsPage />
 				</div>
-				<div class="page-wrap" data-density="soft"></div>
+				<div class="page-wrap" data-density="soft"><BackTo /></div>
 				<div class="page-wrap" data-density="soft">
-					<PlaygroundPage />
+					<!-- <PlaygroundPage /> -->
 				</div>
 			</div>
 		</div>
@@ -95,8 +99,8 @@ onMounted(() => {
 <style lang="scss" scoped>
 .wrapper {
 	position: absolute;
-	left: 10%;
-	bottom: 6%;
+	right: 10%;
+	bottom: 10%;
 	transform-origin: center;
 	transform: rotate(-5deg);
 }
@@ -106,15 +110,18 @@ onMounted(() => {
 		position: absolute;
 		bottom: 15px;
 		background: url('@/assets/img/paper.jpg') center no-repeat;
-		background-size: cover;
-		backface-visibility: visible;
+		background-size: 100% 100%;
 
 		&:nth-child(1) {
+			background: none;
+		}
+
+		&:nth-child(2) {
 			background: url('@/assets/img/page-front.png') center no-repeat;
 			background-size: cover;
 		}
 
-		&:nth-child(2) {
+		&:nth-child(3) {
 			background: url('@/assets/img/page-back.png') center no-repeat;
 			background-size: cover;
 		}
