@@ -1,98 +1,99 @@
 <script setup lang="ts">
-import {
-	ref,
-	computed,
-	reactive,
-	watch,
-	toRefs,
-	onMounted,
-	onBeforeUnmount,
-} from 'vue'
+import { ref, computed, toRefs, onMounted, onBeforeUnmount, watch } from 'vue'
+import { Swiper, SwiperSlide } from 'swiper/vue'
 
-import { TypeBoard } from '@/game/types'
-import { Game } from '@/game/game'
-import { BOARD_ITEM } from '@/game/consts'
+import 'swiper/css'
 
-import { LEVELS, GAME_TYPES } from '@/utils/conts'
-import { copyArray } from '@/utils/helpers'
+import { LEVELS, GAME_TYPES, SIGNS, SIGN_COMPLEXITY_ARR } from '@/utils/conts'
+
+import { evaluateExpression, generateAll } from '@/utils/helpers'
 
 import { useAudio } from '@/composables/useAudio'
 
-import { useGameSettings } from '@/store/gameSettings'
 import { useGameStore } from '@/store/gameStore'
 import { useAdsStore } from '@/store/adsStore'
 
 import HeadMain from '@/components/HeadMain.vue'
-import BoardTable from '@/components/BoardTable.vue'
 import ResultTable from '@/components/ResultTable.vue'
 
 import Admob from '@/utils/admob'
+import { getRandomInt } from '@/utils/helpers'
 
-const gameSettings = useGameSettings()
-const { currentLevel, curGameStat, updateGameStat, reload, gameType } = toRefs(
-	useGameStore()
-)
+interface ISign {
+	sign: string
+	state: boolean
+}
+
+type IExpresstion = ISign[]
+
+type IExpresstionOption = {
+	value: IExpresstion
+	complexity: number
+	suggests: string[]
+}
+
+const { restore, selectLevel, currentLevel, updateGameStat, gameType } = toRefs(useGameStore())
 const adsStore = useAdsStore()
 const { playAudio } = useAudio()
 
-const game = ref<Game>()
-const possibleMoves = ref<number[][]>([])
-const isTimeEnd = ref(false)
-const board = reactive<{ value: TypeBoard | null }>({
-	value: null,
+const COUNT = 3
+const expresstions = ref<IExpresstionOption[]>([])
+const solved = ref<{ [key: number]: boolean }>({})
+const score = ref(0)
+const mySwiper = ref()
+const selectedSymbol = ref(0)
+const timeouts: { [key: number]: ReturnType<typeof setTimeout> } = {}
+
+const currentExpresstion = computed(() => {
+	return mySwiper.value?.$el.swiper.activeIndex || 0
 })
-const horsePos = ref([0, 0])
-
-const pillCounts = computed(() => {
-	return game.value?.board?.board?.reduce((acc, r) => {
-		acc += r.reduce((acc2, c) => {
-			if (c.type === BOARD_ITEM.pill) {
-				acc2 += 1
-			}
-
-			return acc2
-		}, 0)
-		return acc
-	}, 0)
+const getCurrentExpresstion = computed(() => {
+	return expresstions.value[currentExpresstion.value]
 })
-
+const getCurrentExpresstionValue = computed(() => {
+	return getCurrentExpresstion.value?.value
+})
+const getSuggests = computed(() => getCurrentExpresstion.value?.suggests)
+const allSolved = computed(() => {
+	return Object.values(solved.value).length === expresstions.value?.length
+})
 const isFirstType = computed(() => {
-	return gameType.value === GAME_TYPES.COLLECT_ALL
+	return gameType.value === GAME_TYPES.CLASSIC
 })
-
 const isSecondType = computed(() => {
-	return gameType.value === GAME_TYPES.NO_WAY_BACK
+	return gameType.value === GAME_TYPES.FOR_SCORE
 })
-
-const isThirdType = computed(() => {
-	return gameType.value === GAME_TYPES.BY_TIME
+const getCurrentLevel = computed(() => {
+	return LEVELS.find((level) => level.id === currentLevel.value)
 })
-
-const isGameEnd = computed(() => {
-	if (isFirstType.value) {
-		return !pillCounts.value
-	} else if (isSecondType.value) {
-		console.log('possibleMoves', !possibleMoves.value?.length)
-		return !possibleMoves.value?.length
-	} else if (isThirdType.value) {
-		return isTimeEnd.value
+const getExpressionFunc = computed<(opt: any) => string[]>(() => {
+	if (gameType.value === GAME_TYPES.CLASSIC) {
+		return getCurrentLevel.value?.generate || (() => [])
 	}
+	return generateAll
+})
+const isGameEnd = ref(false)
+
+watch(() => currentLevel.value, () => {
+	isGameEnd.value = false
+	mySwiper.value?.$el.swiper.slideTo(0)
+	initLevel()
 })
 
 watch(
-	() => gameSettings.showPossibleMoves,
-	() => {
-		updatePossibleMoves()
-	}
-)
-
-watch(
-	() => currentLevel.value,
-	() => {
-		initGame()
-	},
-	{
-		immediate: true,
+	() => currentExpresstion.value,
+	(curValue, prevValue) => {
+		selectedSymbol.value = 0
+		moveSelectedSymbol()
+		if (isSecondType.value && curValue !== 0) {
+			expresstions.value.push(addToExpArr(expresstions.value.length))
+			if (prevValue < curValue && !solved.value[prevValue]) {
+				score.value -= getCurrentExpresstion.value.complexity
+				updateGameStat.value(['score'], {
+					score: score.value,
+				})
+			}
+		}
 	}
 )
 
@@ -106,134 +107,285 @@ onMounted(async () => {
 				adsStore.bannerInit()
 			}
 		}
+
+		initLevel()
 	} catch (error: any) {
 		// console.log(error)
 	}
 })
 
 onBeforeUnmount(() => {
-	if (import.meta.env.VITE_APP_MODE !== 'TEST') {
-		Admob.hideBanner()
-	}
+	if (import.meta.env.VITE_APP_MODE !== 'TEST') Admob.hideBanner()
+	clearTimeOuts()
 })
 
-function updatePossibleMoves() {
-	possibleMoves.value =
-		game.value?.horses[0]
-			.getPossibleMoves()
-			.filter((p) =>
-				isSecondType.value
-					? board.value && board.value[p[0]][p[1]].type === BOARD_ITEM.pill
-					: true
-			) || []
+function levelSolved() {
+	isGameEnd.value = true
 }
 
-function move({ row, col }: { row: number; col: number }) {
-	const is_coin = isCoin(game.value?.board?.board as TypeBoard, [row, col])
-	const isMoved = game.value?.move(row, col, !isSecondType.value)
+function expresstionSolved() {
+	const nextInd = setNextExpression()
+	if (nextInd !== undefined) {
+		mySwiper.value?.$el.swiper.slideTo(nextInd)
+	}
+}
 
-	if (isMoved) {
-		board.value = game.value?.board?.board?.map((r) => r) || []
-		horsePos.value = [...(game.value?.horses[0]?.currentPos || [0, 0])]
-		updatePossibleMoves()
-		if (is_coin) {
-			playAudio('pickupCoin')
+function numSums(expressionValue: IExpresstion, hidedSymbols: string[]) {
+	let sum = 0
+	expressionValue.forEach((e) => {
+		if (!isNaN(+e.sign)) sum += +e.sign
+	})
+	hidedSymbols.forEach((e) => {
+		if (!isNaN(+e)) sum += +e
+	})
+	return Math.floor(sum / 2)
+}
+
+function setSuggests(hidedSymbols: string[], expressionValue: IExpresstion) {
+	const addSymb = []
+	const count = 8 - hidedSymbols.length
+	for (let i = 0; i < count; i += 1) {
+		const prb = Math.random()
+
+		if (prb > 0.5) {
+			addSymb.push(SIGNS[getRandomInt(SIGNS.length - 1)])
 		} else {
-			playAudio('move')
+			addSymb.push(String(getRandomInt(numSums(expressionValue, hidedSymbols))))
 		}
+	}
+	return addSymb.concat(hidedSymbols || [])
+}
 
-		if (curGameStat.value) {
-			if (isThirdType.value) {
-				if (is_coin) {
-					if (!game.value) return
-					game.value.board.setCoin()
-					board.value = game.value?.board?.board
-					updateGameStat.value(['moves'], {
-						moves: curGameStat.value.moves + 1,
-					})
-				}
+function selectSymbolValue(value: string) {
+	getCurrentExpresstionValue.value[selectedSymbol.value].sign = value
+
+	const nextSymbol = moveSelectedSymbol()
+	if (nextSymbol === -1) {
+		const isRight = checkExpression()
+		if (isRight) {
+			if (!solved.value[currentExpresstion.value]) {
+				score.value += getCurrentExpresstion.value.complexity
+			}
+			solved.value[currentExpresstion.value] = true
+
+			if (allSolved.value) {
+				levelSolved()
 			} else {
-				updateGameStat.value(['moves'], { moves: curGameStat.value.moves + 1 })
+				updateGameStat.value(['score'], {
+					score: score.value,
+				})
+				expresstionSolved()
 			}
 		}
-	} else {
-		// console.log('wrong move!!!')
 	}
 }
 
-function initGame() {
-	let boardInit: TypeBoard
+function setNextExpression() {
+	let i = currentExpresstion.value
+	let nextInd
 
-	if (isThirdType.value) {
-		boardInit = clearBoard(
-			copyArray(LEVELS[currentLevel.value || 0].board) as TypeBoard
-		)
-	} else {
-		boardInit = copyArray(LEVELS[currentLevel.value || 0].board) as TypeBoard
+	while (nextInd === undefined && i < expresstions.value.length) {
+		if (!solved.value[i]) {
+			nextInd = i
+		}
+		i += 1
+	} 
+
+	if (!nextInd) {
+		i = -1
+
+		do {
+			i += 1
+			if (!solved.value[i]) nextInd = i
+		} while (solved.value[i] && i < currentExpresstion.value)
+	}
+	return nextInd
+}
+
+function checkExpression(): boolean {
+	return (
+		getCurrentExpresstionValue.value &&
+		evaluateExpression(getCurrentExpresstionValue.value.map((s) => s.sign)) !==
+			null
+	)
+}
+
+function selectSymbol(symbol: ISign, symbolInd: number) {
+	if (symbol.state) return
+	selectedSymbol.value = symbolInd
+}
+
+function moveSelectedSymbol() {
+	const findedIndex = getCurrentExpresstionValue.value.findIndex(
+		(symbol, symbolIndex) => {
+			return !symbol.sign && symbolIndex >= selectedSymbol.value
+		}
+	)
+
+	if (findedIndex > -1) {
+		selectedSymbol.value = findedIndex
+
+		return findedIndex
 	}
 
-	horsePos.value = copyArray(LEVELS[currentLevel.value || 0].horsePos)
-	board.value = boardInit
-	game.value = new Game({
-		board: boardInit,
-		horsePos: [horsePos.value],
-		usersCount: 1,
+	const iterFindedIndex = getCurrentExpresstionValue.value.findIndex(
+		(symbol) => !symbol.sign
+	)
+
+	if (iterFindedIndex > -1) {
+		selectedSymbol.value = iterFindedIndex
+
+		return iterFindedIndex
+	}
+
+	return -1
+}
+
+function initLevel() {
+	solved.value = {}
+	score.value = 0
+	selectedSymbol.value = 0
+	restore.value()
+	isGameEnd.value = false
+	generate()
+	moveSelectedSymbol()
+}
+
+function addToExpArr(i: number) {
+	const expression = getExpressionFunc.value(
+		gameType.value === GAME_TYPES.CLASSIC ? getMaxNum(i) : SIGNS.slice(0, 2)
+	)
+	const [hiddensCount, transformedExpression, hidedSymbols] =
+		transformExpresstion(expression)
+	const expressionComplexity = calcExpComplexity(expression, hiddensCount)
+
+	return {
+		value: transformedExpression,
+		complexity: expressionComplexity,
+		suggests: setSuggests(hidedSymbols, transformedExpression),
+	}
+}
+
+function generate() {
+	for (let i = 0; i < COUNT; i++) {
+		if (i < 5) expresstions.value[i] = addToExpArr(i)
+		else {
+			timeouts[i] = setTimeout(() => {
+				expresstions.value[i] = addToExpArr(i)
+				delete timeouts[i]
+			}, i * 50)
+		}
+	}
+}
+
+function clearTimeOuts() {
+	Object.values(timeouts).forEach((timeId) => clearTimeout(timeId))
+}
+
+function getMaxNum(index: number) {
+	if (index < 10) return 10
+	else if (index < 20) return 50
+	else if (index < 30) return 100
+	return 200
+}
+
+function transformExpresstion(
+	expression: string[]
+): [number, ISign[], string[]] {
+	const hiddensCount = getRandomInt(1, Math.floor(expression.length * 0.5))
+	const hidedSymbols: string[] = []
+	const expresstionArray = expression?.map((symbol) => {
+		return {
+			sign: symbol,
+			state: true,
+		}
 	})
-
-	if (isThirdType.value) game.value.board.setCoin()
-
-	updatePossibleMoves()
+	for (let i = 0; i < hiddensCount; i += 1) {
+		const symbolIndex = getRandomInt(0, expression.length - 1)
+		hidedSymbols.push(expresstionArray[symbolIndex].sign)
+		expresstionArray[symbolIndex] = {
+			sign: '',
+			state: false,
+		}
+	}
+	return [hiddensCount, expresstionArray, hidedSymbols]
 }
 
-function clearBoard(board: TypeBoard) {
-	return board.map((row) =>
-		row.map((col) => {
-			if ((col.type = BOARD_ITEM.pill)) col.type = BOARD_ITEM.cell
-
-			return col
-		})
-	)
-}
-
-function isCoin(board: TypeBoard, point: [number, number]): boolean {
-	if (
-		board[point[0]] &&
-		board[point[0]][point[1]] &&
-		board[point[0]][point[1]].type === BOARD_ITEM.pill
-	)
-		return true
-	return false
-}
-
-function reloadGame() {
-	isTimeEnd.value = false
-	initGame()
-	reload.value()
+function calcExpComplexity(expression: string[], hiddensCount: number): number {
+	let comp = hiddensCount * 2
+	SIGN_COMPLEXITY_ARR.forEach(([symbol, value]) => {
+		comp += expression.filter((e) => e === symbol).length * value
+	})
+	const eqIndex = expression.findIndex((i) => i === '=')
+	if (eqIndex > -1) {
+		comp += Math.floor(
+			Math.max(eqIndex, expression.length - eqIndex - 1) /
+				Math.min(eqIndex, expression.length - eqIndex - 1)
+		)
+	}
+	return comp
 }
 
 function timeend() {
-	isTimeEnd.value = true
+	updateGameStat.value(['score'], {
+		score: score.value,
+	})
+	isGameEnd.value = true
+}
+
+function reload() {
+	selectLevel.value(currentLevel.value)
+	mySwiper.value?.$el.swiper.slideTo(0)
+	initLevel()
 }
 </script>
 
 <template>
 	<HeadMain :isGameEnd="isGameEnd" :settings="true" @timeend="timeend" />
-	<div class="page playground-page">
+	<div class="view-page playground-page">
 		<div v-if="isGameEnd" class="playground-page__overlay">
-			<ResultTable
-				class="playground-page__table"
-				:showTime="isFirstType"
-				@reload="reloadGame"
-			/>
+			<ResultTable :show-time="isFirstType" @reload="reload" />
 		</div>
-		<BoardTable
-			v-if="!adsStore.loading && board.value"
-			:board="board.value"
-			:possibleMoves="possibleMoves"
-			:horsePos="horsePos"
-			:canToBack="!isSecondType"
-			@move="move"
-		/>
+
+		<Swiper
+			ref="mySwiper"
+			class="swiper"
+			:slidePerView="1"
+			:speed="500"
+			:direction="'horizontal'"
+		>
+			<SwiperSlide
+				v-for="(expresstion, expresstionInd) in expresstions"
+				:key="expresstionInd"
+			>
+				<div class="expression">
+					<div
+						v-for="(symbol, symbolInd) in expresstion.value"
+						:key="symbolInd"
+						class="expression__sign"
+						:class="{
+							'expression__sign--empty': !symbol.state,
+							'expression__sign--active': selectedSymbol === symbolInd,
+						}"
+						@click="selectSymbol(symbol, symbolInd)"
+					>
+						{{ symbol.sign }}
+					</div>
+				</div>
+			</SwiperSlide>
+		</Swiper>
+
+		<div class="suggests">
+			<div
+				v-for="(suggest, suggestInd) in getSuggests"
+				:key="suggestInd"
+				class="suggests__sign"
+				@click="selectSymbolValue(String(suggest))"
+			>
+				{{ String(suggest) }}
+			</div>
+		</div>
+
 		<div v-if="adsStore.loading" class="loading">
 			<span>L</span>
 			<span>o</span>
@@ -253,6 +405,7 @@ function timeend() {
 .playground-page {
 	position: relative;
 	overflow: visible;
+	color: #000;
 
 	&__overlay {
 		position: fixed;
@@ -341,5 +494,56 @@ function timeend() {
 	100% {
 		opacity: 1;
 	}
+}
+
+.expression {
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: 15px;
+	padding: 15px 35px;
+
+	&__sign {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		border-bottom: 1px solid dark;
+		padding: 5px 10px 10px;
+		cursor: pointer;
+		font-size: 54px;
+		font-weight: 900;
+
+		&--empty {
+			border-bottom: 1px solid green;
+			color: green;
+		}
+
+		&--active {
+			border-bottom: 1px solid red;
+			color: red;
+		}
+	}
+}
+
+.suggests {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 15px;
+	padding: 15px 35px;
+
+	&__sign {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+		padding: 5px 10px 10px;
+		cursor: pointer;
+		background: #a1a1a1;
+		color: #000;
+		font-weight: 700;
+	}
+}
+
+.swiper {
+	width: 100%;
 }
 </style>

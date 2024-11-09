@@ -1,81 +1,203 @@
-import levels from './levels'
+import { generateMathEquation } from './helpers'
 
-export type GAME_TYPE = 'COLLECT_ALL' | 'NO_WAY_BACK' | 'BY_TIME'
+export type GAME_TYPE = 'CLASSIC' | 'FOR_SCORE'
+
+export type PagesType = 'START' | 'LEVELTYPES' | 'LEVELS' | 'PLAYGROUND'
+
+export type SIGNS_TYPES = '+' | '-' | '*' | '/' | '(' | ')' | '^' | '√' | 'log'
 
 export const GAME_TYPES: { [key in GAME_TYPE]: GAME_TYPE } = {
-	COLLECT_ALL: 'COLLECT_ALL',
-	NO_WAY_BACK: 'NO_WAY_BACK',
-	BY_TIME: 'BY_TIME',
+	CLASSIC: 'CLASSIC',
+	FOR_SCORE: 'FOR_SCORE',
 }
-
-export type PagesType =
-	| 'START'
-	| 'LEVELS'
-	| 'PLAYGROUND'
-	| 'LEVELDRAW'
-	| 'LEVELTYPES'
 
 export const PAGES: { [key in PagesType]: PagesType } = {
 	START: 'START',
+	LEVELTYPES: 'LEVELTYPES',
 	LEVELS: 'LEVELS',
 	PLAYGROUND: 'PLAYGROUND',
-	LEVELDRAW: 'LEVELDRAW',
-	LEVELTYPES: 'LEVELTYPES',
 }
 
-export const LEVELS = levels
+export const PAGES_CONST: { [key in PagesType]: number } = {
+	START: 0,
+	LEVELTYPES: 2,
+	LEVELS: 4,
+	PLAYGROUND: 6,
+}
 
-export const GAME_SETTINGS = [
-	{
-		id: 0,
-		board1: '#2156d6',
-		board2: '#2156d6',
-		bodyBg:
-			'radial-gradient(circle, rgba(83, 101, 210, 1) 0%, rgba(3, 34, 110, 1) 100%)',
-		boardBorder: '#192363',
-		horse: 'horse-1',
-		board: 'board-1',
-		coinBg:
-			'radial-gradient(circle, rgba(255,143,143,1) 0%, rgba(255,0,0,1) 36%, rgba(111,18,18,1) 76%)',
-		mainColor: '#2156d6',
-	},
+export const SIGNS: SIGNS_TYPES[] = [
+	'+',
+	'-',
+	'*',
+	'/',
+	'(',
+	')',
+	'^',
+	'√',
+	'log',
+]
+
+export const SIGN_COMPLEXITY: { [key in SIGNS_TYPES]: number } = {
+	'+': 1,
+	'-': 1,
+	'*': 2,
+	'/': 2,
+	')': 3,
+	'(': 0,
+	'^': 4,
+	'√': 5,
+	'log': 6,
+}
+
+export const SIGN_COMPLEXITY_ARR = Object.entries(SIGN_COMPLEXITY)
+
+export const SIGNS_DEF = {
+	PLUS: SIGNS[0],
+	MINUS: SIGNS[1],
+	MULTI: SIGNS[2],
+	DIVIDE: SIGNS[3],
+	LEFT_BRACK: SIGNS[4],
+	RIGTH_BRACK: SIGNS[5],
+	POWER: SIGNS[6],
+	ROOT: SIGNS[7],
+	LOG: SIGNS[8],
+}
+
+export const LEVELS = [
 	{
 		id: 1,
-		board1: '#E47702',
-		board2: '#E47702',
-		bodyBg:
-			'radial-gradient(circle, rgba(83, 101, 210, 1) 0%, rgba(3, 34, 110, 1) 100%)',
-		boardBorder: '#713f09',
-		horse: 'horse-2',
-		board: 'board-2',
-		coinBg:
-			'radial-gradient(circle, rgba(132,168,255,1) 0%, rgba(33,86,214,1) 46%, rgba(16,50,133,1) 73%)',
-		mainColor: '#E47702',
+		title: 'Simple Arithmetic',
+		description: '',
+		generate(numMax: number = 10) {
+			return generateMathEquation(['+', '-'], ['+', '-'], {
+				allowDecimals: false,
+				decimalProbability: 0.2,
+				numMax: numMax,
+			})
+		},
 	},
 	{
 		id: 2,
-		board1: '#FA3C3C',
-		board2: '#FA3C3C',
-		bodyBg:
-			'radial-gradient(circle, rgba(83, 101, 210, 1) 0%, rgba(3, 34, 110, 1) 100%)',
-		boardBorder: '#c10202',
-		horse: 'horse-3',
-		board: 'board-3',
-		coinBg:
-			'radial-gradient(circle, rgba(79,235,113,1) 0%, rgba(20,120,42,1) 46%, rgba(20,120,42,1) 73%)',
-		mainColor: '#FA3C3C',
+		title: 'Multiplication',
+		description: '',
+		generate(numMax: number = 10) {
+			return generateMathEquation(['*'], ['+', '-'], {
+				allowDecimals: false,
+				decimalProbability: 0.2,
+				numMax: numMax,
+			})
+		},
 	},
 	{
 		id: 3,
-		board1: '#14782A',
-		board2: '#14782A',
-		bodyBg:
-			'radial-gradient(circle, rgba(83, 101, 210, 1) 0%, rgba(3, 34, 110, 1) 100%)',
-		boardBorder: '#00c72b',
-		horse: 'horse-4',
-		board: 'board-4',
-		coinBg:
-			'radial-gradient(circle, rgba(255,194,129,1) 0%, rgba(228,119,2,1) 46%, rgba(131,73,11,1) 73%)',
-		mainColor: '#14782A',
+		title: 'Division',
+		description: '',
+		generate(numMax: number = 10) {
+			return generateMathEquation(['/'], ['+', '-'], {
+				allowDecimals: false,
+				decimalProbability: 0.5,
+				numMax: numMax,
+			})
+		},
+	},
+	{
+		id: 4,
+		title: 'Brackets',
+		description: '',
+		generate(numMax: number = 10) {
+			return generateMathEquation(['(', ')'], ['+', '-', '*', '/'], {
+				allowDecimals: false,
+				decimalProbability: 0.5,
+				numMax: numMax,
+			})
+		},
+	},
+	{
+		id: 5,
+		title: 'Degree',
+		description: '',
+		generate(numMax: number = 10) {
+			return generateMathEquation(['^'], ['+', '-', '*', '/', '(', ')'], {
+				allowDecimals: false,
+				decimalProbability: 0.5,
+				numMax: numMax,
+			})
+		},
+	},
+	{
+		id: 6,
+		title: 'Root',
+		description: '',
+		generate(numMax: number = 10) {
+			return generateMathEquation(['√'], ['+', '-', '*', '/', '(', ')', '^'], {
+				allowDecimals: false,
+				decimalProbability: 0.5,
+				numMax: numMax,
+			})
+		},
+	},
+	{
+		id: 7,
+		title: 'Fractional numbers',
+		description: '',
+		generate(numMax: number = 10) {
+			return generateMathEquation(
+				['+', '-'],
+				['+', '-', '*', '/', '(', ')', '^', '√'],
+				{
+					allowDecimals: true,
+					decimalProbability: 0.5,
+					numMax: numMax,
+				}
+			)
+		},
+	},
+	{
+		id: 8,
+		title: 'Logarithms',
+		description: '',
+		generate(numMax: number = 10) {
+			return generateMathEquation(
+				['log'],
+				['+', '-', '*', '/', '(', ')', '^', '√'],
+				{
+					allowDecimals: false,
+					decimalProbability: 0.5,
+					numMax: numMax,
+				}
+			)
+		},
+	},
+	{
+		id: 9,
+		title: 'Complex polysemous expressions',
+		description: '',
+		generate(numMax: number = 10) {
+			return generateMathEquation(
+				['log'],
+				['+', '-', '*', '/', '(', ')', '^', '√'],
+				{
+					allowDecimals: true,
+					decimalProbability: 0.5,
+					numMax: numMax,
+				}
+			)
+		},
+	},
+	{
+		id: 10,
+		title: 'Expert mode',
+		description: '',
+		generate(numMax: number = 10) {
+			return generateMathEquation(
+				['log', '^', '√', '(', ')'],
+				['+', '-', '*', '/', '(', ')', '^', '√', 'log'],
+				{
+					allowDecimals: true,
+					decimalProbability: 0.5,
+					numMax: numMax,
+				}
+			)
+		},
 	},
 ]

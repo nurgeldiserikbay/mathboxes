@@ -11,44 +11,34 @@ const { routeTo } = usePageStore()
 
 function clickOnType(type: GAME_TYPE) {
 	gameStore.setGameType(type)
+
+	if (type === GAME_TYPES.FOR_SCORE) {
+		return routeTo(PAGES.PLAYGROUND)
+	}
+
 	routeTo(PAGES.LEVELS)
 }
 </script>
 
 <template>
 	<HeadMain :settings="false" />
-	<div class="page level-types-page">
+	<div class="view-page level-types-page">
 		<div class="level-types">
 			<div class="level-type">
 				<button
 					class="level-type__title"
-					@click="clickOnType(GAME_TYPES.COLLECT_ALL)"
+					@click="clickOnType(GAME_TYPES.CLASSIC)"
 				>
 					<span>Classic</span>
 				</button>
-				<div class="level-type__desc">
-					Need to collect all the pills and open level by level
-				</div>
 			</div>
 			<div class="level-type">
 				<button
 					class="level-type__title"
-					@click="clickOnType(GAME_TYPES.NO_WAY_BACK)"
+					@click="clickOnType(GAME_TYPES.FOR_SCORE)"
 				>
-					<span>No way back</span>
+					<span>For Score</span>
 				</button>
-				<div class="level-type__desc">
-					Need to collect all the pills. Previous tiles will disappear
-				</div>
-			</div>
-			<div class="level-type">
-				<button
-					class="level-type__title"
-					@click="clickOnType(GAME_TYPES.BY_TIME)"
-				>
-					<span>For Time</span>
-				</button>
-				<div class="level-type__desc">Collect the pills in the given time</div>
 			</div>
 		</div>
 	</div>

@@ -9,23 +9,22 @@
 					<span>Time:</span>
 					<span>{{ gameStore.curGameStat.time }}</span>
 				</div>
-				<div class="result-table__move">
-					<span v-if="showTime">Moves:</span>
-					<span v-else>Pills:</span>
+				<div v-else class="result-table__move">
+					<span>Score:</span>
 					<span v-if="gameStore.curGameStat">{{
-						gameStore.curGameStat.moves
+						gameStore.curGameStat.score
 					}}</span>
 				</div>
 			</div>
 			<div class="result-table__controls">
-				<button class="btn result-table__menu" @click="routeTo(PAGES.LEVELS)">
+				<button class="btn result-table__menu" @click="routeTo(showTime ? PAGES.LEVELS : PAGES.LEVELTYPES)">
 					<IconMenu />
 				</button>
 				<button class="btn result-table__reload" @click="reload">
 					<IconReload />
 				</button>
 				<button
-					v-if="nextLevel !== undefined"
+					v-if="showTime && nextLevel !== undefined"
 					class="btn result-table__next"
 					@click="next"
 				>

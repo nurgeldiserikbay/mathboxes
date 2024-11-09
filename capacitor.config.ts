@@ -1,8 +1,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.thelightcome.chessknightpuzzles',
-  appName: 'Chess Knight Puzzles',
+  appId: 'com.thelightcome.mathpuzzle',
+  appName: 'Math Puzzle',
   webDir: 'docs',
   server: {
     androidScheme: 'https'

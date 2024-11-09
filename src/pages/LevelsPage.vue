@@ -12,7 +12,7 @@ const { routeTo } = usePageStore()
 const { gameType, gameStats, selectLevel } = useGameStore()
 
 const isLevelActive = computed(() => (level: number) => {
-	return level === 0 || gameStats[GAME_TYPES.COLLECT_ALL][level - 1]
+	return level === 1 || gameStats[GAME_TYPES.CLASSIC][level - 1]
 })
 
 const modalActive = ref(false)
@@ -38,7 +38,7 @@ onBeforeUnmount(() => {
 
 <template>
 	<HeadMain :settings="false" />
-	<div class="page levels-page">
+	<div class="view-page levels-page">
 		<div v-show="modalActive" class="levels-page__modal">
 			This level has not yet been opened. You must complete the previous level
 			in classic
@@ -46,35 +46,22 @@ onBeforeUnmount(() => {
 		<div class="levels-page__list">
 			<button
 				v-for="level in LEVELS"
-				:key="level.level"
+				:key="level.id"
 				class="levels-page__item level"
-				:class="{ 'level--disaled': !isLevelActive(level.level) }"
-				@click="clickLevel(level.level)"
+				:class="{ 'level--disaled': !isLevelActive(level.id) }"
+				@click="clickLevel(level.id)"
 			>
-				<div class="level__img">
-					<span class="level__row level__row--level">{{
-						level.level + 1
-					}}</span>
-					<!-- <img :src="`./img/levels/${level.img}.png`" alt="" /> -->
-				</div>
 				<div class="level__info">
-					<span class="level__row level__row--level">{{
-						level.level + 1
-					}}</span>
+					<span class="level__row level__row--level">{{ level.id }}</span>
 					<div
-						v-if="gameType && gameStats[gameType][level.level]"
+						v-if="gameType && gameStats[gameType][level.id]"
 						class="level__stat"
 					>
 						<span
-							v-if="gameType === GAME_TYPES.COLLECT_ALL"
+							v-if="gameType === GAME_TYPES.CLASSIC"
 							class="level__row level__row--small"
 							><span>Time:</span
-							><span>{{ gameStats[gameType][level.level].time }}</span></span
-						>
-						<span class="level__row level__row--small">
-							<span v-if="gameType === GAME_TYPES.COLLECT_ALL">Moves:</span>
-							<span v-else>Pills:</span>
-							<span>{{ gameStats[gameType][level.level].moves }}</span></span
+							><span>{{ gameStats[gameType][level.id].time }}</span></span
 						>
 					</div>
 				</div>
@@ -100,7 +87,11 @@ onBeforeUnmount(() => {
 		max-width: 280px;
 		color: #fff;
 		padding: 12px 25px;
-		background: radial-gradient(circle, rgb(210, 45, 59) 0%, rgb(237, 30, 30) 60%);
+		background: radial-gradient(
+			circle,
+			rgb(210, 45, 59) 0%,
+			rgb(237, 30, 30) 60%
+		);
 		box-sizing: border-box;
 
 		@media screen and (max-width: $media-phone) {

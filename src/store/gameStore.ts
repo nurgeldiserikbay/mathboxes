@@ -1,12 +1,12 @@
-import { ref, computed, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { Preferences } from '@capacitor/preferences'
 
-import { LEVELS, GAME_TYPE, GAME_TYPES } from '@/utils/conts'
+import { GAME_TYPE, GAME_TYPES, LEVELS } from '@/utils/conts'
 
 export interface IGameStat {
-	time: string
-	moves: number
+	time?: string
+	score?: number
 	date: string
 }
 
@@ -16,25 +16,19 @@ export type IGameStats = {
 
 export const useGameStore = defineStore('GameStore', () => {
 	const gameType = ref<GAME_TYPE | null>(null)
-	const currentLevel = ref(LEVELS[0]?.level || 0)
+	const currentLevel = ref(0)
 	const curGameStat = ref<IGameStat>({
 		time: '',
-		moves: 0,
+		score: 0,
 		date: '',
 	})
 	const gameStats = ref<IGameStats>({
-		[GAME_TYPES.COLLECT_ALL]: {},
-		[GAME_TYPES.NO_WAY_BACK]: {},
-		[GAME_TYPES.BY_TIME]: {},
+		[GAME_TYPES.CLASSIC]: {},
+		[GAME_TYPES.FOR_SCORE]: {},
 	})
 
 	const nextLevel = computed(() => {
-		if (
-			gameType.value !== GAME_TYPES.COLLECT_ALL &&
-			!gameStats.value[GAME_TYPES.COLLECT_ALL][currentLevel.value]
-		)
-			return
-		return LEVELS[currentLevel.value + 1]?.level
+		return LEVELS.find((level) => level.id === currentLevel.value + 1)?.id
 	})
 
 	watch(
@@ -57,7 +51,7 @@ export const useGameStore = defineStore('GameStore', () => {
 
 		curGameStat.value = {
 			time: '',
-			moves: 0,
+			score: 0,
 			date: '',
 		}
 	}
@@ -89,6 +83,14 @@ export const useGameStore = defineStore('GameStore', () => {
 		selectLevel(currentLevel.value)
 	}
 
+	function restore() {
+		curGameStat.value = {
+			time: '',
+			score: 0,
+			date: '',
+		}
+	}
+
 	async function loadData() {
 		const ret = await Preferences.get({ key: 'gameStats' })
 
@@ -100,7 +102,6 @@ export const useGameStore = defineStore('GameStore', () => {
 	return {
 		gameType,
 		setGameType,
-		nextLevel,
 		currentLevel,
 		selectLevel,
 		curGameStat,
@@ -109,5 +110,7 @@ export const useGameStore = defineStore('GameStore', () => {
 		reload,
 		gameStats,
 		loadData,
+		nextLevel,
+		restore,
 	}
 })

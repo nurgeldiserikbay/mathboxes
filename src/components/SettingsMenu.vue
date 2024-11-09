@@ -30,43 +30,6 @@
 								/>
 							</div>
 						</div>
-						<div class="settings-menu__option settings-menu__option--row">
-							<div class="settings-menu__option-title">Show possible moves</div>
-							<div class="settings-menu__option-body">
-								<UiToggle
-									:modelValue="gameSettings.showPossibleMoves"
-									@update:modelValue="gameSettings.toggleShowPossibleMoves"
-								/>
-							</div>
-						</div>
-						<div class="settings-menu__option settings-menu__option--row">
-							<div class="settings-menu__option-title">Knight</div>
-							<div class="settings-menu__option-body">
-								<img :src="getHorseImage" alt="knight" class="horse" />
-								<UiToggle
-									:modelValue="isWhiteKnigt"
-									@update:modelValue="gameSettings.toggleHorseColor"
-								/>
-							</div>
-						</div>
-						<div class="settings-menu__option">
-							<div class="settings-menu__option-title">Themes</div>
-							<div class="settings-menu__option-body">
-								<button
-									v-for="setting in GAME_SETTINGS"
-									:key="setting.id"
-									class="theme"
-									:class="{
-										'theme--active':
-											setting.id === gameSettings.getGameSettings.id,
-									}"
-									:style="{
-										background: `${setting.board1}`,
-									}"
-									@click="selectTheme(setting.id)"
-								></button>
-							</div>
-						</div>
 					</div>
 				</div>
 			</div>
@@ -82,28 +45,11 @@ import IconClose from '@/assets/img/close.svg'
 
 import UiToggle from '@/components/UiToggle.vue'
 
-import { useGameSettings } from '@/store/gameSettings'
-
 import { useAudio } from '@/composables/useAudio'
 
-import { GAME_SETTINGS } from '@/utils/conts'
-
-const gameSettings = useGameSettings()
 const { audioActive, toggleAudio } = useAudio()
 
 const isActive = ref(false)
-
-const isWhiteKnigt = computed(() => {
-	return gameSettings.horseColor === 'white'
-})
-
-const getHorseImage = computed(() => {
-	return `./img/board/${gameSettings.getGameSettings.horse}-${gameSettings.horseColor}.png`
-})
-
-function selectTheme(id: number) {
-	gameSettings.setGameSettings(id)
-}
 </script>
 
 <style lang="scss" scoped>

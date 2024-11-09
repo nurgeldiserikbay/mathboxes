@@ -1,14 +1,13 @@
 <template>
 	<div class="score-table">
-		<div v-if="!isSecondType" class="score-table__time">
+		<div class="score-table__time">
 			<span>Time:</span>
 			<span class="score-table__time-value">{{ timeValue }}</span>
 		</div>
-		<div class="score-table__move">
-			<span v-if="isFirstType">Moves:</span>
-			<span v-else>Pills:</span>
+		<div v-if="isSecondType" class="score-table__move">
+			<span>Score:</span>
 			<span v-if="gameStore.curGameStat">{{
-				gameStore.curGameStat.moves
+				gameStore.curGameStat.score
 			}}</span>
 		</div>
 	</div>
@@ -44,34 +43,35 @@ const date = ref(0)
 const timeValue = ref('')
 
 const isFirstType = computed(() => {
-	return gameStore.gameType === GAME_TYPES.COLLECT_ALL
+	return gameStore.gameType === GAME_TYPES.CLASSIC
 })
 
 const isSecondType = computed(() => {
-	return gameStore.gameType === GAME_TYPES.NO_WAY_BACK
+	return gameStore.gameType === GAME_TYPES.FOR_SCORE
 })
 
-const isThirdType = computed(() => {
-	return gameStore.gameType === GAME_TYPES.BY_TIME
-})
+watch(
+	() => gameStore.curGameStat.score,
+	(curState, oldState) => {
+		if (isSecondType.value && curState > oldState) date.value += 50
+	}
+)
 
 watch(
 	() => gameStore.curGameStat,
 	() => {
-		if (!isSecondType.value) {
-			setTimerStart()
-			if (import.meta.env.VITE_APP_MODE !== 'TEST') {
-				adsStore.toggleLoading(true)
-				Admob.interstitial({
-					isFirst: false,
-					onInterstitialAdClosed: () => {
-						adsStore.toggleLoading(false)
-						createTimer()
-					},
-				})
-			} else {
-				createTimer()
-			}
+		setTimerStart()
+		if (import.meta.env.VITE_APP_MODE !== 'TEST') {
+			adsStore.toggleLoading(true)
+			Admob.interstitial({
+				isFirst: false,
+				onInterstitialAdClosed: () => {
+					adsStore.toggleLoading(false)
+					createTimer()
+				},
+			})
+		} else {
+			createTimer()
 		}
 	},
 	{ immediate: true }
@@ -90,7 +90,7 @@ watch(
 watch(
 	() => date.value,
 	() => {
-		if (isThirdType.value && date.value === 0) {
+		if (isSecondType.value && date.value === 0) {
 			clearTimer()
 			$emits('timeend')
 		}
@@ -102,7 +102,7 @@ onBeforeUnmount(() => {
 })
 
 function setTimerStart() {
-	if (isThirdType.value) date.value = 300
+	if (isSecondType.value) date.value = 300
 	else date.value = 0
 	setTimerValue()
 }
@@ -110,7 +110,7 @@ function setTimerStart() {
 function createTimer() {
 	clearTimer()
 	timerId = setInterval(() => {
-		date.value += isThirdType.value ? -1 : 1
+		date.value += isSecondType.value ? -1 : 1
 		setTimerValue()
 
 		if ($props.isGameEnd) {
