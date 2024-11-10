@@ -85,8 +85,7 @@ export function generateMathEquation(
 		leftValue = evaluateExpression(leftExpressionParts)
 	}
 
-	let rightExpressionParts = [leftValue.toFixed(2).toString()]
-
+	let rightExpressionParts = [leftValue.toString()]
 	if (operators.length > 0) {
 		rightExpressionParts = createExpression(operators, allowDecimals, decimalProbability, numMax)
 		while (evaluateExpression(rightExpressionParts) !== leftValue) {
@@ -97,50 +96,10 @@ export function generateMathEquation(
 	return [...leftExpressionParts, '=', ...rightExpressionParts]
 }
 
-export function generateAll(signs = SIGNS) {
+export function generateAll(signs = SIGNS, numMax: number = 100) {
 	return generateMathEquation([], signs, {
-		allowDecimals: true,
+		allowDecimals: false,
 		decimalProbability: 0.3,
-		numMax: 100
+		numMax: numMax
 	})
 }
-
-// export function generateMathEquation(
-// 	requiredOperators: SIGNS_TYPES[],
-// 	optionalOperators: SIGNS_TYPES[],
-// 	options: {
-// 		allowDecimals: boolean
-// 		decimalProbability: number
-// 		numMax: number
-// 	} = {
-// 		allowDecimals: false,
-// 		decimalProbability: 0.5,
-// 		numMax: 1000,
-// 	}
-// ) {
-// 	const { allowDecimals, decimalProbability, numMax } = options
-// 	const operators = [
-// 		...new Set([...requiredOperators, ...optionalOperators]),
-// 	].filter((op) => SIGNS.includes(op))
-
-// 	const leftExpressionParts = createExpression(operators, allowDecimals, decimalProbability, numMax)
-// 	const leftValue = evaluateExpression(leftExpressionParts)
-
-// 	if (leftValue === null) {
-// 		return generateMathEquation(
-// 			requiredOperators,
-// 			optionalOperators,
-// 			allowDecimals
-// 		)
-// 	}
-
-// 	let rightExpressionParts: string[] = []
-// 	let rightValue = null
-
-// 	while (rightValue !== leftValue) {
-// 		rightExpressionParts = createExpression(operators, allowDecimals, decimalProbability, numMax)
-// 		rightValue = evaluateExpression(rightExpressionParts)
-// 	}
-
-// 	return [...leftExpressionParts, '=', ...rightExpressionParts]
-// }

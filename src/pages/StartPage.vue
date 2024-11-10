@@ -18,7 +18,7 @@ const { routeTo } = usePageStore()
 				>Privacy Policy</a
 			>
 		</div>
-		<button class="start-page__btn" @click="routeTo(PAGES.LEVELTYPES)">
+		<button class="start-page__btn" @click="routeTo(PAGES.LEVELS)">
 			<span>Start</span>
 		</button>
 	</div>
@@ -31,12 +31,6 @@ const { routeTo } = usePageStore()
 	justify-content: space-between;
 	align-items: center;
 	height: 100dvh;
-
-	&__head {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
 
 	&__logo {
 		position: absolute;

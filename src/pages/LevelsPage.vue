@@ -1,72 +1,47 @@
 <script lang="ts" setup>
 import { ref, computed, onBeforeUnmount } from 'vue'
 
-import { LEVELS, PAGES, GAME_TYPES } from '@/utils/conts'
-
-import HeadMain from '@/components/HeadMain.vue'
+import { LEVELS, PAGES } from '@/utils/conts'
 
 import { usePageStore } from '@/store/pageStore'
 import { useGameStore } from '@/store/gameStore'
 
 const { routeTo } = usePageStore()
-const { gameType, gameStats, selectLevel } = useGameStore()
+const { activeLevels, clickLevel, gameStats } = useGameStore()
 
-const isLevelActive = computed(() => (level: number) => {
-	return level === 1 || gameStats[GAME_TYPES.CLASSIC][level - 1]
+const isActive = computed(() => (level: number) => {
+	return activeLevels[level]
 })
-
-const modalActive = ref(false)
+const someActive = computed(() => {
+	return Object.values(activeLevels).length
+})
 let timerId: ReturnType<typeof setTimeout>
-
-function clickLevel(levelInd: number) {
-	if (!isLevelActive.value(levelInd)) {
-		modalActive.value = true
-		if (timerId) clearTimeout(timerId)
-		timerId = setTimeout(() => {
-			modalActive.value = false
-		}, 1500)
-	} else {
-		selectLevel(levelInd)
-		routeTo(PAGES.PLAYGROUND)
-	}
-}
-
-onBeforeUnmount(() => {
-	if (timerId) clearTimeout(timerId)
-})
 </script>
 
 <template>
-	<HeadMain :settings="false" />
 	<div class="view-page levels-page">
-		<div v-show="modalActive" class="levels-page__modal">
-			This level has not yet been opened. You must complete the previous level
-			in classic
-		</div>
+		<div class="levels-page__title">Select operators</div>
 		<div class="levels-page__list">
 			<button
 				v-for="level in LEVELS"
 				:key="level.id"
 				class="levels-page__item level"
-				:class="{ 'level--disaled': !isLevelActive(level.id) }"
+				:class="{ 'level--active': isActive(level.id) }"
 				@click="clickLevel(level.id)"
 			>
 				<div class="level__info">
-					<span class="level__row level__row--level">{{ level.id }}</span>
-					<div
-						v-if="gameType && gameStats[gameType][level.id]"
-						class="level__stat"
-					>
-						<span
-							v-if="gameType === GAME_TYPES.CLASSIC"
-							class="level__row level__row--small"
-							><span>Time:</span
-							><span>{{ gameStats[gameType][level.id].time }}</span></span
-						>
-					</div>
+					<span class="level__row level__row--level">{{ level.id + ')' }}</span>
+					<span class="level__row level__row--level">{{ level.title }}</span>
+					<span class="level__row level__row--level">{{ level.definition.join(', ') }}</span>
+				</div>
+				<div class="level__check">
+					<span>+</span>
 				</div>
 			</button>
 		</div>
+		<button v-if="someActive" class="levels-page__btn" @click="routeTo(PAGES.PLAYGROUND)">
+			<span>Play</span>
+		</button>
 	</div>
 </template>
 
@@ -75,48 +50,42 @@ onBeforeUnmount(() => {
 
 .levels-page {
 	position: relative;
+	padding-top: 35px;
 
-	&__modal {
-		position: fixed;
-		left: 50%;
-		bottom: 120px;
-		z-index: 1000;
+	&__title {
+		font-size: 24px;
 		text-align: center;
-		transform: translateX(-50%);
-		width: 90%;
-		max-width: 280px;
-		color: #fff;
-		padding: 12px 25px;
-		background: radial-gradient(
-			circle,
-			rgb(210, 45, 59) 0%,
-			rgb(237, 30, 30) 60%
-		);
-		box-sizing: border-box;
-
-		@media screen and (max-width: $media-phone) {
-			font-size: 12px;
-			padding: 8px 15px;
-			bottom: 80px;
-		}
+		margin-bottom: 20px;
 	}
 
 	&__list {
-		width: 100%;
 		display: flex;
-		justify-content: space-between;
-		flex-wrap: wrap;
-		gap: 25px;
-		align-items: stretch;
-		padding-bottom: 30px;
+		flex-direction: column;
+		justify-content: flex-start;
+		align-items: flex-start;
+		gap: 15px;
+	}
 
-		@media screen and (max-width: $media-tablet) {
-			gap: 15px;
-			justify-content: space-between;
-		}
+	&__btn {
+		position: absolute;
+		bottom: 0;
+		right: 0;
+		z-index: 1;
+		text-align: center;
+		cursor: pointer;
+		padding: 0;
+		border: 0;
+		outline: 0;
+		width: 66px;
+		height: 66px;
+		background: url('@/assets/img/paper-white-color.png') no-repeat center;
+		background-size: 100% 100%;
+		box-shadow: -5px -5px 10px 0 rgba(0, 0, 0, 0.1);
 
-		@media screen and (max-width: $media-phone) {
-			gap: 10px;
+		span {
+			display: block;
+			transform-origin: center;
+			transform: translate(-6px, -6px) rotateZ(-45deg);
 		}
 	}
 
@@ -124,120 +93,49 @@ onBeforeUnmount(() => {
 		position: relative;
 		box-sizing: border-box;
 		display: flex;
-		flex-direction: column;
-		justify-content: center;
+		justify-content: space-between;
 		align-items: center;
 		font-size: 1.2rem;
-		gap: 0.5rem;
+		gap: 25px;
 		cursor: pointer;
+		width: 100%;
+		box-sizing: border-box;
+		padding: 0 25px;
 		background: transparent;
 		border: none;
 		outline: none;
-		width: 25%;
-		aspect-ratio: 1;
-		padding: 0;
-
-		&--disaled {
-			cursor: auto;
-		}
-
-		@media screen and (max-width: $media-tablet) {
-			font-size: 1rem;
-			gap: 0.3rem;
-			width: 30%;
-		}
-
-		@media screen and (max-width: $media-phone) {
-			font-size: 0.8rem;
-			gap: 0.3rem;
-			width: 30%;
-		}
-
-		&:after {
-			content: '';
-			position: absolute;
-			left: 0;
-			top: 0;
-			bottom: 0;
-			right: 0;
-			z-index: -1;
-			background: rgba(0, 0, 0, 0.8);
-			opacity: 0;
-		}
-
-		&--disaled:after {
-			opacity: 1;
-		}
-
-		&__img {
-			position: relative;
-			max-width: 100%;
-			align-items: flex-start;
-			display: flex;
-
-			img {
-				max-width: 50%;
-				height: auto;
-				display: block;
-			}
-		}
-
-		&--disaled .level__img {
-			display: none;
-		}
 
 		&__info {
 			display: flex;
-			flex-direction: column;
 			align-items: center;
-			max-width: 80%;
-			height: 20px;
-			color: #fff;
+			color: #020202;
 		}
 
 		&__row {
-			width: 100%;
-			display: flex;
-			justify-content: space-between;
-			gap: 8px;
-
-			&--small {
-				font-size: 0.8rem;
-
-				@media screen and (max-width: $media-phone) {
-					font-size: 0.6rem;
-				}
-
-				span {
-					&:last-child {
-						color: #fecb23;
-					}
-				}
+			&:nth-child(2) {
+				padding-left: 15px;
+				width: 120px;
+				text-align: left;
 			}
 
-			&--level {
-				width: 100%;
-				font-size: 32px;
-				text-align: center;
-				color: #fecb23;
-				display: none;
-				text-shadow: #aa1e05 0 0 25px;
+			&:nth-child(3) {
+				font-size: 24px;
+				line-height: 1;
 			}
 		}
 
-		&__img .level__row--level,
-		&--disaled .level__row--level {
-			display: block;
+		&__check {
+			border: 1px solid #020202;
+			padding: 0px 10px;
+			line-height: 1;
+
+			span {
+				opacity: 0;
+			}
 		}
 
-		&__stat {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 0 18px;
-		}
-
-		&__stat &__row {
-			flex-grow: 1;
+		&--active .level__check span {
+			opacity: 1;
 		}
 	}
 }

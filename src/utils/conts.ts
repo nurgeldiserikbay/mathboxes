@@ -1,28 +1,55 @@
-import { generateMathEquation } from './helpers'
-
-export type GAME_TYPE = 'CLASSIC' | 'FOR_SCORE'
-
-export type PagesType = 'START' | 'LEVELTYPES' | 'LEVELS' | 'PLAYGROUND'
+export type PagesType = 'START' | 'LEVELS' | 'PLAYGROUND'
 
 export type SIGNS_TYPES = '+' | '-' | '*' | '/' | '(' | ')' | '^' | '√' | 'log'
 
-export const GAME_TYPES: { [key in GAME_TYPE]: GAME_TYPE } = {
-	CLASSIC: 'CLASSIC',
-	FOR_SCORE: 'FOR_SCORE',
-}
-
 export const PAGES: { [key in PagesType]: PagesType } = {
 	START: 'START',
-	LEVELTYPES: 'LEVELTYPES',
 	LEVELS: 'LEVELS',
 	PLAYGROUND: 'PLAYGROUND',
 }
 
+export const LEVELS = [
+	{
+		id: 0,
+		title: 'Base',
+		definition: ['+', '-'],
+	},
+	{
+		id: 1,
+		title: 'Multiply',
+		definition: ['*'],
+	},
+	{
+		id: 2,
+		title: 'Divide',
+		definition: ['/'],
+	},
+	{
+		id: 3,
+		title: 'Brackets',
+		definition: ['(', ')'],
+	},
+	{
+		id: 4,
+		title: 'Power',
+		definition: ['^'],
+	},
+	{
+		id: 5,
+		title: 'Root',
+		definition: ['√'],
+	},
+	{
+		id: 6,
+		title: 'Logarithm',
+		definition: ['Log'],
+	},
+]
+
 export const PAGES_CONST: { [key in PagesType]: number } = {
 	START: 1,
-	LEVELTYPES: 3,
-	LEVELS: 5,
-	PLAYGROUND: 7,
+	LEVELS: 3,
+	PLAYGROUND: 5,
 }
 
 export const SIGNS: SIGNS_TYPES[] = [
@@ -62,142 +89,3 @@ export const SIGNS_DEF = {
 	ROOT: SIGNS[7],
 	LOG: SIGNS[8],
 }
-
-export const LEVELS = [
-	{
-		id: 1,
-		title: 'Simple Arithmetic',
-		description: '',
-		generate(numMax: number = 10) {
-			return generateMathEquation(['+', '-'], ['+', '-'], {
-				allowDecimals: false,
-				decimalProbability: 0.2,
-				numMax: numMax,
-			})
-		},
-	},
-	{
-		id: 2,
-		title: 'Multiplication',
-		description: '',
-		generate(numMax: number = 10) {
-			return generateMathEquation(['*'], ['+', '-'], {
-				allowDecimals: false,
-				decimalProbability: 0.2,
-				numMax: numMax,
-			})
-		},
-	},
-	{
-		id: 3,
-		title: 'Division',
-		description: '',
-		generate(numMax: number = 10) {
-			return generateMathEquation(['/'], ['+', '-'], {
-				allowDecimals: false,
-				decimalProbability: 0.5,
-				numMax: numMax,
-			})
-		},
-	},
-	{
-		id: 4,
-		title: 'Brackets',
-		description: '',
-		generate(numMax: number = 10) {
-			return generateMathEquation(['(', ')'], ['+', '-', '*', '/'], {
-				allowDecimals: false,
-				decimalProbability: 0.5,
-				numMax: numMax,
-			})
-		},
-	},
-	{
-		id: 5,
-		title: 'Degree',
-		description: '',
-		generate(numMax: number = 10) {
-			return generateMathEquation(['^'], ['+', '-', '*', '/', '(', ')'], {
-				allowDecimals: false,
-				decimalProbability: 0.5,
-				numMax: numMax,
-			})
-		},
-	},
-	{
-		id: 6,
-		title: 'Root',
-		description: '',
-		generate(numMax: number = 10) {
-			return generateMathEquation(['√'], ['+', '-', '*', '/', '(', ')', '^'], {
-				allowDecimals: false,
-				decimalProbability: 0.5,
-				numMax: numMax,
-			})
-		},
-	},
-	{
-		id: 7,
-		title: 'Fractional numbers',
-		description: '',
-		generate(numMax: number = 10) {
-			return generateMathEquation(
-				['+', '-'],
-				['+', '-', '*', '/', '(', ')', '^', '√'],
-				{
-					allowDecimals: true,
-					decimalProbability: 0.5,
-					numMax: numMax,
-				}
-			)
-		},
-	},
-	{
-		id: 8,
-		title: 'Logarithms',
-		description: '',
-		generate(numMax: number = 10) {
-			return generateMathEquation(
-				['log'],
-				['+', '-', '*', '/', '(', ')', '^', '√'],
-				{
-					allowDecimals: false,
-					decimalProbability: 0.5,
-					numMax: numMax,
-				}
-			)
-		},
-	},
-	{
-		id: 9,
-		title: 'Complex polysemous expressions',
-		description: '',
-		generate(numMax: number = 10) {
-			return generateMathEquation(
-				['log'],
-				['+', '-', '*', '/', '(', ')', '^', '√'],
-				{
-					allowDecimals: true,
-					decimalProbability: 0.5,
-					numMax: numMax,
-				}
-			)
-		},
-	},
-	{
-		id: 10,
-		title: 'Expert mode',
-		description: '',
-		generate(numMax: number = 10) {
-			return generateMathEquation(
-				['log', '^', '√', '(', ')'],
-				['+', '-', '*', '/', '(', ')', '^', '√', 'log'],
-				{
-					allowDecimals: true,
-					decimalProbability: 0.5,
-					numMax: numMax,
-				}
-			)
-		},
-	},
-]

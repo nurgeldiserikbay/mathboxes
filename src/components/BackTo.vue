@@ -20,7 +20,18 @@ function click() {
 .back-to {
 	position: absolute;
 	bottom: 7px;
-	right: 10px;
+	right: 53%;
 	z-index: 20;
+	animation: show 1s 0.5s linear forwards;
+	opacity: 0;
+}
+
+@keyframes show {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 1;
+	}
 }
 </style>

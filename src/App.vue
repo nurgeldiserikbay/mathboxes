@@ -1,6 +1,8 @@
 <script lang="ts" setup>
-import { computed, onBeforeMount, onMounted, ref, watch } from 'vue'
+import { onBeforeMount, onMounted, ref, watch } from 'vue'
 import { FlipCorner, PageFlip } from 'page-flip'
+
+import { PAGES } from '@/utils/conts'
 
 import { usePageStore } from '@/store/pageStore'
 import { useGameStore } from '@/store/gameStore'
@@ -10,9 +12,9 @@ import RatioResize from '@/components/RatioResize.vue'
 import Admob from '@/utils/admob'
 
 import BackTo from '@/components/BackTo.vue'
+import ScoreTable from '@/components/ScoreTable.vue'
 
 import StartPage from '@/pages/StartPage.vue'
-import LevelTypes from '@/pages/LevelTypes.vue'
 import LevelsPage from '@/pages/LevelsPage.vue'
 import PlaygroundPage from '@/pages/PlaygroundPage.vue'
 
@@ -48,7 +50,6 @@ watch(
 	() => pageStore.currentPageIndex,
 	() => {
 		if (pageFlip) {
-			console.log(getSide(pageStore.currentPageIndex), pageStore.currentPageIndex)
 			pageFlip.flip(
 				pageStore.currentPageIndex,
 				getSide(pageStore.currentPageIndex)
@@ -73,25 +74,25 @@ onMounted(() => {
 
 <template>
 	<RatioResize :width="width" :height="height">
+		<ScoreTable
+			v-if="pageStore.currentPage === PAGES.PLAYGROUND"
+		/>
 		<div class="wrapper" :style="{ width: `${2 * noteBookWidth}px`, height: `${notebookHeight}px` }">
 			<div ref="wrapElem" class="wrapElem">
 				<div class="page-wrap" data-density="soft"></div>
 				<div class="page-wrap" data-density="soft">
 					<StartPage />
 				</div>
-				<div class="page-wrap" data-density="soft"><BackTo /></div>
-				<div class="page-wrap" data-density="soft">
-					<LevelTypes />
-				</div>
-				<div class="page-wrap" data-density="soft"><BackTo /></div>
+				<div class="page-wrap" data-density="soft"></div>
 				<div class="page-wrap" data-density="soft">
 					<LevelsPage />
 				</div>
-				<div class="page-wrap" data-density="soft"><BackTo /></div>
+				<div class="page-wrap" data-density="soft"></div>
 				<div class="page-wrap" data-density="soft">
-					<!-- <PlaygroundPage /> -->
+					<PlaygroundPage />
 				</div>
 			</div>
+			<BackTo />
 		</div>
 	</RatioResize>
 </template>
