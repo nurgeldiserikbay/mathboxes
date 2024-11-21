@@ -1,10 +1,11 @@
-import { reactive, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { Preferences } from '@capacitor/preferences'
 
 export interface IGameStat {
-	score?: number
-	date: string
+	time: string
+	score: number
+	date: Date
 }
 
 export type IGameStats = {
@@ -12,13 +13,8 @@ export type IGameStats = {
 }
 
 export const useGameStore = defineStore('GameStore', () => {
-	const curGameStat = ref<IGameStat>({
-		score: 0,
-		date: '',
-	})
+	const selectedBookInd = ref<null | number>(null)
 	const gameStats = ref<IGameStats>({})
-
-	const activeLevels = reactive<{ [key: string]: boolean }>({})
 
 	watch(
 		() => gameStats.value,
@@ -31,29 +27,15 @@ export const useGameStore = defineStore('GameStore', () => {
 		{ deep: true }
 	)
 
-	function updateGameStat(
-		fields: (keyof IGameStat)[],
-		newGameStat: Partial<IGameStat>
-	) {
-		fields.forEach((key) => {
-			if (curGameStat.value[key] !== undefined) {
-				// @ts-ignore
-				curGameStat.value[key] = newGameStat[key]
-			}
-		})
+	function setSelectedBookInd(id: number | null) {
+		selectedBookInd.value = id
 	}
 
-	function gameEnd() {
-		curGameStat.value.date = new Date().toDateString()
-
-		gameStats.value[new Date().getMilliseconds()] = curGameStat.value
-	}
-
-	function restore() {
-		curGameStat.value = {
-			score: 0,
-			date: '',
+	function gameEnd(data: IGameStat) {
+		if (!gameStats.value[String(selectedBookInd.value)]) {
+			return gameStats.value[String(selectedBookInd.value)] = { [data.date.getTime()]: data }
 		}
+		gameStats.value[String(selectedBookInd.value)][data.date.getTime()] = data
 	}
 
 	async function loadData() {
@@ -64,22 +46,12 @@ export const useGameStore = defineStore('GameStore', () => {
 		}
 	}
 
-	function clickLevel(levelInd: number) {
-		if (activeLevels[levelInd]) {
-			delete activeLevels[levelInd]
-		} else {
-			activeLevels[levelInd] = true
-		}
-	}
-
 	return {
-		clickLevel,
-		activeLevels,
-		curGameStat,
-		updateGameStat,
+		selectedBookInd,
+		setSelectedBookInd,
+
 		gameEnd,
 		gameStats,
 		loadData,
-		restore,
 	}
 })

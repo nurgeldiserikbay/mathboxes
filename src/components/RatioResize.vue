@@ -1,9 +1,3 @@
-<template>
-  <div class="ratio-resize" ref="ratioResize" :style="{ ...getSizeStyle, ...getResizeStyle }">
-    <slot></slot>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { computed, nextTick, onBeforeMount, onBeforeUnmount, onMounted, ref } from 'vue'
 
@@ -64,7 +58,13 @@ function setScaleOpt() {
 }
 </script>
 
-<style scoped>
+<template>
+  <div class="ratio-resize" ref="ratioResize" :style="{ ...getSizeStyle, ...getResizeStyle }">
+    <slot></slot>
+  </div>
+</template>
+
+<style lang="scss" scoped>
 .ratio-resize {
   position: absolute !important;
   top: 50% !important;

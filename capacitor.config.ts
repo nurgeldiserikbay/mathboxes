@@ -1,8 +1,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.thelightcome.mathpuzzle',
-  appName: 'Math Puzzle',
+  appId: 'com.thelightcome.mathshelf',
+  appName: 'Math Shelf',
   webDir: 'docs',
   server: {
     androidScheme: 'https'

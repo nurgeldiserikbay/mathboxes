@@ -1,5 +1,5 @@
 {
-  "name": "mathpuzzle",
+  "name": "mathshelf",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -11,17 +11,19 @@
   },
   "dependencies": {
     "@capacitor-community/admob": "^5.3.1",
-    "@capacitor/android": "^6.1.1",
+    "@capacitor/android": "^6.2.0",
     "@capacitor/app": "^6.0.0",
     "@capacitor/core": "^6.1.1",
     "@capacitor/ios": "^6.1.1",
     "@capacitor/preferences": "^6.0.0",
+    "gsap": "^3.12.5",
     "page-flip": "^2.0.7",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^3.2.1",
     "sass": "^1.71.1",
     "vite-svg-loader": "^5.1.0",
-    "vue": "^3.4.19"
+    "vue": "^3.4.19",
+    "vue-i18n": "10"
   },
   "devDependencies": {
     "@capacitor/assets": "^3.0.5",

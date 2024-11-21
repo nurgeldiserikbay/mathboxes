@@ -6,10 +6,16 @@ export function getRandomInt(max: number, min: number = 0) {
 	return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-export function generateNumber(allowDecimals: boolean = false, probability: number = 0.5, max: number = 1000) {
+export function generateNumber(
+	allowDecimals: boolean = false,
+	probability: number = 0.5,
+	max: number = 1000
+) {
 	let number = String(Math.floor(Math.random() * max) + 1)
 	if (allowDecimals && Math.random() > probability) {
-		const decimalPart = (Math.random() * Math.max(10, max / 10)).toFixed(0).padStart(2, '0')
+		const decimalPart = (Math.random() * Math.max(10, max / 10))
+			.toFixed(0)
+			.padStart(2, '0')
 		number = `${number}.${decimalPart}`
 	}
 	return parseFloat(number)
@@ -19,7 +25,12 @@ export function getRandomOperator(operators: SIGNS_TYPES[]) {
 	return operators[Math.floor(Math.random() * operators.length)]
 }
 
-export function createExpression(operators: SIGNS_TYPES[], allowDecimals: boolean, decimalProbability: number, numMax: number) {
+export function createExpression(
+	operators: SIGNS_TYPES[],
+	allowDecimals: boolean,
+	decimalProbability: number,
+	numMax: number
+) {
 	const expressionParts: string[] = []
 	const operandCount = Math.floor(Math.random() * 3) + 1
 
@@ -45,7 +56,7 @@ export function createExpression(operators: SIGNS_TYPES[], allowDecimals: boolea
 	return expressionParts
 }
 
-export function evaluateExpression(expressionParts: string[]) {
+export function evaluateExpression(expressionParts: (string | number)[]) {
 	let expression = expressionParts.join(' ')
 	expression = expression.replace(/\^/g, '**')
 	expression = expression.replace(/√\(([^)]+)\)/g, 'Math.sqrt($1)')
@@ -72,7 +83,7 @@ export function generateMathEquation(
 		decimalProbability: 0.5,
 		numMax: 1000,
 	}
-) {
+): string[] {
 	const { allowDecimals, decimalProbability, numMax } = options
 	const operators = [
 		...new Set([...requiredOperators, ...optionalOperators]),
@@ -81,15 +92,30 @@ export function generateMathEquation(
 	let leftExpressionParts: string[] = []
 	let leftValue = null
 	while (leftValue === null) {
-		leftExpressionParts = createExpression(operators, allowDecimals, decimalProbability, numMax)
+		leftExpressionParts = createExpression(
+			operators,
+			allowDecimals,
+			decimalProbability,
+			numMax
+		)
 		leftValue = evaluateExpression(leftExpressionParts)
 	}
 
 	let rightExpressionParts = [leftValue.toString()]
 	if (operators.length > 0) {
-		rightExpressionParts = createExpression(operators, allowDecimals, decimalProbability, numMax)
+		rightExpressionParts = createExpression(
+			operators,
+			allowDecimals,
+			decimalProbability,
+			numMax
+		)
 		while (evaluateExpression(rightExpressionParts) !== leftValue) {
-			rightExpressionParts = createExpression(operators, allowDecimals, decimalProbability, numMax)
+			rightExpressionParts = createExpression(
+				operators,
+				allowDecimals,
+				decimalProbability,
+				numMax
+			)
 		}
 	}
 
@@ -100,6 +126,20 @@ export function generateAll(signs = SIGNS, numMax: number = 100) {
 	return generateMathEquation([], signs, {
 		allowDecimals: false,
 		decimalProbability: 0.3,
-		numMax: numMax
+		numMax: numMax,
 	})
+}
+
+export function generateColors() {
+	let colors = []
+	for (let i = 0; i < 40; i++) {
+		// 40 different hues
+		let hue = i * (360 / 40) // evenly distributed hues
+		for (let j = 0; j < 16; j++) {
+			// 16 lightness variations
+			let lightness = 30 + j * 4 // lightness from 30% to 90%
+			colors.push(`hsl(${hue}, 50%, ${lightness}%)`)
+		}
+	}
+	return colors
 }
