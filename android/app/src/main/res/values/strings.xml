@@ -1,7 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Math Shelf</string>
-    <string name="title_activity_main">Math Shelf</string>
-    <string name="package_name">com.thelightcome.mathshelf</string>
-    <string name="custom_url_scheme">com.thelightcome.mathshelf</string>
+    <string name="app_name">Math Boxes</string>
+    <string name="title_activity_main">Math Boxes</string>
+    <string name="package_name">com.thelightcome.mathboxes</string>
+    <string name="custom_url_scheme">com.thelightcome.mathboxes</string>
+    <string name="admob_app_id">[APP_ID]</string>
 </resources>

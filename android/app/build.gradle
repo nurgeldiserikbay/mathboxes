@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "com.thelightcome.mathshelf"
+    namespace "com.thelightcome.mathboxes"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.thelightcome.mathshelf"
+        applicationId "com.thelightcome.mathboxes"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

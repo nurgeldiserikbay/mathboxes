@@ -1,21 +1,63 @@
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { Preferences } from '@capacitor/preferences'
 
-export interface IGameStat {
-	time: string
-	score: number
-	date: Date
-}
+import { I_GameStats, TYPE_TIMES } from '@/utils/types'
 
-export type IGameStats = {
-	[key: string]: { [key: number]: IGameStat }
-}
+import { DEFAULT_NAME, LEVELS, TIMES } from '@/utils/conts'
+import { randomInt } from '@/pages/bookfile'
 
 export const useGameStore = defineStore('GameStore', () => {
-	const selectedBookInd = ref<null | number>(null)
-	const gameStats = ref<IGameStats>({})
+	const name = ref<string>('')
+	const setName = (value: string) => (name.value = value)
+	watch(
+		() => name.value,
+		async () => {
+			await Preferences.set({
+				key: 'name',
+				value: name.value || DEFAULT_NAME,
+			})
+		}
+	)
 
+	const level = ref<null | number>(null)
+	const selectLevel = (id: number | null) => {
+		level.value = id
+	}
+	const getCurrentLevel = computed(() =>
+		LEVELS.find((item) => item.id === level.value)
+	)
+
+	const timeType = ref<TYPE_TIMES>(TIMES.MIN_3)
+	const setTimeType = (type: TYPE_TIMES) => (timeType.value = type)
+
+	const gameStats = ref<I_GameStats>({})
+	const recordGameStat = (score: number, id: number, nameValue?: string) => {
+		if (!gameStats.value[id]) {
+			gameStats.value[id] = Object.values(TIMES).reduce(
+				(total: Partial<{ [key in TYPE_TIMES]: [] }>, key: TYPE_TIMES) => {
+					total[key] = []
+					return total
+				},
+				{}
+			) as { [key in TYPE_TIMES]: [] }
+		}
+
+		if (!gameStats.value[id][timeType.value]) {
+			gameStats.value[id][timeType.value] = []
+		}
+
+		gameStats.value[id][timeType.value] = [
+			...gameStats.value[id][timeType.value],
+			{
+				name: nameValue || name.value || DEFAULT_NAME,
+				score,
+				date: new Date(),
+			},
+		]
+			.sort((a, b) => (a.score > b.score ? -1 : 1))
+			.slice(0, 30)
+	}
 	watch(
 		() => gameStats.value,
 		async () => {
@@ -23,35 +65,41 @@ export const useGameStore = defineStore('GameStore', () => {
 				key: 'gameStats',
 				value: JSON.stringify(gameStats.value),
 			})
-		},
-		{ deep: true }
+		}
 	)
 
-	function setSelectedBookInd(id: number | null) {
-		selectedBookInd.value = id
-	}
+	const loadData = async () => {
+		const localData = await Preferences.get({ key: 'gameStats' })
 
-	function gameEnd(data: IGameStat) {
-		if (!gameStats.value[String(selectedBookInd.value)]) {
-			return gameStats.value[String(selectedBookInd.value)] = { [data.date.getTime()]: data }
+		if (localData.value) {
+			gameStats.value = JSON.parse(localData.value) as I_GameStats
 		}
-		gameStats.value[String(selectedBookInd.value)][data.date.getTime()] = data
+
+		const nameData = await Preferences.get({ key: 'name' })
+
+		name.value = nameData.value || DEFAULT_NAME
 	}
 
-	async function loadData() {
-		const ret = await Preferences.get({ key: 'gameStats' })
-
-		if (ret.value) {
-			gameStats.value = JSON.parse(ret.value) as IGameStats
-		}
-	}
+	const rLevel = LEVELS[randomInt(0, LEVELS.length - 1)]
+	const bgColor = computed(() => {
+		return rLevel.bgColor
+	})
+	const mainColor = computed(() => {
+		return rLevel.mainColor
+	})
 
 	return {
-		selectedBookInd,
-		setSelectedBookInd,
-
-		gameEnd,
+		name,
+		setName,
+		level,
+		selectLevel,
+		getCurrentLevel,
+		timeType,
+		setTimeType,
 		gameStats,
+		recordGameStat,
 		loadData,
+		bgColor,
+		mainColor,
 	}
 })

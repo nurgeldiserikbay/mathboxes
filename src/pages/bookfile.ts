@@ -1,154 +1,125 @@
-import { SIGN_COMPLEXITY_ARR, SIGNS_TYPES } from '@/utils/conts'
-import { evaluateExpression, generateMathEquation, getRandomInt } from '@/utils/helpers'
+import { SIGNS } from '@/utils/conts'
+import { I_Exp, I_Exp_Sign } from '@/utils/types'
 
-export interface ITimerObj {
-	[key: number]: ReturnType<typeof setTimeout>
-}
-
-export interface ISign {
-	id: number
-	sign: string
-	state: boolean
-}
-
-export type IExpresstion = ISign[]
-
-export type IExpresstionOption = {
-	value: IExpresstion
-	complexity: number
-	suggests: ISuggests[]
-}
-
-export interface ISuggests {
-	id: number
-	sign: string
-}
-
-export function getMaxNum(index: number) {
-	if (index < 20) return 10
-	else if (index < 30) return 50
-	return 100
-}
-
-export function findEmptySymbols(
-	start: number,
-	expression: IExpresstion,
-	answers: { [key: number]: ISuggests }
-) {
-	for (let i = start; i < expression.length; i += 1) {
-		if (!expression[i].state && !answers[expression[i].id]) return i
-	}
-	for (let i = 0; i < start; i += 1) {
-		if (!expression[i].state && !answers[expression[i].id]) return i
-	}
-	return -1
-}
-
-export function checkExp(expression: IExpresstion, answers: { [key: number]: ISuggests }) {
-	return evaluateExpression(expression.map((exp) => {
-		if (exp.state) return exp.sign
-		else return answers[exp.id]?.sign
-	}))
-}
-
-export function getExpOption(
-	mainsign: SIGNS_TYPES[],
-	signs: SIGNS_TYPES[],
-  i: number,
-	func?: () => string[]
-): IExpresstionOption {
-	const expression = func ? func() : generateMathEquation(mainsign, signs, {
-		allowDecimals: false,
-		decimalProbability: 0,
-		numMax: getMaxNum(i),
-	})
-	const [hiddensCount, expresstionArray, hidedSymbols] =
-		transformExpresstion(expression)
-	const totalSum = expression
-		.filter((sign) => !isNaN(+sign))
-		.reduce((summ, sign) => {
-			summ += +sign
-			return summ
-		}, 0)
-	const suggests = genSuggestSymbols(
-		[...mainsign, ...signs],
-		totalSum,
-		hidedSymbols
-	)
-	const expressionComplexity = calcExpComplexity(expression, hiddensCount)
+export function getParsedExp(sign: string, index: number): I_Exp {
+	const range = getRange(index, sign)
+	const exp = codeFunc(getExp(sign, range))
+	const nums = exp.filter((item) => item.type === SIGNS.NUMBER)
+	const hidedInd = randomInt(0, nums.length - 1)
+	const hided = nums[hidedInd]
 	return {
-		value: expresstionArray,
-		complexity: expressionComplexity,
-		suggests: suggests,
+		raw: exp,
+		answer: hided.order,
+		options: getOptions(Number(hided.value), 4),
 	}
 }
 
-export function genSuggestSymbols(
-	signs: string[],
-	totalSum: number,
-	hidedSymbols: string[]
-): ISuggests[] {
-	const symbols: string[] = hidedSymbols
-	const count = 8 - hidedSymbols.length
-	for (let i = 0; i < count; i += 1) {
-		if (Math.random() > 0.5) {
-			symbols.push(signs[getRandomInt(0, signs.length - 1)])
-		} else {
-			symbols.push(String(getRandomInt(0, totalSum)))
+export function getRange(index: number, sign: string): [number, number] {
+	if (['+', '-'].includes(sign)) {
+		if (index < 5) return [0, 10]
+		if (index < 20) return [0, 100]
+		if (index < 30) return [0, 200]
+		if (index < 40) return [0, 1000]
+		return [0, 9999]
+	} else if (['*', '/'].includes(sign)) {
+		if (index < 5) return [0, 10]
+		if (index < 20) return [0, 100]
+		if (index < 30) return [0, 200]
+		if (index < 40) return [0, 1000]
+		return [0, 9999]
+	} else if (['^', '√', 'ln'].includes(sign)) {
+		if (index < 5) return [0, 10]
+		if (index < 20) return [0, 100]
+		if (index < 30) return [0, 200]
+		if (index < 40) return [0, 1000]
+		return [0, 9999]
+	}
+
+	return [0, 100]
+}
+
+export function getOptions(target: number, count: number): number[] {
+	const similarNumbers: number[] = [target]
+
+	while (similarNumbers.length < count) {
+		const offset = Math.floor(Math.random() * 10) + 1
+		const variation = Math.random() < 0.5 ? -offset : offset
+		const similar = target + variation
+
+		if (similar !== target) {
+			similarNumbers.push(similar)
 		}
 	}
-	return shuffle(symbols).map((s, sInd) => ({
-		id: sInd,
-		sign: s,
+
+	return Array.from(similarNumbers).sort(() => (Math.random() < 0.5 ? -1 : 1))
+}
+
+export function codeFunc(exp: (string | number)[]): I_Exp_Sign[] {
+	return exp.map((value, index) => ({
+		type: !isNaN(+value) ? SIGNS.NUMBER : SIGNS.SIGN,
+		order: index,
+		value: value,
 	}))
 }
 
-export function shuffle<T>(arr: T[]): T[] {
-	return arr.sort(() => (Math.random() > 0.5 ? 1 : -1))
-}
+export function getExp(
+	operator: string,
+	range: [number, number]
+): (number | string)[] {
+	const [min, max] = range
 
-export function transformExpresstion(
-	expression: string[]
-): [number, ISign[], string[]] {
-	const hiddensCount = getRandomInt(1, Math.floor(expression.length / 2))
-	const expresstionArray = expression?.map((symbol, symbolInd) => {
-		return {
-			id: symbolInd,
-			sign: symbol,
-			state: true,
-		}
-	})
-	const hidedSymbols: string[] = []
-	let i = 0
-	do {
-		const symbolIndex = getRandomInt(0, expression.length - 1)
-		if (expresstionArray[symbolIndex].state) {
-			hidedSymbols.push(expresstionArray[symbolIndex].sign)
-			expresstionArray[symbolIndex].state = false
-			i += 1
-		}
-	} while (i < hiddensCount)
-	return [hiddensCount, expresstionArray, hidedSymbols]
-}
-
-export function calcExpComplexity(
-	expression: string[],
-	hiddensCount: number
-): number {
-	let comp = hiddensCount * 2
-	SIGN_COMPLEXITY_ARR.forEach(([symbol, value]) => {
-		comp += expression.filter((e) => e === symbol).length * value
-	})
-	const eqIndex = expression.findIndex((i) => i === '=')
-	if (eqIndex > -1) {
-		comp += Math.floor(
-			Math.max(eqIndex, expression.length - eqIndex - 1) /
-				Math.min(eqIndex, expression.length - eqIndex - 1)
+	if (operator === '√') {
+		const root = randomInt(
+			Math.ceil(Math.sqrt(min)),
+			Math.floor(Math.sqrt(max))
 		)
+		const square = root * root
+		return ['√', square, '=', root]
+	} else {
+		const a = randomInt(min, max)
+		const b = randomInt(min, max)
+
+		let result
+
+		switch (operator) {
+			case '+':
+				result = a + b
+				break
+			case '-':
+				result = a - b
+				break
+			case '*':
+				result = a * b
+				break
+			case '/':
+				const divisor = randomInt(1, max)
+				const dividend = divisor * randomInt(min, Math.floor(max / divisor))
+				return [
+					dividend.toString(),
+					'/',
+					divisor.toString(),
+					'=',
+					(dividend / divisor).toString(),
+				]
+			case '^':
+				result = Math.pow(a, (b % 3) + 1)
+				break
+			case 'log':
+				const lnInput = randomInt(1, max)
+				return [
+					'log',
+					lnInput.toString(),
+					'=',
+					Math.floor(Math.log(lnInput)).toString(),
+				]
+			default:
+				throw new Error('Unsupported operator')
+		}
+
+		return [a, operator, b, '=', result]
 	}
-	return comp
 }
 
-export function clearTimeOuts(timeouts: ITimerObj) {
-	Object.values(timeouts).forEach((timeId) => clearTimeout(timeId))
+export function randomInt(min: number, max: number): number {
+	return Math.floor(Math.random() * (max - min + 1)) + min
 }

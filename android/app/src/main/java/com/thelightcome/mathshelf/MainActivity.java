@@ -1,4 +1,4 @@
-package com.thelightcome.mathshelf;
+package com.thelightcome.mathboxes;
 
 import com.getcapacitor.BridgeActivity;
 

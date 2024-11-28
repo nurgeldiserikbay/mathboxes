@@ -13,7 +13,7 @@ import {
 
 const AdMobInitializationOptions = {
 	// testingDevices: ['8a1b4b83d67add00', '1f6e845f97c74f32'],
-	// initializeForTesting: true,
+	initializeForTesting: true,
 	tagForChildDirectedTreatment: true,
 }
 
@@ -55,7 +55,7 @@ class Admob {
 			adSize: BannerAdSize.BANNER,
 			position: BannerAdPosition.BOTTOM_CENTER,
 			margin: 0,
-			// isTesting: true,
+			isTesting: true,
 			// npa: true
 		}
 

@@ -1,229 +1,102 @@
-import { evaluateExpression, getRandomInt } from './helpers'
+import { I_LEVEL, TYPE_PAGES, TYPE_SIGN, TYPE_TIMES } from './types'
 
-export type PagesType = 'START' | 'PLAYGROUND'
+export const DEFAULT_NAME = 'Anonym'
 
-export type SIGNS_TYPES = '+' | '-' | '*' | '/' | '(' | ')' | '^' | '√' | 'log'
-
-export const PAGES: { [key in PagesType]: PagesType } = {
+export const PAGES: { [key in TYPE_PAGES]: TYPE_PAGES } = {
 	START: 'START',
 	PLAYGROUND: 'PLAYGROUND',
 }
 
-export const LEVELS = [
+export const TIMES: { [key in TYPE_TIMES]: TYPE_TIMES } = {
+	MIN: 'MIN',
+	MIN_3: 'MIN_3',
+	MIN_5: 'MIN_5',
+}
+
+export const LEVELS: I_LEVEL[] = [
 	{
 		id: 0,
-		title: 'Base',
-		description: 'Base',
-		mainsign: ['+', '-'],
-		signs: [],
-		background: 'linear-gradient(135deg, #FFB3AB, #FF7D6B)',
-		positions: {
-			top: '112px',
-			left: '45px',
-		},
-		startStyle: {
-			transform: `translate(-125.5px, -100.5px) scale(0.167) rotateX(20deg) rotateY(-10deg)`,
-		},
-		endStyle: {
-			transform: `translate(-120px, -94px) scale(0.172) rotateX(0deg) rotateY(0deg)`,
-		},
-		generate() {
-			const maxInt = 100
-			const operators = ['+', '-']
-
-			while (true) {
-				const totalOperands = Math.floor(Math.random() * 3) + 3
-				const leftOperandCount =
-					Math.floor(Math.random() * (totalOperands - 1)) + 1
-				const rightOperandCount = totalOperands - leftOperandCount
-
-				const generateSide = (count: number) => {
-					const side: string[] = [String(getRandomInt(maxInt))]
-					for (let i = 1; i < count; i++) {
-						const operator =
-							operators[Math.floor(Math.random() * operators.length)]
-						const operand = getRandomInt(maxInt)
-						side.push(operator, String(operand))
-					}
-					return side
-				}
-
-				const leftSide = generateSide(leftOperandCount)
-				const rightSide = generateSide(rightOperandCount)
-
-				const leftValue = evaluateExpression(leftSide)
-				const rightValue = evaluateExpression(rightSide)
-
-				if (leftValue === rightValue) {
-					return [...leftSide, '=', ...rightSide]
-				}
-			}
-		},
+		name: 'addition',
+		sign: '+',
+		description: 'addition_desc',
+		bgColor:
+			'linear-gradient(to bottom, rgba(255, 120, 120, 1), rgba(255, 190, 120, 1))',
+		infoIcon: 'rgba(80, 190, 255, 1)',
+		mainColor: 'rgba(255, 190, 120, 1)',
 	},
 	{
 		id: 1,
-		title: 'Multiply',
-		description: 'Multiplication',
-		mainsign: ['*'],
-		signs: ['+', '-'],
-		background: 'linear-gradient(135deg, #FFD69C, #FFA455)',
-		positions: {
-			top: '112px',
-			left: '165px',
-		},
-		startStyle: {
-			transform: `translate(-5px, -100.5px) rotateX(20deg) rotateY(-10deg) scale(0.167)`,
-		},
-		endStyle: {
-			transform: `translate(0px, -94px) scale(0.172) rotateX(0deg) rotateY(0deg)`,
-		},
+		name: 'subtraction',
+		sign: '-',
+		description: 'subtraction_desc',
+		bgColor:
+			'linear-gradient(to bottom, rgba(120, 255, 150, 1), rgba(80, 190, 255, 1))',
+		infoIcon: 'rgba(180, 90, 255, 1)',
+		mainColor: 'rgba(80, 190, 255, 1)',
 	},
 	{
 		id: 2,
-		title: 'Divide',
-		description: 'Division',
-		mainsign: ['/'],
-		signs: ['+', '-'],
-		background: 'linear-gradient(135deg, #FFE8A1, #FFCD58)',
-		positions: {
-			top: '112px',
-			left: '285px',
-		},
-		startStyle: {
-			transform: `translate(115.5px, -100.5px) rotateX(20deg) rotateY(-10deg) scale(0.167)`,
-		},
-		endStyle: {
-			transform: `translate(120px, -94px) scale(0.172) rotateX(0deg) rotateY(0deg)`,
-		},
+		name: 'multiplication',
+		sign: '*',
+		description: 'multiplication_desc',
+		bgColor:
+			'linear-gradient(to bottom, rgba(80, 90, 255, 1), rgba(180, 90, 255, 1))',
+		infoIcon: 'rgba(20, 170, 50, 1)',
+		mainColor: 'rgba(180, 90, 255, 1)',
 	},
 	{
 		id: 3,
-		title: 'Bracket',
-		description: 'Parentheses',
-		mainsign: ['(', ')'],
-		signs: ['+', '-'],
-		background: 'linear-gradient(135deg, #A6F2BC, #4DD69C)',
-		positions: {
-			top: '240px',
-			left: '45px',
-		},
-		startStyle: {
-			transform: `translate(-125.5px, 27px) rotateX(20deg) rotateY(-10deg) scale(0.167)`,
-		},
-		endStyle: {
-			transform: `translate(-120px, 32px) scale(0.172) rotateX(0deg) rotateY(0deg)`,
-		},
+		name: 'division',
+		sign: '/',
+		description: 'division_desc',
+		bgColor:
+			'linear-gradient(to bottom, rgba(100, 250, 120, 1), rgba(20, 170, 50, 1))',
+		infoIcon: 'rgba(255, 200, 70, 1)',
+		mainColor: 'rgba(20, 170, 50, 1)',
 	},
 	{
 		id: 4,
-		title: 'Exponent',
-		description: 'Exponents',
-		mainsign: ['^'],
-		signs: ['+', '-', '/', '*'],
-		background: 'linear-gradient(135deg, #A3DFFF, #5DBFF2)',
-		positions: {
-			top: '240px',
-			left: '165px',
-		},
-		startStyle: {
-			transform: `translate(-5px, 27px) rotateX(20deg) rotateY(-10deg) scale(0.167)`,
-		},
-		endStyle: {
-			transform: `translate(0px, 32px) scale(0.172) rotateX(0deg) rotateY(0deg)`,
-		},
+		name: 'exponent',
+		sign: '^',
+		description: 'exponent_desc',
+		bgColor:
+			'linear-gradient(to bottom, rgba(255, 90, 50, 1), rgba(255, 200, 70, 1))',
+		infoIcon: 'rgba(0, 100, 200, 1)',
+		mainColor: 'rgba(255, 200, 70, 1)',
 	},
 	{
 		id: 5,
-		title: 'Root',
-		description: 'Square Roots',
-		mainsign: ['√'],
-		signs: ['+', '-', '/', '*'],
-		background: 'linear-gradient(135deg, #DAB0FF, #B784FF)',
-		positions: {
-			top: '240px',
-			left: '285px',
-		},
-		startStyle: {
-			transform: `translate(115.5px, 27px) rotateX(20deg) rotateY(-10deg) scale(0.167)`,
-		},
-		endStyle: {
-			transform: `translate(120px, 32px) scale(0.172) rotateX(0deg) rotateY(0deg)`,
-		},
+		name: 'square_root',
+		sign: '√',
+		description: 'square_root_desc',
+		bgColor:
+			'linear-gradient(to bottom, rgba(0, 200, 255, 1), rgba(0, 100, 200, 1))',
+		infoIcon: 'rgba(120, 90, 255, 1)',
+		mainColor: 'rgba(0, 100, 200, 1)',
 	},
 	{
 		id: 6,
-		title: 'Logarithm',
-		description: 'Logarithm',
-		mainsign: ['Log'],
-		signs: ['+', '-', '/', '*'],
-		background: 'linear-gradient(135deg, #FFBDAE, #FF846A)',
-		positions: {
-			top: '373px',
-			left: '80px',
-		},
-		startStyle: {
-			transform: `translate(-90px, 161px) rotateX(20deg) rotateY(-10deg) scale(0.167)`,
-		},
-		endStyle: {
-			transform: `translate(-84px, 166px) scale(0.172) rotateX(0deg) rotateY(0deg)`,
-		},
+		name: 'logarithm',
+		sign: 'log',
+		description: 'logarithm_desc',
+		bgColor:
+			'linear-gradient(to bottom, rgba(255, 90, 120, 1), rgba(120, 90, 255, 1))',
+		infoIcon: 'rgba(190, 50, 200, 1)',
+		mainColor: 'rgba(120, 90, 255, 1)',
 	},
 	{
 		id: 7,
-		title: 'All',
-		description: 'All',
-		mainsign: [],
-		signs: ['+', '-', '*', '/', '(', ')', '^', '√', 'Log'],
-		background: 'linear-gradient(135deg, #9CE8E0, #5AB9BA)',
-		positions: {
-			top: '373px',
-			left: '240px',
-		},
-		startStyle: {
-			transform: `translate(70px, 161px) rotateX(20deg) rotateY(-10deg) scale(0.167)`,
-		},
-		endStyle: {
-			transform: `translate(76px, 166px) scale(0.172) rotateX(0deg) rotateY(0deg)`,
-		},
+		name: 'all',
+		sign: '...',
+		description: 'all_desc',
+		bgColor:
+			'linear-gradient(to bottom, rgba(255, 70, 150, 1), rgba(190, 50, 200, 1))',
+		infoIcon: 'rgba(255, 190, 120, 1)',
+		mainColor: 'rgba(190, 50, 200, 1)',
 	},
 ]
 
-export const PAGE_COUNT = 15
-
-export const SIGNS: SIGNS_TYPES[] = [
-	'+',
-	'-',
-	'*',
-	'/',
-	'(',
-	')',
-	'^',
-	'√',
-	'log',
-]
-
-export const SIGN_COMPLEXITY: { [key in SIGNS_TYPES]: number } = {
-	'+': 1,
-	'-': 1,
-	'*': 2,
-	'/': 2,
-	')': 3,
-	'(': 0,
-	'^': 4,
-	'√': 5,
-	log: 6,
-}
-
-export const SIGN_COMPLEXITY_ARR = Object.entries(SIGN_COMPLEXITY)
-
-export const SIGNS_DEF = {
-	PLUS: SIGNS[0],
-	MINUS: SIGNS[1],
-	MULTI: SIGNS[2],
-	DIVIDE: SIGNS[3],
-	LEFT_BRACK: SIGNS[4],
-	RIGTH_BRACK: SIGNS[5],
-	POWER: SIGNS[6],
-	ROOT: SIGNS[7],
-	LOG: SIGNS[8],
+export const SIGNS: { [key in TYPE_SIGN]: TYPE_SIGN } = {
+	NUMBER: 'NUMBER',
+	SIGN: 'SIGN',
 }
