@@ -28,19 +28,21 @@ const descModal = ref<I_LEVEL>()
 				:key="level.id"
 				:style="{ background: level.bgColor }"
 				class="level"
+				@click="playAudio('click', true), gameStore.selectLevel(level.id)"
 			>
 				<div class="level__name">{{ $t(level.name) }}</div>
 				<div class="level__sign">{{ level.sign }}</div>
-				<button class="level__desc-btn" @click="playAudio('click', true),descModal = level">
+				<button class="level__desc-btn" @click.stop="playAudio('click', true),descModal = level">
 					<IconInfo :style="{ fill: level.infoIcon }" />
 				</button>
 				<button
 					class="level__select-btn"
-					@click="playAudio('click', true), gameStore.selectLevel(level.id)"
 				>
 					<IconPlay />
 				</button>
 			</div>
+
+			<a href="https://docs.google.com/document/d/1Hk88865_6yvWeWvi25jErXQOD6Oi5-h2qEHW5d8P25Y/edit?usp=sharing" target="_blank" class="privacy">{{ $t('privacy') }}</a>
 		</div>
 
 		<LevelDesc
@@ -55,7 +57,7 @@ const descModal = ref<I_LEVEL>()
 <style lang="scss" scoped>
 .start-page {
 	padding-top: 80px;
-	padding-bottom: 80px;
+	padding-bottom: 40px;
 }
 
 .levels {
@@ -137,6 +139,14 @@ const descModal = ref<I_LEVEL>()
 			width: 25px;
 		}
 	}
+}
+
+.privacy {
+	display: block;
+	margin: 25px auto;
+	font-size: 16px;
+	color: #ffffff;
+	text-decoration: none;
 }
 </style>
 

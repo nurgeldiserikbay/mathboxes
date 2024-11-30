@@ -24,7 +24,10 @@ const getValue = computed(() => {
 })
 
 const getFontSize = computed(() => {
-	if ($props.value.length > 2) return '18px'
+	if ($props.value.length > 5) return '12px'
+	else if ($props.value.length > 4) return '14px'
+	else if ($props.value.length > 3) return '16px'
+	else if ($props.value.length > 2) return '18px'
 	else if ($props.value.length > 1) return '20px'
 	return '22px'
 })

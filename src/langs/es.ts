@@ -1,5 +1,6 @@
 export default {
 	lang: 'Spanish',
+	privacy: 'Política de privacidad',
 	addition: 'Suma',
 	addition_desc: `<p>La suma es una operación matemática básica utilizada para encontrar el total de dos o más números. 
         <br><br><strong>Ejemplo:</strong><br> Si tienes 2 manzanas y alguien te da 3 más, tendrás <br><br><span class="expression"><strong>2 + 3 = 5</strong></span><br> manzanas.</p>`,

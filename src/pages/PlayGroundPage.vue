@@ -7,18 +7,21 @@ import CubeRube from '@/components/CubeRube.vue'
 import ResultTable from '@/components/ResultTable.vue'
 
 import { usePageStore } from '@/store/pageStore'
+import { useAdsStore } from '@/store/adsStore'
+import { useGameStore } from '@/store/gameStore'
 
 import { useAudio } from '@/composables/useAudio'
-import { useGameStore } from '@/store/gameStore'
 import { LEVELS } from '@/utils/conts'
 import { I_Exp } from '@/utils/types'
+import Admob from '@/utils/admob'
 
-import { getParsedExp, randomInt } from './bookfile'
+import { checkEquation, getParsedExp, randomInt } from './bookfile'
 
 let timerID: ReturnType<typeof setInterval>
 let timerCorID: ReturnType<typeof setInterval>
 const gameStore = useGameStore()
 const pageStore = usePageStore()
+const adsStore = useAdsStore()
 const { playAudio } = useAudio()
 const expressions = ref<I_Exp[]>([])
 const exp = ref(0)
@@ -40,13 +43,24 @@ watch(
 	}
 )
 
-const getLevelSign = computed(() => {
-	if (gameStore.getCurrentLevel?.id === 7)
-		LEVELS[randomInt(0, LEVELS.length - 1)].sign
+const getLevelSign = () => {
+	if (gameStore.getCurrentLevel?.id === 7) return LEVELS[randomInt(0, LEVELS.length - 1)].sign || '+'
 	return gameStore.getCurrentLevel?.sign || '+'
-})
+}
 
-onMounted(() => {
+onMounted(async () => {
+	try {
+		if (import.meta.env.VITE_APP_MODE !== 'TEST') {
+			if (adsStore.bannerInited) {
+				await Admob.resumeBanner()
+			} else {
+				await Admob.showBanner()
+				adsStore.bannerInit()
+			}
+		}
+	} catch (error: any) {
+		// console.log(error)
+	}
 	genExps()
 })
 
@@ -54,12 +68,24 @@ onBeforeUnmount(() => {
 	if (timerID) clearInterval(timerID)
 	if (timerCorID) clearTimeout(timerCorID)
 	gameStore.selectLevel(null)
+	if (import.meta.env.VITE_APP_MODE !== 'TEST') {
+		Admob.hideBanner()
+	}
 })
 
 function timeend() {
 	if (timerID) clearInterval(timerID)
 	playAudio('result', true)
 	isEnd.value = true
+	if (import.meta.env.VITE_APP_MODE !== 'TEST') {
+		adsStore.toggleLoading(true)
+		Admob.interstitial({
+			isFirst: false,
+			onInterstitialAdClosed: () => {
+				adsStore.toggleLoading(false)
+			},
+		})
+	} 
 }
 
 function setColors() {
@@ -68,10 +94,17 @@ function setColors() {
 		.map(() => LEVELS[randomInt(0, LEVELS.length - 1)].bgColor)
 }
 
-function answer(option: number, index: number) {
+function answer(option: number) {
 	if (answers.value[exp.value] !== undefined) return
 
-	if (getCurrentExp.value.raw[getCurrentExp.value.answer].value === option) {
+	const expRaw = getCurrentExp.value.raw.map((el, index) => {
+		if (index === getCurrentExp.value.answer) return option
+		return el.value
+	}).join('')
+
+	const itsCorrect = checkEquation(expRaw)
+
+	if (itsCorrect) {
 		playAudio('correct', true)
 		isCorrect.value = true
 	} else {
@@ -79,7 +112,7 @@ function answer(option: number, index: number) {
 		isCorrect.value = false
 	}
 
-	answers.value[exp.value] = index
+	answers.value[exp.value] = option
 
 	timerCorID = setTimeout(() => {
 		if (isCorrect.value) correctAns.value += 1
@@ -99,11 +132,11 @@ function genExps() {
 	timerID = setInterval(() => {
 		if (expressions.value.length === 1100) return
 		expressions.value.push(
-			getParsedExp(getLevelSign.value, expressions.value.length - 1)
+			getParsedExp(getLevelSign(), expressions.value.length - 1)
 		)
 
 		if (expressions.value.length === 1) setColors()
-	}, 50)
+	}, 1000)
 }
 
 function save(name: string) {
@@ -123,13 +156,13 @@ function save(name: string) {
 		<BackLink />
 		<div class="corrects">{{ correctAns }}</div>
 		<div v-if="getCurrentExp" class="task">
-			<TimerItem :time="gameStore.timeType" class="time" @timeend="timeend" />
+			<TimerItem :time="gameStore.timeType" :correct-ans="correctAns" class="time" @timeend="timeend" />
 			<div class="exp">
 				<CubeRube
 					v-for="(item, index) in getCurrentExp.raw"
 					:animateClass="''"
 					:key="item.order"
-					:value="String(item.value)"
+					:value="String(item.order === getCurrentExp.answer && isCorrect ? answers[exp] : item.value)"
 					:show="item.order !== getCurrentExp.answer || isCorrect !== null"
 					:bgcolor="colors[index]"
 				/>
@@ -144,17 +177,17 @@ function save(name: string) {
 					:size="'64px'"
 					:show="true"
 					:animateClass="
-						answers[exp] !== undefined && answers[exp] === optionInd
+						answers[exp] !== undefined && answers[exp] === option
 							? isCorrect
 								? 'rotate'
 								: 'shaking'
 							: ''
 					"
 					:class="{
-						hide: answers[exp] !== undefined && answers[exp] !== optionInd,
+						hide: answers[exp] !== undefined && answers[exp] !== option,
 					}"
 					class="options__cube"
-					@click="answer(option, optionInd)"
+					@click="answer(option)"
 				/>
 			</div>
 		</div>

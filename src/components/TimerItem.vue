@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onBeforeUnmount, onMounted, ref, computed } from 'vue'
+import { onBeforeUnmount, onMounted, ref, computed, watch } from 'vue'
 
 import { TYPE_TIMES } from '@/utils/types'
 import { TIMES } from '@/utils/conts'
@@ -15,6 +15,7 @@ const TIMES_VALUE: { [key in TYPE_TIMES]: number } = {
 const $props = withDefaults(
 	defineProps<{
 		time?: TYPE_TIMES
+		correctAns: number
 	}>(),
 	{
 		time: TIMES.MIN_3,
@@ -30,6 +31,10 @@ let timerId: ReturnType<typeof setInterval> | undefined
 const date = ref(0)
 const getWidth = computed(() => {
 	return `${(date.value / TIMES_VALUE[$props.time]) * 100}%`
+})
+
+watch(() => $props.correctAns, () => {
+	date.value += 10
 })
 
 onMounted(() => {

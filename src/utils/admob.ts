@@ -12,7 +12,7 @@ import {
 } from '@capacitor-community/admob'
 
 const AdMobInitializationOptions = {
-	// testingDevices: ['8a1b4b83d67add00', '1f6e845f97c74f32'],
+	testingDevices: ['8a1b4b83d67add00', '1f6e845f97c74f32', 'e81b6ee74e7f26dc'],
 	initializeForTesting: true,
 	tagForChildDirectedTreatment: true,
 }
@@ -51,7 +51,7 @@ class Admob {
 		)
 
 		const options: BannerAdOptions = {
-			adId: 'ca-app-pub-9702825788968948/5814818821',
+			adId: 'ca-app-pub-9702825788968948/2239900584',
 			adSize: BannerAdSize.BANNER,
 			position: BannerAdPosition.BOTTOM_CENTER,
 			margin: 0,
@@ -100,8 +100,8 @@ class Admob {
 		})
 
 		const options: AdOptions = {
-			adId: 'ca-app-pub-9702825788968948/5638576464',
-			// isTesting: true,
+			adId: 'ca-app-pub-9702825788968948/8253981889',
+			isTesting: true,
 			// npa: true
 		}
 

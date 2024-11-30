@@ -1,5 +1,6 @@
 export default {
 	lang: 'German',
+	privacy: 'Datenschutzrichtlinie',
 	addition: 'Addition',
 	addition_desc: `<p>Die Addition ist eine grundlegende mathematische Operation, die verwendet wird, um die Summe von zwei oder mehr Zahlen zu ermitteln.  
         <br><br><strong>Beispiel:</strong><br> Wenn du 2 Äpfel hast und jemand dir 3 weitere gibt, hast du <br><br><span class="expression"><strong>2 + 3 = 5</strong></span><br> Äpfel.</p>`,

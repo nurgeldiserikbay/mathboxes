@@ -1,5 +1,6 @@
 export default {
 	lang: 'English',
+	privacy: 'Privacy Policy',
 	addition: 'Addition',
 	addition_desc: `<p>The addition operation is a basic mathematical process used to find the total of two or more numbers. 
         <br><br><strong>Example:</strong><br> If you have 2 apples and someone gives you 3 more, you will have <br><br><span class="expression"><strong>2 + 3 = 5</strong></span><br> apples.</p>`,

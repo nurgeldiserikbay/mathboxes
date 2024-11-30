@@ -47,7 +47,7 @@ const $emits = defineEmits(['close'])
 	align-items: center;
 
 	.container {
-		width: 85%;
+		width: 95%;
 		max-width: 350px;
 	}
 

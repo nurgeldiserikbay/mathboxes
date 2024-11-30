@@ -4,5 +4,5 @@
     <string name="title_activity_main">Math Boxes</string>
     <string name="package_name">com.thelightcome.mathboxes</string>
     <string name="custom_url_scheme">com.thelightcome.mathboxes</string>
-    <string name="admob_app_id">[APP_ID]</string>
+    <string name="admob_app_id">ca-app-pub-9702825788968948~7121526324</string>
 </resources>

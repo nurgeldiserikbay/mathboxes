@@ -1,5 +1,6 @@
 export default {
 	lang: 'French',
+	privacy: 'Politique de confidentialité',
 	addition: 'Addition',
 	addition_desc: `<p>L'addition est une opération mathématique de base utilisée pour trouver la somme de deux nombres ou plus.  
         <br><br><strong>Exemple:</strong><br> Si vous avez 2 pommes et qu'on vous en donne 3 autres, vous aurez <br><br><span class="expression"><strong>2 + 3 = 5</strong></span><br> pommes.</p>`,
