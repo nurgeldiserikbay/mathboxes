@@ -43,7 +43,12 @@ function selectTime(time: TYPE_TIMES) {
 	right: 0;
 	bottom: 0;
 	z-index: 1000;
-	background: rgba(0, 0, 0, 0.5);
+	background: rgb(1, 109, 178);
+	background: radial-gradient(
+		circle,
+		rgba(1, 109, 178, 1) 0%,
+		rgba(1, 42, 74, 1) 100%
+	);
 	display: flex;
 	justify-content: center;
 	align-items: center;

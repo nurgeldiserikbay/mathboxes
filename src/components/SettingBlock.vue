@@ -93,7 +93,14 @@ function change(event: Event) {
 		right: 0;
 		bottom: 0;
 		z-index: 1000;
-		background: rgba(0, 0, 0, 0.5);
+		background: rgb(1, 109, 178);
+	background: radial-gradient(
+		circle,
+		rgba(1, 109, 178, 1) 0%,
+		rgba(1, 42, 74, 1) 100%
+	);
+	box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4),
+		inset 0px -2px 4px rgba(255, 255, 255, 0.2);
 		display: flex;
 		justify-content: center;
 		align-items: center;
@@ -164,7 +171,7 @@ function change(event: Event) {
 	&__ok {
 		color: #020202;
 		background: transparent;
-		padding: 8px 18px;
+		padding: 12px 22px;
 		border-radius: 5px;
 		cursor: pointer;
 		font-size: 18px;
