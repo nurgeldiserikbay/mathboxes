@@ -64,14 +64,16 @@ function selectTime(time: TYPE_TIMES) {
 .time {
 	padding: 25px 45px;
 	cursor: pointer;
-	font-size: 18px;
+	font-size: 24px;
+	font-weight: 600;
+	letter-spacing: 2px;
 	background: linear-gradient(
 		to bottom,
 		rgba(1, 158, 219, 1),
 		rgba(0, 78, 139, 1)
 	);
 	border: 1px solid rgba(255, 255, 255, 0.2);
-	border-radius: 5px;
+	border-radius: 15px;
 	color: #ffffff;
 	transition: transform 0.2s ease, box-shadow 0.2s ease;
 	box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4),

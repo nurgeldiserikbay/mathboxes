@@ -40,14 +40,17 @@ function selectLang(lang: string) {
 	justify-content: center;
 	align-items: center;
 	flex-wrap: wrap;
-	gap: 5px;
+	gap: 10px;
 
 	&__item {
-		padding: 5px 10px;
+		padding: 10px 20px;
 		border: 1px solid #020202;
-		border-radius: 5px;
+		border-radius: 10px;
 		cursor: pointer;
 		transition: 300ms;
+		font-size: 20px;
+		font-weight: bold;
+		text-transform: uppercase;
 
 		&--active {
 			color: #ffffff;

@@ -41,8 +41,8 @@ const descModal = ref<I_LEVEL>()
 					<IconPlay />
 				</button>
 			</div>
-
-			<a href="https://docs.google.com/document/d/1Hk88865_6yvWeWvi25jErXQOD6Oi5-h2qEHW5d8P25Y/edit?usp=sharing" target="_blank" class="privacy">{{ $t('privacy') }}</a>
+			
+			<a href="https://docs.google.com/document/d/1zsuymqEMonMRWg1RoEIqpQpo4ThFwEOoOYgnL060GQk/edit?usp=sharing" target="_blank" class="privacy">{{ $t('privacy') }}</a>
 		</div>
 
 		<LevelDesc
@@ -56,7 +56,7 @@ const descModal = ref<I_LEVEL>()
 
 <style lang="scss" scoped>
 .start-page {
-	padding-top: 80px;
+	padding-top: 95px;
 	padding-bottom: 40px;
 }
 
@@ -65,8 +65,8 @@ const descModal = ref<I_LEVEL>()
 	flex-direction: column;
 	justify-content: flex-start;
 	align-items: stretch;
-	gap: 12px;
-	max-width: 320px;
+	gap: 15px;
+	max-width: 350px;
 	margin: 0 auto;
 }
 
@@ -77,7 +77,7 @@ const descModal = ref<I_LEVEL>()
 	align-items: center;
 	padding: 10px 25px;
 	padding-right: 85px;
-	min-height: 80px;
+	min-height: 100px;
 	border-radius: 15px;
 	background: linear-gradient(
 		to bottom,
@@ -113,30 +113,30 @@ const descModal = ref<I_LEVEL>()
 
 	&__desc-btn {
 		position: absolute;
-		top: 10px;
-		right: 10px;
+		top: 8px;
+		right: 8px;
 		cursor: pointer;
 		padding: 0;
 		background: transparent;
 		border: none;
 
 		svg {
-			width: 25px;
-			height: 25px;
+			width: 40px;
+			height: 40px;
 		}
 	}
 
 	&__select-btn {
 		position: absolute;
-		bottom: 10px;
-		right: 10px;
+		bottom: 6px;
+		right: 8px;
 		cursor: pointer;
 		padding: 0;
 		background: transparent;
 		border: none;
 
 		svg {
-			width: 25px;
+			width: 40px;
 		}
 	}
 }
@@ -144,7 +144,10 @@ const descModal = ref<I_LEVEL>()
 .privacy {
 	display: block;
 	margin: 25px auto;
-	font-size: 16px;
+	font-size: 20px;
+	letter-spacing: 2px;
+	padding: 10px 15px;
+	cursor: pointer;
 	color: #ffffff;
 	text-decoration: none;
 }

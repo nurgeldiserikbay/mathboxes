@@ -63,7 +63,7 @@ onMounted(() => {
 	align-items: center;
 
 	.container {
-		width: 85%;
+		width: 93%;
 		max-width: 350px;
 	}
 
@@ -88,7 +88,7 @@ onMounted(() => {
 		display: flex;
 		align-items: stretch;
 		width: 100%;
-		height: 44px;
+		height: 65px;
 		border-radius: 15px;
 		overflow: hidden;
 		border: 1px solid #020202;
@@ -97,10 +97,10 @@ onMounted(() => {
 	}
 
 	&__input-body {
-		width: 85%;
+		width: 93%;
 		background: transparent;
 		border: none;
-		font-size: 18px;
+		font-size: 26px;
 		font-style: italic;
 		padding: 5px 10px 5px 18px;
 		box-sizing: border-box;
@@ -114,13 +114,14 @@ onMounted(() => {
 		align-items: center;
 		justify-content: space-between;
 		padding: 0 18px;
+		font-size: 22px;
 		font-weight: 800;
 		box-sizing: border-box;
 		margin-bottom: 35px;
 
 		div {
 			&:last-child {
-				font-size: 20px;
+				font-size: 24px;
 			}
 		}
 	}
@@ -128,11 +129,12 @@ onMounted(() => {
 	&__ok {
 		color: #020202;
 		background: transparent;
-		padding: 12px 22px;
-		border-radius: 5px;
-		cursor: pointer;
-		font-size: 18px;
+		padding: 18px 40px;
+		font-size: 24px;
+		line-height: 1;
 		font-weight: 600;
+		border-radius: 20px;
+		cursor: pointer;
 	}
 }
 </style>

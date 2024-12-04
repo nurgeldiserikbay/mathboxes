@@ -22,7 +22,7 @@ function back() {
 <style lang="scss" scoped>
 .back-link {
 	position: absolute;
-	top: 20px;
+	top: 10px;
 	background: transparent;
 	padding: 0;
 	border: none;
@@ -30,8 +30,8 @@ function back() {
 	cursor: pointer;
 
 	svg {
-		width: 30px;
-		height: 30px;
+		width: 45px;
+		height: 45px;
 	}
 }
 </style>

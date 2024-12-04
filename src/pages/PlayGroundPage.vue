@@ -202,7 +202,7 @@ function save(name: string) {
 .page {
 	min-height: 100dvh;
 	box-sizing: border-box;
-	padding: 65px 15px 65px;
+	padding: 85px 15px 65px;
 	perspective: 900px;
 	display: flex;
 	flex-direction: column;
@@ -230,7 +230,7 @@ function save(name: string) {
 }
 
 .options {
-	width: 85%;
+	width: 93%;
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 	align-items: center;
@@ -251,7 +251,7 @@ function save(name: string) {
 	position: absolute;
 	top: 15px;
 	right: 35px;
-	font-size: 22px;
+	font-size: 28px;
 	font-weight: 800;
 	color: rgb(240, 164, 42);
 	background: -webkit-linear-gradient(

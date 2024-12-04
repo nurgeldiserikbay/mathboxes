@@ -53,13 +53,15 @@ const selectTime = ref(TIMES.MIN)
 
 	&__btn {
 		width: 100%;
-		padding: 5px 15px;
+		padding: 14px 25px;
 		cursor: pointer;
 		display: flex;
 		justify-content: flex-start;
 		background: transparent;
+		font-size: 22px;
 		font-weight: 800;
 		text-transform: capitalize;
+		border-radius: 15px;
 
 		span {
 			&:last-child {
@@ -90,6 +92,8 @@ const selectTime = ref(TIMES.MIN)
 		margin-bottom: 10px;
 
 		button {
+			padding: 8px;
+			font-size: 20px;
 			flex-grow: 1;
 			flex-shrink: 0;
 			background: linear-gradient(

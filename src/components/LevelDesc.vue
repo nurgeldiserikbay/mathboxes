@@ -59,7 +59,7 @@ const $emits = defineEmits(['close'])
 	}
 
 	&__in {
-		padding: 20px 28px 48px;
+		padding: 20px 10px 30px;
 		border-radius: 12px;
 		height: 80vh;
 		width: 100%;
@@ -76,12 +76,12 @@ const $emits = defineEmits(['close'])
 	}
 
 	&__name {
-		font-size: 20px;
+		font-size: 24px;
 		font-weight: 900;
 		line-height: 1;
 		font-style: italic;
 		text-transform: capitalize;
-		color: #484646;
+		color: #020202;
 		letter-spacing: 4px;
 	}
 
@@ -91,15 +91,15 @@ const $emits = defineEmits(['close'])
 		border-radius: 24px;
 		width: 100%;
 		box-sizing: border-box;
-		padding: 22px 18px;
+		padding: 20px 18px;
 		box-shadow: inset 0 0 15px 0 rgba(0, 0, 0, 0.7);
 		margin-bottom: 18px;
 		text-align: left;
-		line-height: 1.3;
-		font-size: 16px;
+		line-height: 1.2;
+		font-size: 20px;
 		font-weight: 600;
 		font-style: notmal;
-		color: #484646;
+		color: #020202;
 		letter-spacing: 2px;
 	}
 
@@ -110,11 +110,12 @@ const $emits = defineEmits(['close'])
 	&__btn {
 		color: #020202;
 		background: transparent;
-		padding: 12px 22px;
-		border-radius: 5px;
-		cursor: pointer;
-		font-size: 18px;
+		padding: 18px 40px;
+		font-size: 24px;
+		line-height: 1;
 		font-weight: 600;
+		border-radius: 20px;
+		cursor: pointer;
 	}
 }
 </style>

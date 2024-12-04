@@ -76,8 +76,8 @@ function select(id: number) {
 <style lang="scss" scoped>
 .history {
 	&__btn {
-		width: 35px;
-		height: 35px;
+		width: 50px;
+		height: 50px;
 		background: transparent;
 		padding: 0;
 		border: none;
@@ -98,20 +98,20 @@ function select(id: number) {
 		bottom: 0;
 		z-index: 1000;
 		background: rgb(1, 109, 178);
-	background: radial-gradient(
-		circle,
-		rgba(1, 109, 178, 1) 0%,
-		rgba(1, 42, 74, 1) 100%
-	);
-	box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4),
-		inset 0px -2px 4px rgba(255, 255, 255, 0.2);
+		background: radial-gradient(
+			circle,
+			rgba(1, 109, 178, 1) 0%,
+			rgba(1, 42, 74, 1) 100%
+		);
+		box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4),
+			inset 0px -2px 4px rgba(255, 255, 255, 0.2);
 		display: flex;
 		justify-content: center;
 		align-items: center;
 	}
 
 	.container {
-		width: 85%;
+		width: 93%;
 		max-width: 350px;
 	}
 
@@ -119,7 +119,7 @@ function select(id: number) {
 		padding: 24px 14px 24px;
 		border-radius: 12px;
 		width: 100%;
-		height: 70vh;
+		height: 80vh;
 		box-sizing: border-box;
 		display: flex;
 		flex-direction: column;
@@ -131,11 +131,12 @@ function select(id: number) {
 	&__ok {
 		color: #020202;
 		background: transparent;
-		padding: 12px 22px;
-		border-radius: 5px;
-		cursor: pointer;
-		font-size: 18px;
+		padding: 18px 40px;
+		font-size: 24px;
+		line-height: 1;
 		font-weight: 600;
+		border-radius: 20px;
+		cursor: pointer;
 	}
 }
 

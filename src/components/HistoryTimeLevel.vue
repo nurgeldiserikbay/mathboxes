@@ -69,6 +69,8 @@ defineProps<{
 
 	&__record {
 		text-align: center;
+		font-size: 22px;
+		margin-top: 15px;
 	}
 
 	.head {
