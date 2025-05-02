@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { Capacitor } from '@capacitor/core'
 
 import BackLink from '@/components/BackLink.vue'
 import TimerItem from '@/components/TimerItem.vue'
@@ -44,19 +45,15 @@ watch(
 )
 
 const getLevelSign = () => {
-	if (gameStore.getCurrentLevel?.id === 7) return LEVELS[randomInt(0, LEVELS.length - 1)].sign || '+'
+	if (gameStore.getCurrentLevel?.id === 7)
+		return LEVELS[randomInt(0, LEVELS.length - 1)].sign || '+'
 	return gameStore.getCurrentLevel?.sign || '+'
 }
 
 onMounted(async () => {
 	try {
-		if (import.meta.env.VITE_APP_MODE !== 'TEST') {
-			if (adsStore.bannerInited) {
-				await Admob.resumeBanner()
-			} else {
-				await Admob.showBanner()
-				adsStore.bannerInit()
-			}
+		if (Capacitor.getPlatform() === 'android') {
+			await Admob.showBanner()
 		}
 	} catch (error: any) {
 		// console.log(error)
@@ -68,8 +65,8 @@ onBeforeUnmount(() => {
 	if (timerID) clearInterval(timerID)
 	if (timerCorID) clearTimeout(timerCorID)
 	gameStore.selectLevel(null)
-	if (import.meta.env.VITE_APP_MODE !== 'TEST') {
-		Admob.hideBanner()
+	if (Capacitor.getPlatform() === 'android') {
+		Admob.removeBanner()
 	}
 })
 
@@ -77,7 +74,7 @@ function timeend() {
 	if (timerID) clearInterval(timerID)
 	playAudio('result', true)
 	isEnd.value = true
-	if (import.meta.env.VITE_APP_MODE !== 'TEST') {
+	if (Capacitor.getPlatform() === 'android') {
 		adsStore.toggleLoading(true)
 		Admob.interstitial({
 			isFirst: false,
@@ -85,7 +82,7 @@ function timeend() {
 				adsStore.toggleLoading(false)
 			},
 		})
-	} 
+	}
 }
 
 function setColors() {
@@ -97,10 +94,12 @@ function setColors() {
 function answer(option: number) {
 	if (answers.value[exp.value] !== undefined) return
 
-	const expRaw = getCurrentExp.value.raw.map((el, index) => {
-		if (index === getCurrentExp.value.answer) return option
-		return el.value
-	}).join('')
+	const expRaw = getCurrentExp.value.raw
+		.map((el, index) => {
+			if (index === getCurrentExp.value.answer) return option
+			return el.value
+		})
+		.join('')
 
 	const itsCorrect = checkEquation(expRaw)
 
@@ -156,13 +155,24 @@ function save(name: string) {
 		<BackLink />
 		<div class="corrects">{{ correctAns }}</div>
 		<div v-if="getCurrentExp" class="task">
-			<TimerItem :time="gameStore.timeType" :correct-ans="correctAns" class="time" @timeend="timeend" />
+			<TimerItem
+				:time="gameStore.timeType"
+				:correct-ans="correctAns"
+				class="time"
+				@timeend="timeend"
+			/>
 			<div class="exp">
 				<CubeRube
 					v-for="(item, index) in getCurrentExp.raw"
 					:animateClass="''"
 					:key="item.order"
-					:value="String(item.order === getCurrentExp.answer && isCorrect ? answers[exp] : item.value)"
+					:value="
+						String(
+							item.order === getCurrentExp.answer && isCorrect
+								? answers[exp]
+								: item.value
+						)
+					"
 					:show="item.order !== getCurrentExp.answer || isCorrect !== null"
 					:bgcolor="colors[index]"
 				/>

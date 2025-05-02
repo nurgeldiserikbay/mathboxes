@@ -1,5 +1,11 @@
 <script lang="ts" setup>
 import { onMounted } from 'vue'
+import { Capacitor } from '@capacitor/core'
+import { StatusBar } from '@capacitor/status-bar'
+import { SplashScreen } from '@capacitor/splash-screen'
+import { Fullscreen } from '@boengli/capacitor-fullscreen'
+import { useI18n } from 'vue-i18n'
+import { Device } from '@capacitor/device'
 
 import Admob from '@/utils/admob'
 
@@ -12,12 +18,30 @@ import { useGameStore } from '@/store/gameStore'
 
 const pageStore = usePageStore()
 const gameStore = useGameStore()
+const i18n = useI18n()
 
-onMounted(() => {
-	if (import.meta.env.VITE_APP_MODE !== 'TEST') Admob.initialize()
-
+onMounted(async () => {
 	gameStore.loadData()
+
+	if (Capacitor.getPlatform() === 'android') {
+		Admob.initialize()
+	}
+
+	if (Capacitor.getPlatform() === 'android') {
+		await Fullscreen.activateImmersiveMode()
+		await StatusBar.hide()
+		await StatusBar.setOverlaysWebView({ overlay: true })
+		await SplashScreen.hide()
+		logDeviceInfo()
+	}
 })
+
+async function logDeviceInfo() {
+	const info = await Device.getLanguageCode()
+	const lang = i18n.availableLocales.find((lang) => lang === info.value)
+
+	if (lang) i18n.locale.value = lang
+}
 </script>
 
 <template>

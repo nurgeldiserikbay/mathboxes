@@ -150,6 +150,7 @@ const descModal = ref<I_LEVEL>()
 	cursor: pointer;
 	color: #ffffff;
 	text-decoration: none;
+	text-align: center;
 }
 </style>
 
