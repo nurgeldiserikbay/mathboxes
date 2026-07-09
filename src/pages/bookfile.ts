@@ -42,19 +42,20 @@ export function getRange(index: number, sign: string): number[] {
 		if (index < 150) return [1, 5000]
 		return [0, 9999]
 	} else if (['^'].includes(sign)) {
-		if (index < 10) return [1, 10, 2, 2]
-		if (index < 20) return [1, 10, 2, 3]
-		if (index < 30) return [1, 20, 2, 3]
-		if (index < 40) return [1, 50, 2, 3]
-		if (index < 100) return [1, 100, 2, 3]
-		return [0, 9999, 2, 4]
+		// base min 2: base 0/1 makes several answers "correct" (ambiguous).
+		if (index < 10) return [2, 10, 2, 2]
+		if (index < 20) return [2, 10, 2, 3]
+		if (index < 30) return [2, 20, 2, 3]
+		if (index < 40) return [2, 50, 2, 3]
+		// Cap at 100^3 (1e6); larger produced unreadable ~1e16 numbers.
+		return [2, 100, 2, 3]
 	} else if (['log'].includes(sign)) {
-		if (index < 10) return [1, 10, 2, 2]
-		if (index < 20) return [1, 10, 2, 3]
-		if (index < 30) return [1, 20, 2, 3]
-		if (index < 40) return [1, 50, 2, 3]
-		if (index < 100) return [1, 100, 2, 3]
-		return [0, 9999, 2, 4]
+		// base min 2: base 0/1 makes log ambiguous.
+		if (index < 10) return [2, 10, 2, 2]
+		if (index < 20) return [2, 10, 2, 3]
+		if (index < 30) return [2, 20, 2, 3]
+		if (index < 40) return [2, 50, 2, 3]
+		return [2, 100, 2, 3]
 	}
 
 	return [0, 100, 2, 2]
@@ -63,17 +64,23 @@ export function getRange(index: number, sign: string): number[] {
 export function getOptions(target: number, count: number): number[] {
 	const similarNumbers: number[] = [target]
 
+	// Widen the search window if there aren't enough unique small candidates
+	// so this loop can never spin forever (e.g. when target is very small).
+	let spread = 10
+	let guard = 0
 	while (similarNumbers.length < count) {
-		const offset = Math.floor(Math.random() * 10) + 1
+		const offset = Math.floor(Math.random() * spread) + 1
 		const variation = Math.random() < 0.5 ? -offset : offset
 		const similar = target + variation
 
-		if (similar !== target && similar > 0) {
+		if (similar > 0 && !similarNumbers.includes(similar)) {
 			similarNumbers.push(similar)
 		}
+
+		if (++guard % 50 === 0) spread += 10
 	}
 
-	return Array.from(similarNumbers).sort(() => (Math.random() < 0.5 ? -1 : 1))
+	return similarNumbers.sort(() => (Math.random() < 0.5 ? -1 : 1))
 }
 
 export function codeFunc(exp: (string | number)[]): I_Exp_Sign[] {
@@ -184,6 +191,11 @@ export function randomInt(min: number, max: number): number {
 	return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
+// Float-safe equality for sqrt/pow/log results (integers differ by >= 1).
+function approxEqual(a: number, b: number): boolean {
+	return Math.abs(a - b) < 1e-9
+}
+
 export function checkEquation(equation: string) {
 	try {
 		const [left, right] = equation.split('=')
@@ -206,15 +218,15 @@ export function checkEquation(equation: string) {
 			return a / b === expectedResult
 		} else if (left.includes('^')) {
 			const [a, b] = left.split('^').map(Number)
-			return Math.pow(a, b) === expectedResult
+			return approxEqual(Math.pow(a, b), expectedResult)
 		} else if (left.startsWith('√')) {
 			const a = parseFloat(left.slice(1))
-			return Math.sqrt(a) === expectedResult
+			return approxEqual(Math.sqrt(a), expectedResult)
 		} else if (left.startsWith('log(')) {
 			const baseEndIndex = left.indexOf(')')
 			const base = parseFloat(left.slice(4, baseEndIndex))
 			const a = parseFloat(left.slice(baseEndIndex + 1))
-			return Math.pow(base, expectedResult) === a
+			return approxEqual(Math.pow(base, expectedResult), a)
 		} else {
 			throw new Error('Unknown operation')
 		}

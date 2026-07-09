@@ -10,13 +10,12 @@ export const audioList: { [key: string]: string } = {
 const audioActive = ref(true)
 
 export const useAudio = () => {
-	function playAudio(audioType: string, anyway: boolean = false) {
-		if (!anyway && (!audioActive.value || !audioList[audioType])) return
+	function playAudio(audioType: string, _anyway: boolean = false) {
+		// Always respect the mute flag; `_anyway` kept for call-site compatibility.
+		if (!audioActive.value || !audioList[audioType]) return
 
-		if (audioList[audioType]) {
-			const audio = new Audio(audioList[audioType])
-			audio.play()
-		}
+		const audio = new Audio(audioList[audioType])
+		audio.play()
 	}
 
 	function toggleAudio() {

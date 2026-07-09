@@ -5,7 +5,6 @@ import { Preferences } from '@capacitor/preferences'
 import { I_GameStats, TYPE_TIMES } from '@/utils/types'
 
 import { DEFAULT_NAME, LEVELS, TIMES } from '@/utils/conts'
-import { randomInt } from '@/pages/bookfile'
 
 export const useGameStore = defineStore('GameStore', () => {
 	const name = ref<string>('')
@@ -80,13 +79,13 @@ export const useGameStore = defineStore('GameStore', () => {
 		name.value = nameData.value || DEFAULT_NAME
 	}
 
-	const rLevel = LEVELS[randomInt(0, LEVELS.length - 1)]
-	const bgColor = computed(() => {
-		return rLevel.bgColor
-	})
-	const mainColor = computed(() => {
-		return rLevel.mainColor
-	})
+	// Tie the timer/modal colors to the selected level (fallback to first level).
+	const bgColor = computed(
+		() => getCurrentLevel.value?.bgColor ?? LEVELS[0].bgColor
+	)
+	const mainColor = computed(
+		() => getCurrentLevel.value?.mainColor ?? LEVELS[0].mainColor
+	)
 
 	return {
 		name,

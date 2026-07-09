@@ -33,9 +33,13 @@ const getWidth = computed(() => {
 	return `${(date.value / TIMES_VALUE[$props.time]) * 100}%`
 })
 
-watch(() => $props.correctAns, () => {
-	date.value += 10
-})
+watch(
+	() => $props.correctAns,
+	(newVal, oldVal) => {
+		// Only reward time when the score actually increases (correct answer).
+		if (newVal > oldVal) date.value += 10
+	}
+)
 
 onMounted(() => {
 	createTimer()

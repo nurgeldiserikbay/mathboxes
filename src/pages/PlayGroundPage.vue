@@ -32,6 +32,11 @@ const correctAns = ref(0)
 const isEnd = ref(false)
 const isCorrect = ref<boolean | null>(null)
 const colors = ref<string[]>([])
+const optionColors = ref<string[]>([])
+
+// Buffer sizes for expression pre-generation.
+const INITIAL_BUFFER = 20
+const MAX_BUFFER = 1100
 
 const getCurrentExp = computed(() => {
 	return expressions.value[expInd.value]
@@ -45,8 +50,10 @@ watch(
 )
 
 const getLevelSign = () => {
+	// Level 7 ("all") mixes real operators. Exclude the last level itself,
+	// whose sign "..." is not a valid operator and would crash generation.
 	if (gameStore.getCurrentLevel?.id === 7)
-		return LEVELS[randomInt(0, LEVELS.length - 1)].sign || '+'
+		return LEVELS[randomInt(0, LEVELS.length - 2)].sign || '+'
 	return gameStore.getCurrentLevel?.sign || '+'
 }
 
@@ -58,7 +65,6 @@ onMounted(async () => {
 	} catch (error: any) {
 		// console.log(error)
 	}
-	genExps()
 })
 
 onBeforeUnmount(() => {
@@ -86,9 +92,14 @@ function timeend() {
 }
 
 function setColors() {
+	if (!getCurrentExp.value) return
 	colors.value = new Array(getCurrentExp.value.raw.length)
 		.fill(0)
 		.map(() => LEVELS[randomInt(0, LEVELS.length - 1)].bgColor)
+	// Compute option colors once per expression to avoid per-render flicker.
+	optionColors.value = getCurrentExp.value.options.map(
+		() => LEVELS[randomInt(0, LEVELS.length - 1)].bgColor
+	)
 }
 
 function answer(option: number) {
@@ -127,16 +138,26 @@ function answer(option: number) {
 	}, 1000)
 }
 
-function genExps() {
-	timerID = setInterval(() => {
-		if (expressions.value.length === 1100) return
-		expressions.value.push(
-			getParsedExp(getLevelSign(), expressions.value.length - 1)
-		)
+function pushExp() {
+	expressions.value.push(
+		getParsedExp(getLevelSign(), expressions.value.length)
+	)
+}
 
-		if (expressions.value.length === 1) setColors()
+function genExps() {
+	// Pre-generate a buffer so the play field is never empty (no 1s blank frame).
+	for (let i = 0; i < INITIAL_BUFFER; i++) pushExp()
+	setColors()
+
+	// Keep the buffer topped up ahead of the player.
+	timerID = setInterval(() => {
+		if (expressions.value.length >= MAX_BUFFER) return
+		pushExp()
 	}, 1000)
 }
+
+// Build the initial buffer synchronously so the first render already has data.
+genExps()
 
 function save(name: string) {
 	gameStore.recordGameStat(
@@ -183,7 +204,7 @@ function save(name: string) {
 					v-for="(option, optionInd) in getCurrentExp.options"
 					:key="optionInd"
 					:value="String(option)"
-					:bgcolor="LEVELS[randomInt(0, LEVELS.length - 1)].bgColor"
+					:bgcolor="optionColors[optionInd]"
 					:size="'64px'"
 					:show="true"
 					:animateClass="
