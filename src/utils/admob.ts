@@ -10,14 +10,28 @@ import {
 	AdLoadInfo,
 	AdOptions,
 } from '@capacitor-community/admob'
+import type { PluginListenerHandle } from '@capacitor/core'
 
 const AdMobInitializationOptions = {
 	testingDevices: ['8a1b4b83d67add00', '1f6e845f97c74f32', 'e81b6ee74e7f26dc'],
-	initializeForTesting: true,
-	tagForChildDirectedTreatment: true,
+	// Mode-based: enable test ads only in dev builds, real ads in production.
+	initializeForTesting: import.meta.env.DEV,
+	// tagForChildDirectedTreatment removed (was `true`): forcing COPPA child
+	// treatment disables personalized ads and heavily reduces revenue. If this
+	// app is legally directed at children, set the audience in the AdMob
+	// console instead of forcing it client-side.
+	// TODO(owner): confirm target-audience / COPPA policy in AdMob console.
 }
 
+// Frequency cap: show at most one interstitial per this interval.
+const INTERSTITIAL_MIN_INTERVAL_MS = 90 * 1000
+let lastInterstitialShownAt = 0
+
 class Admob {
+	// Guard so banner event listeners are registered only once (prevents a
+	// listener leak: showBanner() runs on every entry to the play screen).
+	private bannerListenersRegistered = false
+
 	async initialize() {
 		await AdMob.initialize(AdMobInitializationOptions)
 
@@ -38,17 +52,21 @@ class Admob {
 	}
 
 	async showBanner() {
-		AdMob.addListener(BannerAdPluginEvents.Loaded, () => {
-			// Subscribe Banner Event Listener
-		})
+		if (!this.bannerListenersRegistered) {
+			this.bannerListenersRegistered = true
 
-		AdMob.addListener(
-			BannerAdPluginEvents.SizeChanged,
-			(size: AdMobBannerSize) => {
-				console.log(size)
-				// Subscribe Change Banner Size
-			}
-		)
+			await AdMob.addListener(BannerAdPluginEvents.Loaded, () => {
+				// Subscribe Banner Event Listener
+			})
+
+			await AdMob.addListener(
+				BannerAdPluginEvents.SizeChanged,
+				(size: AdMobBannerSize) => {
+					console.log(size)
+					// Subscribe Change Banner Size
+				}
+			)
+		}
 
 		const options: BannerAdOptions = {
 			adId: 'ca-app-pub-9702825788968948/2239900584',
@@ -81,27 +99,64 @@ class Admob {
 		isFirst: boolean,
 		onInterstitialAdClosed: () => void
 	}) {
-		let isClosed = false
-		function closeAds() {
+		// Frequency cap: skip showing if we showed one too recently. Still fire
+		// the close callback so the caller's loading state is cleared.
+		if (
+			!isFirst &&
+			Date.now() - lastInterstitialShownAt < INTERSTITIAL_MIN_INTERVAL_MS
+		) {
 			onInterstitialAdClosed()
-			isClosed = true
+			return
 		}
 
-		AdMob.addListener(InterstitialAdPluginEvents.Loaded, (info: AdLoadInfo) => {
-			console.log(info)
-		})
-		AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => {
-			console.log('Dismissed')
-			if (!isClosed) closeAds()
-		})
-		AdMob.addListener(InterstitialAdPluginEvents.FailedToLoad, () => {
-			console.log('FailedToLoad')
-			if (!isClosed) closeAds()
-		})
-		AdMob.addListener(InterstitialAdPluginEvents.FailedToShow, () => {
-			console.log('FailedToShow')
-			if (!isClosed) closeAds()
-		})
+		const handles: PluginListenerHandle[] = []
+		let isClosed = false
+
+		async function cleanup() {
+			for (const handle of handles) {
+				try {
+					await handle.remove()
+				} catch {
+					// ignore
+				}
+			}
+			handles.length = 0
+		}
+
+		function closeAds() {
+			if (isClosed) return
+			isClosed = true
+			onInterstitialAdClosed()
+			// Remove this call's listeners so they don't accumulate across games.
+			cleanup()
+		}
+
+		handles.push(
+			await AdMob.addListener(
+				InterstitialAdPluginEvents.Loaded,
+				(info: AdLoadInfo) => {
+					console.log(info)
+				}
+			)
+		)
+		handles.push(
+			await AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => {
+				console.log('Dismissed')
+				closeAds()
+			})
+		)
+		handles.push(
+			await AdMob.addListener(InterstitialAdPluginEvents.FailedToLoad, () => {
+				console.log('FailedToLoad')
+				closeAds()
+			})
+		)
+		handles.push(
+			await AdMob.addListener(InterstitialAdPluginEvents.FailedToShow, () => {
+				console.log('FailedToShow')
+				closeAds()
+			})
+		)
 
 		const options: AdOptions = {
 			adId: 'ca-app-pub-9702825788968948/8253981889',
@@ -109,8 +164,20 @@ class Admob {
 			// npa: true
 		}
 
-		await AdMob.prepareInterstitial(options)
-		if (!isFirst) await AdMob.showInterstitial()
+		try {
+			await AdMob.prepareInterstitial(options)
+			if (!isFirst) {
+				await AdMob.showInterstitial()
+				lastInterstitialShownAt = Date.now()
+				// Close is driven by the Dismissed/Failed listeners above.
+			} else {
+				// Preload only (not shown): drop listeners to avoid a leak.
+				await cleanup()
+			}
+		} catch (error) {
+			console.log(error)
+			closeAds()
+		}
 	}
 }
 
