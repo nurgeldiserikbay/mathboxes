@@ -7,7 +7,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:8.2.1'
+        classpath 'com.android.tools.build:gradle:8.5.0'
         classpath 'com.google.gms:google-services:4.4.0'
 
         // NOTE: Do not place your application dependencies here; they belong
@@ -21,6 +21,13 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+    // Capacitor and its dependencies require Java 21+. 
+    // Using a toolchain ensures the correct JDK is used for compilation.
+    tasks.withType(JavaCompile).configureEach {
+        javaCompiler = javaToolchains.compilerFor {
+            languageVersion = JavaLanguageVersion.of(22)
+        }
     }
 }
 

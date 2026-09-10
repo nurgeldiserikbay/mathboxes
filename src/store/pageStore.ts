@@ -7,38 +7,36 @@ import { TYPE_PAGES } from '@/utils/types'
 import { PAGES } from '@/utils/conts'
 
 import StartPage from '@/pages/StartPage.vue'
-import PlayGroundPage from '@/pages/PlayGroundPage.vue'
+// Прежняя доска — та, где ответ выбирался нажатием — осталась в дереве целиком.
+// Откат к ней стоит одной строки ниже: переписана треть кодовой базы, и такая
+// правка должна быть обратимой без археологии в истории.
+import ClimbPage from '@/pages/ClimbPage.vue'
 
 export const usePageStore = defineStore('PageStore', () => {
 	const currentPage = ref<TYPE_PAGES>(PAGES.START)
 
+	/**
+	 * Bumped on every run. `App.vue` keys the page on it, so "play again"
+	 * remounts the board with a fresh session instead of routing through a menu.
+	 */
+	const runId = ref(0)
+
 	const pages: { [key in TYPE_PAGES]: Component } = {
 		START: StartPage,
-		PLAYGROUND: PlayGroundPage,
+		PLAYGROUND: ClimbPage,
 	}
 
-	const currentPageComponent = computed(() => {
-		return pages[currentPage.value]
-	})
+	const currentPageComponent = computed(() => pages[currentPage.value])
+	const viewKey = computed(() => `${currentPage.value}-${runId.value}`)
 
-	const backLink = computed(() => {
-		if (currentPage.value === PAGES.PLAYGROUND) return PAGES.START
-		else return ''
-	})
-
-	function routeTo(page: TYPE_PAGES) {
-		currentPage.value = page
+	function startRun() {
+		runId.value += 1
+		currentPage.value = PAGES.PLAYGROUND
 	}
 
-	function toBackLink() {
-		if (backLink.value) routeTo(backLink.value)
+	function toHome() {
+		currentPage.value = PAGES.START
 	}
 
-	return {
-		currentPage,
-		currentPageComponent,
-		routeTo,
-		backLink,
-		toBackLink,
-	}
+	return { currentPage, currentPageComponent, viewKey, startRun, toHome }
 })

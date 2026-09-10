@@ -1,35 +1,109 @@
 export default {
 	lang: 'English',
 	privacy: 'Privacy Policy',
+
 	addition: 'Addition',
-	addition_desc: `<p>The addition operation is a basic mathematical process used to find the total of two or more numbers. 
-        <br><br><strong>Example:</strong><br> If you have 2 apples and someone gives you 3 more, you will have <br><br><span class="expression"><strong>2 + 3 = 5</strong></span><br> apples.</p>`,
+	addition_desc: `<p>Addition finds the total of two numbers.
+        <br><br><strong>Example:</strong><br> You have 2 apples and someone gives you 3 more: <br><br><span class="expression"><strong>2 + 3 = 5</strong></span></p>`,
 	subtraction: 'Subtraction',
-	subtraction_desc: `<p>Subtraction allows you to determine the difference between two numbers. This operation is often used to find out how much is left or what the difference is. 
-        <br><br><strong>Example:</strong><br> You had 5 apples and ate 2. How many are left? <br><br><span class="expression"><strong>5 − 2 = 3</strong></span>.</p>`,
+	subtraction_desc: `<p>Subtraction finds the difference between two numbers — how much is left.
+        <br><br><strong>Example:</strong><br> You had 5 apples and ate 2: <br><br><span class="expression"><strong>5 − 2 = 3</strong></span></p>`,
 	multiplication: 'Multiplication',
-	multiplication_desc: `<p>Multiplication is a faster way to add the same number multiple times. It is used when you need to add identical values repeatedly. 
-        <br><br><strong>Example:</strong><br> You have 3 boxes, and each box contains 4 apples. The total number of apples is: <br><br><span class="expression"><strong>3 × 4 = 12</strong></span>.</p>`,
+	multiplication_desc: `<p>Multiplication is a faster way of adding the same number several times.
+        <br><br><strong>Example:</strong><br> 3 boxes with 4 apples in each: <br><br><span class="expression"><strong>3 × 4 = 12</strong></span></p>`,
 	division: 'Division',
-	division_desc: `<p>Division allows you to split a number into equal parts or determine how many times one number is contained within another. 
-        <br><br><strong>Example:</strong><br> You have 12 apples that need to be divided into 3 baskets. Each basket will contain: <br><br><span class="expression"><strong>12 ÷ 3 = 4</strong></span>.</p>`,
-	exponent: 'Exponentiation',
-	exponent_desc: `<p>Exponentiation is the operation of multiplying a number by itself a specified number of times. 
-        <br><br><strong>Example:</strong><br> If you raise 2 to the power of 3, the result is: <br><br><span class="expression"><strong>2³ = 2 × 2 × 2 = 8</strong></span>.
-    </p>`,
-	square_root: 'Square Root',
-	square_root_desc: `<p>Square rooting is the inverse operation of exponentiation. It finds the number which, when squared, gives the original value. 
-        <br><br><strong>Example:</strong><br> The square root of 9 is: <br><br><span class="expression"><strong>√9 = 3</strong></span>.
-    </p>`,
-	logarithm: 'Logarithm',
-	logarithm_desc: `<p>A logarithm shows the power to which the base must be raised to produce a given number. 
-        <br><br><strong>Example:</strong><br> The logarithm of 8 with base 2 is 3, because <br><br><span class="expression"><strong>log<sup>2</sup>8 = 3</strong></span><span class="expression"><strong>2<sup>3</sup> = 8</strong></span>.
-    </p>`,
-	all: 'All',
-	all_desc: `<p>Here you will solve problems that include all previously studied operations: addition, subtraction, multiplication, division, exponentiation, square root, and logarithm. The tasks will become more challenging, so stay sharp!</p>`,
-	MIN: '1 min',
-	MIN_3: '3 min',
-	MIN_5: '5 min',
-	no_records: 'No Records',
-	your_score: 'You scored',
+	division_desc: `<p>Division splits a number into equal parts.
+        <br><br><strong>Example:</strong><br> 12 apples into 3 baskets: <br><br><span class="expression"><strong>12 ÷ 3 = 4</strong></span></p>`,
+
+	start: 'Play',
+	tagline: 'Solve the equation — build the floor — climb higher.',
+	first_climb: 'Your first climb',
+
+	floor: 'Floor',
+	best_floor: 'Best floor',
+	new_best: 'New best',
+	previous_best: 'Was',
+	next_checkpoint: 'Next checkpoint',
+	checkpoint: 'Checkpoint',
+	checkpoints: 'Checkpoints',
+	checkpoint_held: 'Checkpoint held',
+	out_of_time: 'Out of time',
+	shield_held: 'Shield held',
+	new_zone: 'New heights',
+	score: 'Score',
+
+	combo_label: 'Combo',
+	max_combo: 'Best combo',
+	correct_answers: 'Correct answers',
+	accuracy: 'Accuracy',
+
+	theme: 'Location',
+	theme_random: 'Random',
+	loc_city: 'City',
+	loc_valley: 'Valley',
+	loc_winter: 'Winter',
+	loc_canyon: 'Canyon',
+	loc_night: 'Night',
+	loc_space: 'Space',
+
+	praise_fast: 'Fast!',
+	praise_good: 'Nice!',
+	praise_streak: 'Streak {n}!',
+	praise_wow: 'Amazing!',
+	praise_tier: 'Tougher!',
+
+	challenge_new: 'New challenge',
+	ch_double_goal: '5 correct in a row',
+	ch_double_reward: 'Double score',
+	ch_double_done: 'Double score!',
+	ch_shield_goal: '3 correct in a row',
+	ch_shield_reward: 'Floor shield',
+	ch_shield_done: 'Floor shield!',
+	ch_bonus_goal: 'Reach combo ×5',
+	ch_bonus_reward: '+100 score',
+	ch_bonus_done: '+100 score!',
+	ch_quick_goal: '3 quick answers',
+	ch_quick_reward: 'Extra life',
+	ch_quick_done: 'Quick hands!',
+	ch_perfect_goal: '6 without a mistake',
+	ch_perfect_reward: '+250 score',
+	ch_perfect_done: 'Flawless!',
+
+	pause: 'Pause',
+	paused: 'Paused',
+	resume: 'Resume',
+	loading: 'Loading…',
+	play_again: 'Play again',
+	game_over: 'Game over',
+	main_menu: 'Main menu',
+
+	stat_games: 'Games',
+	stat_solved: 'Solved',
+
+	sound: 'Sound',
+	vibration: 'Vibration',
+	settings: 'Settings',
+	save: 'Save',
+	close: 'Close',
+	player_name: 'Player name',
+	sound_and_vibro: 'Sound and vibration',
+	language: 'Language',
+	on: 'On',
+	off: 'Off',
+
+	sec_short: 's',
+	climb_hint: 'Drag to run',
+	climb_jump: 'Jump',
+	fork_title: 'How to build on?',
+	fork_note: 'until the next support',
+	boon_support: 'Closer supports',
+	boon_support_note: 'A support every 5 floors',
+	boon_calm: 'More time',
+	boon_calm_note: 'A quarter more time per answer',
+	boon_rush: 'Rush',
+	boon_rush_note: 'Bigger numbers, less time — double points',
+	help_ops: 'What are these operations?',
+	promo_label: 'More from us',
+	promo_open: 'Get',
+	help_title: 'Operations',
 }

@@ -1,182 +1,251 @@
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 
-import IconSettings from '@/assets/img/settings.svg'
-import IconLogin from '@/assets/img/login.svg'
+import AppIcon from '@/components/AppIcon.vue'
 
 import { useGameStore } from '@/store/gameStore'
 import { useAudio } from '@/composables/useAudio'
 
 import LangSelect from '@/components/LangSelect.vue'
+import ThemeSelect from '@/components/ThemeSelect.vue'
+import ModalSheet from '@/components/ModalSheet.vue'
 
-const { playAudio } = useAudio()
+const { playAudio, audioActive, vibroActive, toggleAudio, toggleVibro, vibrate } =
+	useAudio()
 const gameStore = useGameStore()
 
-const isActive = ref(false)
+const $props = defineProps<{ open: boolean }>()
+const $emits = defineEmits(['close'])
+
 const name = ref('')
 
 onMounted(() => {
 	name.value = gameStore.name
 })
 
-function saveName() {
-	if (!name.value) return
+// Keep the field in step with the name edited on the result screen.
+watch(
+	() => gameStore.name,
+	(value) => {
+		if (!$props.open) name.value = value
+	}
+)
 
-	gameStore.setName(name.value)
+watch(
+	() => $props.open,
+	(value) => {
+		if (value) name.value = gameStore.name
+	}
+)
+
+function close() {
+	// Saving on close means a typed name is never lost by tapping the backdrop.
+	if (name.value.trim() && name.value.trim() !== gameStore.name) {
+		gameStore.setName(name.value)
+	}
+	name.value = gameStore.name
+	$emits('close')
 }
 
 function change(event: Event) {
 	const target = event.target as HTMLInputElement
+	if (!target) return
+	if (target.value.length > 12) target.value = target.value.slice(0, 12)
+	name.value = target.value
+}
 
-	if (target) {
-		if (target.value.length > 12) target.value = target.value.slice(0, 12)
-		name.value = target.value
-	}
+function onToggleSound() {
+	toggleAudio()
+	// Played after enabling so the change is audible straight away.
+	if (audioActive.value) playAudio('click')
+}
+
+function onToggleVibro() {
+	toggleVibro()
+	if (vibroActive.value) vibrate('tap')
 }
 </script>
 
 <template>
 	<div class="settings">
-		<button class="settings__btn" @click="playAudio('click', true), isActive = true">
-			<IconSettings />
-		</button>
-
-		<div v-if="isActive" class="settings__body" @click="playAudio('click', true), isActive = false">
-			<div class="container">
-				<div
-					class="settings__body-in"
-					:style="{ background: gameStore.bgColor }"
-					@click.stop=""
-				>
-					<div class="settings__input">
-						<input
-							:value="name"
-							type="text"
-							class="settings__input-body"
-							@input="change"
-							@keypress.enter="saveName"
-						/>
-						<button class="settings__input-btn" @click="saveName">
-							<IconLogin />
-						</button>
-					</div>
-
-					<LangSelect class="settings__select" />
-					<button class="settings__ok" @click="playAudio('click', true), isActive = false">Ok</button>
+		<ModalSheet
+			v-if="open"
+			:title="$t('settings')"
+			icon="gear"
+			:action-label="$t('save')"
+			@close="close"
+		>
+			<div class="group">
+				<div class="group__label">{{ $t('player_name') }}</div>
+				<div class="field">
+					<input
+						:value="name"
+						type="text"
+						class="field__input"
+						maxlength="12"
+						:placeholder="$t('player_name')"
+						@input="change"
+						@keyup.enter="close"
+					/>
+					<span class="field__count">{{ name.length }}/12</span>
 				</div>
 			</div>
-		</div>
+
+			<div class="group">
+				<div class="group__label">{{ $t('sound_and_vibro') }}</div>
+				<div class="toggles">
+					<button
+						class="toggle"
+						:class="{ 'is-on': audioActive }"
+						type="button"
+						:aria-pressed="audioActive"
+						@click="onToggleSound"
+					>
+						<AppIcon :name="audioActive ? 'sound-on' : 'sound-off'" :size="24" class="toggle__icon" />
+						<span class="toggle__name">{{ $t('sound') }}</span>
+						<span class="toggle__state">{{ audioActive ? $t('on') : $t('off') }}</span>
+					</button>
+					<button
+						class="toggle"
+						:class="{ 'is-on': vibroActive }"
+						type="button"
+						:aria-pressed="vibroActive"
+						@click="onToggleVibro"
+					>
+						<AppIcon name="vibration" :size="24" class="toggle__icon" />
+						<span class="toggle__name">{{ $t('vibration') }}</span>
+						<span class="toggle__state">{{ vibroActive ? $t('on') : $t('off') }}</span>
+					</button>
+				</div>
+			</div>
+
+			<div class="group">
+				<div class="group__label">{{ $t('theme') }}</div>
+				<ThemeSelect />
+			</div>
+
+			<div class="group">
+				<div class="group__label">{{ $t('language') }}</div>
+				<LangSelect />
+			</div>
+		</ModalSheet>
 	</div>
 </template>
 
 <style lang="scss" scoped>
-.settings {
-	&__btn {
-		width: 50px;
-		height: 50px;
-		background: transparent;
-		padding: 0;
-		border: none;
-		outline: none;
-		cursor: pointer;
-
-		svg {
-			width: 100%;
-			height: 100%;
-		}
+.group {
+	& + & {
+		margin-top: 16px;
 	}
 
-	&__body {
-		position: fixed;
-		top: 0;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		z-index: 1000;
-		background: rgb(1, 109, 178);
-		background: radial-gradient(
-			circle,
-			rgba(1, 109, 178, 1) 0%,
-			rgba(1, 42, 74, 1) 100%
-		);
-		box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.4),
-			inset 0px -2px 4px rgba(255, 255, 255, 0.2);
-		display: flex;
-		justify-content: center;
-		align-items: center;
+	&__label {
+		margin-bottom: 7px;
+		font-size: 9px;
+		font-weight: 900;
+		letter-spacing: 1.6px;
+		text-transform: uppercase;
+		color: var(--text-faint);
 	}
+}
 
-	.container {
-		width: 93%;
-		max-width: 350px;
-	}
-
-	&__body-in {
-		padding: 34px 14px 48px;
-		border-radius: 12px;
-		width: 100%;
-		box-sizing: border-box;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		overflow: hidden;
-		margin-bottom: 15px;
-	}
+/* Поле имени: вдавленное, а не поднятое. Всё, во что можно писать, в этом
+   языке уходит внутрь — так видно, что это не кнопка. */
+.field {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 0 12px;
+	height: 52px;
+	border-radius: 14px;
+	background: rgba(6, 9, 30, 0.5);
+	box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.45), inset 0 0 0 2px rgba(255, 255, 255, 0.06);
 
 	&__input {
-		display: flex;
-		align-items: stretch;
-		width: 100%;
-		height: 65px;
-		border-radius: 15px;
-		overflow: hidden;
-		border: 1px solid #020202;
-		box-sizing: border-box;
-		margin-bottom: 28px;
-	}
-
-	&__input-body {
-		width: 93%;
-		background: transparent;
+		flex: 1;
+		min-width: 0;
 		border: none;
-		font-size: 26px;
-		font-style: italic;
-		padding: 5px 10px 5px 18px;
-		box-sizing: border-box;
-		flex-grow: 1;
+		background: transparent;
+		font-size: 19px;
+		font-weight: 900;
+		color: #fff;
 		outline: none;
-	}
 
-	&__input-btn {
-		background: transparent;
-		padding: 0;
-		border: none;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		cursor: pointer;
-		padding-right: 5px;
-
-		svg {
-			width: 44px;
-			height: 44px;
-			display: block;
+		&::placeholder {
+			color: var(--text-faint);
+			font-weight: 700;
 		}
 	}
 
-	&__select {
-		margin-bottom: 32px;
+	&__count {
+		font-size: 11px;
+		font-weight: 800;
+		color: var(--text-faint);
+	}
+}
+
+.toggles {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 8px;
+}
+
+.toggle {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	padding: 12px 8px 10px;
+	border: none;
+	border-radius: 15px;
+	cursor: pointer;
+	background: rgba(255, 255, 255, 0.05);
+	box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.08);
+	transition: transform 110ms var(--soft), box-shadow 180ms var(--soft),
+		background 180ms var(--soft);
+
+	&:active {
+		transform: scale(0.97);
 	}
 
-	&__ok {
-		color: #020202;
-		background: transparent;
-		padding: 18px 40px;
-		font-size: 24px;
-		line-height: 1;
-		font-weight: 600;
-		border-radius: 20px;
-		cursor: pointer;
+	&__icon {
+		margin-bottom: 2px;
+		transition: filter 180ms var(--soft), opacity 180ms var(--soft);
+		opacity: 0.5;
+		filter: saturate(0.2);
+	}
+
+	&__name {
+		font-size: 13px;
+		font-weight: 800;
+		color: var(--text-dim);
+	}
+
+	/* Состояние сказано словом, а не только цветом: «вкл/выкл» читается и в
+	   монохроме, и человеком, который не различает эти два оттенка. */
+	&__state {
+		font-size: 10px;
+		font-weight: 900;
+		letter-spacing: 1.4px;
+		text-transform: uppercase;
+		color: var(--text-faint);
+	}
+
+	&.is-on {
+		background: rgba(69, 201, 119, 0.16);
+		box-shadow: inset 0 0 0 2px rgba(120, 226, 160, 0.6), 0 0 18px rgba(69, 201, 119, 0.24);
+
+		.toggle__icon {
+			opacity: 1;
+			filter: none;
+		}
+
+		.toggle__name {
+			color: #fff;
+		}
+
+		.toggle__state {
+			color: #7de3a0;
+		}
 	}
 }
 </style>

@@ -1,35 +1,109 @@
 export default {
-	lang: 'French',
+	lang: 'Français',
 	privacy: 'Politique de confidentialité',
+
 	addition: 'Addition',
-	addition_desc: `<p>L'addition est une opération mathématique de base utilisée pour trouver la somme de deux nombres ou plus.  
-        <br><br><strong>Exemple:</strong><br> Si vous avez 2 pommes et qu'on vous en donne 3 autres, vous aurez <br><br><span class="expression"><strong>2 + 3 = 5</strong></span><br> pommes.</p>`,
+	addition_desc: `<p>L'addition donne le total de deux nombres.
+        <br><br><strong>Exemple :</strong><br> Tu as 2 pommes et on t'en donne 3 : <br><br><span class="expression"><strong>2 + 3 = 5</strong></span></p>`,
 	subtraction: 'Soustraction',
-	subtraction_desc: `<p>La soustraction permet de déterminer la différence entre deux nombres. Elle est souvent utilisée pour savoir ce qui reste ou pour comparer.  
-        <br><br><strong>Exemple:</strong><br> Vous aviez 5 pommes et en avez mangé 2. Combien en reste-t-il ? <br><br><span class="expression"><strong>5 − 2 = 3</strong></span>.</p>`,
+	subtraction_desc: `<p>La soustraction donne la différence entre deux nombres — ce qu'il reste.
+        <br><br><strong>Exemple :</strong><br> Tu avais 5 pommes et tu en as mangé 2 : <br><br><span class="expression"><strong>5 − 2 = 3</strong></span></p>`,
 	multiplication: 'Multiplication',
-	multiplication_desc: `<p>La multiplication est un moyen rapide d'ajouter un même nombre plusieurs fois.  
-       <br><br><strong>Exemple:</strong><br> Vous avez 3 boîtes contenant chacune 4 pommes. Le total est: <br><br><span class="expression"><strong>3 × 4 = 12</strong></span>.</p>`,
+	multiplication_desc: `<p>Multiplier, c'est additionner rapidement le même nombre plusieurs fois.
+        <br><br><strong>Exemple :</strong><br> 3 boîtes de 4 pommes : <br><br><span class="expression"><strong>3 × 4 = 12</strong></span></p>`,
 	division: 'Division',
-	division_desc: `<p>La division permet de répartir un nombre en parties égales ou de déterminer combien de fois un nombre contient un autre.  
-        <br><br><strong>Exemple:</strong><br> Vous avez 12 pommes à répartir dans 3 paniers. Chaque panier contiendra: <br><br><span class="expression"><strong>12 ÷ 3 = 4</strong></span>.</p>`,
-	exponent: 'Exponentiation',
-	exponent_desc: `<p>L'exponentiation est l'opération consistant à multiplier un nombre par lui-même un certain nombre de fois.  
-        <br><br><strong>Exemple:</strong><br> Si vous élevez 2 à la puissance 3, le résultat est: <br><br><span class="expression"><strong>2³ = 2 × 2 × 2 = 8</strong></span>.
-    </p>`,
-	square_root: 'Racine carrée',
-	square_root_desc: `<p>La racine carrée est l'opération inverse de l'exponentiation au carré. Elle trouve le nombre qui, élevé au carré, donne la valeur d'origine.  
-        <br><br><strong>Exemple:</strong><br> La racine carrée de 9 est: <br><br><span class="expression"><strong>√9 = 3</strong></span>.
-    </p>`,
-	logarithm: 'Logarithme',
-	logarithm_desc: `<p>Le logarithme indique à quelle puissance une base doit être élevée pour obtenir un nombre donné.  
-        <br><br><strong>Exemple:</strong><br> Le logarithme de 8 en base 2 est 3, car <br><br><span class="expression"><strong>log<sup>2</sup>8 = 3</strong></span><span class="expression"><strong>2<sup>3</sup> = 8</strong></span>.
-    </p>`,
-	all: 'Toute',
-	all_desc: `<p>Ici, vous résoudrez des problèmes comprenant toutes les opérations étudiées auparavant : addition, soustraction, multiplication, division, exponentiation, racine carrée et logarithme. Les défis deviennent plus complexes, soyez attentif!</p>`,
-	MIN: '1 min',
-	MIN_3: '3 min',
-	MIN_5: '5 min',
-	no_records: 'Aucun enregistrement',
-	your_score: 'Vous avez marqué',
+	division_desc: `<p>La division partage un nombre en parts égales.
+        <br><br><strong>Exemple :</strong><br> 12 pommes dans 3 paniers : <br><br><span class="expression"><strong>12 ÷ 3 = 4</strong></span></p>`,
+
+	start: 'Jouer',
+	tagline: 'Résous — construis l\'étage — monte plus haut.',
+	first_climb: 'Ta première montée',
+
+	floor: 'Étage',
+	best_floor: 'Meilleur étage',
+	new_best: 'Nouveau record',
+	previous_best: 'Avant',
+	next_checkpoint: 'Prochain appui',
+	checkpoint: 'Appui',
+	checkpoints: 'Appuis',
+	checkpoint_held: 'L\'appui a tenu',
+	out_of_time: 'Temps écoulé',
+	shield_held: 'Le bouclier a tenu',
+	new_zone: 'Nouvelle hauteur',
+	score: 'Points',
+
+	combo_label: 'Combo',
+	max_combo: 'Meilleur combo',
+	correct_answers: 'Bonnes réponses',
+	accuracy: 'Précision',
+
+	theme: 'Lieu',
+	theme_random: 'Aléatoire',
+	loc_city: 'Ville',
+	loc_valley: 'Vallée',
+	loc_winter: 'Hiver',
+	loc_canyon: 'Canyon',
+	loc_night: 'Nuit',
+	loc_space: 'Espace',
+
+	praise_fast: "Rapide !",
+	praise_good: "Bien !",
+	praise_streak: "Série {n} !",
+	praise_wow: "Incroyable !",
+	praise_tier: "Plus dur !",
+
+	challenge_new: 'Nouveau défi',
+	ch_double_goal: '5 bonnes de suite',
+	ch_double_reward: 'Points doublés',
+	ch_double_done: 'Points doublés !',
+	ch_shield_goal: '3 bonnes de suite',
+	ch_shield_reward: 'Bouclier d\'étages',
+	ch_shield_done: 'Bouclier d\'étages !',
+	ch_bonus_goal: 'Atteindre combo ×5',
+	ch_bonus_reward: '+100 points',
+	ch_bonus_done: '+100 points !',
+	ch_quick_goal: '3 réponses rapides',
+	ch_quick_reward: 'Vie supplémentaire',
+	ch_quick_done: 'Rapide !',
+	ch_perfect_goal: '6 sans faute',
+	ch_perfect_reward: '+250 points',
+	ch_perfect_done: 'Sans faute !',
+
+	pause: 'Pause',
+	paused: 'En pause',
+	resume: 'Reprendre',
+	loading: 'Chargement…',
+	play_again: 'Rejouer',
+	game_over: 'Partie terminée',
+	main_menu: 'Menu principal',
+
+	stat_games: 'Parties',
+	stat_solved: 'Résolus',
+
+	sound: 'Son',
+	vibration: 'Vibration',
+	settings: 'Réglages',
+	save: 'Enregistrer',
+	close: 'Fermer',
+	player_name: 'Nom du joueur',
+	sound_and_vibro: 'Son et vibration',
+	language: 'Langue',
+	on: 'Oui',
+	off: 'Non',
+
+	sec_short: 's',
+	climb_hint: 'Glisse pour courir',
+	climb_jump: 'Saut',
+	fork_title: 'Comment continuer ?',
+	fork_note: "jusqu'au prochain appui",
+	boon_support: 'Appuis rapprochés',
+	boon_support_note: 'Un appui tous les 5 étages',
+	boon_calm: 'Plus de temps',
+	boon_calm_note: 'Un quart de temps en plus par réponse',
+	boon_rush: 'Élan',
+	boon_rush_note: 'Nombres plus grands, moins de temps — points ×2',
+	help_ops: 'Quelles sont ces opérations ?',
+	promo_label: 'Encore de nous',
+	promo_open: 'Ouvrir',
+	help_title: 'Opérations',
 }

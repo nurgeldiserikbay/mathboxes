@@ -1,4 +1,4 @@
-import { I_LEVEL, TYPE_PAGES, TYPE_SIGN, TYPE_TIMES } from './types'
+import { I_OPERATION, TYPE_CHALLENGE, TYPE_PAGES } from './types'
 
 export const DEFAULT_NAME = 'Anonym'
 
@@ -7,96 +7,71 @@ export const PAGES: { [key in TYPE_PAGES]: TYPE_PAGES } = {
 	PLAYGROUND: 'PLAYGROUND',
 }
 
-export const TIMES: { [key in TYPE_TIMES]: TYPE_TIMES } = {
-	MIN: 'MIN',
-	MIN_3: 'MIN_3',
-	MIN_5: 'MIN_5',
-}
-
-export const LEVELS: I_LEVEL[] = [
+/**
+ * Palette rule: one clear hue per operation, all at the same rough lightness so
+ * none of them shouts over the others. Inside the tower these are barely used —
+ * a floor takes the colour of its height, not of its operation — but the help
+ * sheet and the logo still need one colour per sign.
+ */
+export const OPERATIONS: I_OPERATION[] = [
 	{
 		id: 0,
 		name: 'addition',
 		sign: '+',
+		glyph: '+',
 		description: 'addition_desc',
-		bgColor:
-			'linear-gradient(to bottom, rgba(255, 120, 120, 1), rgba(255, 190, 120, 1))',
-		infoIcon: 'rgba(80, 190, 255, 1)',
-		mainColor: 'rgba(255, 190, 120, 1)',
+		tint: '#e07a4e',
 	},
 	{
 		id: 1,
 		name: 'subtraction',
 		sign: '-',
+		glyph: '−',
 		description: 'subtraction_desc',
-		bgColor:
-			'linear-gradient(to bottom, rgba(120, 255, 150, 1), rgba(80, 190, 255, 1))',
-		infoIcon: 'rgba(180, 90, 255, 1)',
-		mainColor: 'rgba(80, 190, 255, 1)',
+		tint: '#3fa89a',
 	},
 	{
 		id: 2,
 		name: 'multiplication',
 		sign: '*',
+		glyph: '×',
 		description: 'multiplication_desc',
-		bgColor:
-			'linear-gradient(to bottom, rgba(80, 90, 255, 1), rgba(180, 90, 255, 1))',
-		infoIcon: 'rgba(20, 170, 50, 1)',
-		mainColor: 'rgba(180, 90, 255, 1)',
+		tint: '#7b5fd6',
 	},
 	{
 		id: 3,
 		name: 'division',
 		sign: '/',
+		glyph: '÷',
 		description: 'division_desc',
-		bgColor:
-			'linear-gradient(to bottom, rgba(100, 250, 120, 1), rgba(20, 170, 50, 1))',
-		infoIcon: 'rgba(255, 200, 70, 1)',
-		mainColor: 'rgba(20, 170, 50, 1)',
-	},
-	{
-		id: 4,
-		name: 'exponent',
-		sign: '^',
-		description: 'exponent_desc',
-		bgColor:
-			'linear-gradient(to bottom, rgba(255, 90, 50, 1), rgba(255, 200, 70, 1))',
-		infoIcon: 'rgba(0, 100, 200, 1)',
-		mainColor: 'rgba(255, 200, 70, 1)',
-	},
-	{
-		id: 5,
-		name: 'square_root',
-		sign: '√',
-		description: 'square_root_desc',
-		bgColor:
-			'linear-gradient(to bottom, rgba(0, 200, 255, 1), rgba(0, 100, 200, 1))',
-		infoIcon: 'rgba(120, 90, 255, 1)',
-		mainColor: 'rgba(0, 100, 200, 1)',
-	},
-	{
-		id: 6,
-		name: 'logarithm',
-		sign: 'log',
-		description: 'logarithm_desc',
-		bgColor:
-			'linear-gradient(to bottom, rgba(255, 90, 120, 1), rgba(120, 90, 255, 1))',
-		infoIcon: 'rgba(190, 50, 200, 1)',
-		mainColor: 'rgba(120, 90, 255, 1)',
-	},
-	{
-		id: 7,
-		name: 'all',
-		sign: '...',
-		description: 'all_desc',
-		bgColor:
-			'linear-gradient(to bottom, rgba(255, 70, 150, 1), rgba(190, 50, 200, 1))',
-		infoIcon: 'rgba(255, 190, 120, 1)',
-		mainColor: 'rgba(190, 50, 200, 1)',
+		tint: '#4faa6a',
 	},
 ]
 
-export const SIGNS: { [key in TYPE_SIGN]: TYPE_SIGN } = {
-	NUMBER: 'NUMBER',
-	SIGN: 'SIGN',
+/** Neutral accent for surfaces that do not belong to one floor or operation. */
+export const NEUTRAL_TINT = '#818cf8'
+
+/* ------------------------------------------------------------------ rules -- */
+
+export const START_LIVES = 3
+export const MAX_LIVES = 3
+
+/** Correct answers in a row that earn a heart back. */
+export const LIFE_EVERY = 5
+/** Given instead of the heart when all three are already lit. */
+export const LIFE_BONUS_SCORE = 60
+
+export const BASE_POINTS = 10
+/** The combo stops multiplying here; beyond it the score would run away. */
+export const COMBO_CAP = 10
+
+/** i18n keys per challenge, kept next to the rules they belong to. */
+export const CHALLENGE_TEXT: {
+	[key in TYPE_CHALLENGE]: { goal: string; reward: string }
+} = {
+	double: { goal: 'ch_double_goal', reward: 'ch_double_reward' },
+	shield: { goal: 'ch_shield_goal', reward: 'ch_shield_reward' },
+	bonus: { goal: 'ch_bonus_goal', reward: 'ch_bonus_reward' },
+	quick: { goal: 'ch_quick_goal', reward: 'ch_quick_reward' },
+	perfect: { goal: 'ch_perfect_goal', reward: 'ch_perfect_reward' },
 }

@@ -1,35 +1,109 @@
 export default {
-	lang: 'Kazakh',
+	lang: 'Қазақша',
 	privacy: 'Құпиялылық саясаты',
+
 	addition: 'Қосу',
-	addition_desc: `<p>Қосу операциясы-екі немесе одан да көп сандардың жалпы қосындысын табу үшін қолданылатын негізгі математикалық операция.
-       <br><br><strong>Мысал:</strong><br> Егер сізде 2 алма болса және біреу сізге тағы 3 алма берсе, онда сізде <br><br><span class="expression"><strong>2 + 3 = 5</strong></span><BR> алма болады.</p>`,
+	addition_desc: `<p>Қосу — екі санның қосындысын табу.
+        <br><br><strong>Мысал:</strong><br> Сізде 2 алма бар, тағы 3 берді: <br><br><span class="expression"><strong>2 + 3 = 5</strong></span></p>`,
 	subtraction: 'Азайту',
-	subtraction_desc: `<p>Азайту екі санның арасындағы айырмашылықты анықтауға мүмкіндік береді. Бұл операция көбінесе қанша қалғанын немесе қандай айырмашылық бар екенін түсіну үшін қолданылады. 
-        <br><br><strong>Мысал:</strong><br> Сізде 5 алма болды, сіз 2 жеп қойдыңыз. Қанша қалды? <br><br><span class="expression"><strong>5 − 2 = 3</strong></span>.</p>`,
+	subtraction_desc: `<p>Азайту сандар арасындағы айырманы көрсетеді — қанша қалғанын.
+        <br><br><strong>Мысал:</strong><br> 5 алма болды, 2-еуін жедіңіз: <br><br><span class="expression"><strong>5 − 2 = 3</strong></span></p>`,
 	multiplication: 'Көбейту',
-	multiplication_desc: `<p>Көбейту-бірдей сандарды жеделдетіп қосу. Ол бір санды бірнеше рет қосу қажет болғанда қолданылады. 
-        <br><br><strong>Мысал:</strong><br> Сізде 3 қорап және әр қорапта 4 алма бар. Алманың жалпы саны: <br><br><span class="expression"><strong>3 × 4 = 12</strong></span>.</p>`,
+	multiplication_desc: `<p>Көбейту — бір санды бірнеше рет қосудың жылдам жолы.
+        <br><br><strong>Мысал:</strong><br> 4 алмадан 3 қорап: <br><br><span class="expression"><strong>3 × 4 = 12</strong></span></p>`,
 	division: 'Бөлу',
-	division_desc: `<p>Бөлу бір санды тең бөліктерге бөлуге немесе бір санның екіншісінде қанша рет болатынын білуге мүмкіндік береді. 
-        <br><br><strong>Мысал:</strong><br> Сізде 12 алма бар, оларды 3 себетке салу керек. Әр себетте қаншадан болады: <br><br><span class="expression"><strong>12 ÷ 3 = 4</strong></span>.</p>`,
-	exponent: 'Дәреже',
-	exponent_desc: `<p>Дәреже - бұл санды берілген рет санына көбейту. 
-        <br><br><strong>Мысал:</strong><br> Егер 2-нін 3 дәрежесіне көтерілсе, ол мынағын тең болады: <br><br><span class="expression"><strong>2³ = 2 × 2 × 2 = 8</strong></span>.
-    </p>`,
-	square_root: 'Түбірді алу',
-	square_root_desc: `<p>Түбірді алу-бұл дәрежеге көтерілудің кері әрекеті. Ол квадратталған кезде қай санның бастапқы мәнін беретінін көрсетеді. 
-        <br><br><strong>Мысал:</strong><br> 9-ның квадрат түбірі: <br><br><span class="expression"><strong>√9 = 3</strong></span>.
-    </p>`,
-	logarithm: 'Логарифм',
-	logarithm_desc: `<p>Логарифм берілген санды алу үшін негізді қаншалықты салу керектігін көрсетеді. 
-        <br><br><strong>Мысал:</strong><br> 2 негізі бойынша 8 санының логарифмі 3-ке тең, өйткені <br><br><span class="expression"><strong>log<sup>2</sup>8 = 3</strong></span><span class="expression"><strong>2<sup>3</sup> = 8</strong></span>.
-    </p>`,
-	all: 'Барлығы',
-	all_desc: `<p>Мұнда сіз бұрын зерттелген барлық амалдарды қамтитын мысалдарды шешуіңіз керек: қосу, азайту, көбейту, бөлу, дәреже, түбір және логарифм. Тапсырмалар күрделене түседі, сондықтан мұқият болыңыз!</p>`,
-	MIN: '1 мин',
-	MIN_3: '3 мин',
-	MIN_5: '5 мин',
-	no_records: 'Жазбалар жоқ',
-	your_score: 'Сіздің ұпайыныз',
+	division_desc: `<p>Бөлу санды тең бөліктерге ажыратады.
+        <br><br><strong>Мысал:</strong><br> 12 алманы 3 себетке: <br><br><span class="expression"><strong>12 ÷ 3 = 4</strong></span></p>`,
+
+	start: 'Ойнау',
+	tagline: 'Мысалды шеш — қабат тұрғыз — жоғары көтеріл.',
+	first_climb: 'Алғашқы көтерілу',
+
+	floor: 'Қабат',
+	best_floor: 'Ең жоғары қабат',
+	new_best: 'Жаңа рекорд',
+	previous_best: 'Бұрын',
+	next_checkpoint: 'Келесі тірек',
+	checkpoint: 'Тірек',
+	checkpoints: 'Тіректер',
+	checkpoint_held: 'Тірек шыдады',
+	out_of_time: 'Уақыт бітті',
+	shield_held: 'Қалқан шыдады',
+	new_zone: 'Жаңа биіктік',
+	score: 'Ұпай',
+
+	combo_label: 'Комбо',
+	max_combo: 'Үздік комбо',
+	correct_answers: 'Дұрыс жауап',
+	accuracy: 'Дәлдік',
+
+	theme: 'Локация',
+	theme_random: 'Кездейсоқ',
+	loc_city: 'Қала',
+	loc_valley: 'Аңғар',
+	loc_winter: 'Қыс',
+	loc_canyon: 'Шатқал',
+	loc_night: 'Түн',
+	loc_space: 'Ғарыш',
+
+	praise_fast: 'Жылдам!',
+	praise_good: 'Жарайсың!',
+	praise_streak: '{n} қатарынан!',
+	praise_wow: 'Керемет!',
+	praise_tier: 'Қиындады!',
+
+	challenge_new: 'Жаңа тапсырма',
+	ch_double_goal: 'Қатарынан 5 дұрыс',
+	ch_double_reward: 'Қос ұпай',
+	ch_double_done: 'Қос ұпай!',
+	ch_shield_goal: 'Қатарынан 3 дұрыс',
+	ch_shield_reward: 'Қабат қалқаны',
+	ch_shield_done: 'Қабат қалқаны!',
+	ch_bonus_goal: 'Комбо ×5-ке жету',
+	ch_bonus_reward: '+100 ұпай',
+	ch_bonus_done: '+100 ұпай!',
+	ch_quick_goal: '3 жылдам жауап',
+	ch_quick_reward: 'Қосымша өмір',
+	ch_quick_done: 'Жылдам!',
+	ch_perfect_goal: 'Қатесіз 6',
+	ch_perfect_reward: '+250 ұпай',
+	ch_perfect_done: 'Мінсіз!',
+
+	pause: 'Кідіріс',
+	paused: 'Кідіріс',
+	resume: 'Жалғастыру',
+	loading: 'Жүктелуде…',
+	play_again: 'Тағы ойнау',
+	game_over: 'Ойын аяқталды',
+	main_menu: 'Басты мәзір',
+
+	stat_games: 'Ойын',
+	stat_solved: 'Шешілді',
+
+	sound: 'Дыбыс',
+	vibration: 'Дірілдеу',
+	settings: 'Баптаулар',
+	save: 'Сақтау',
+	close: 'Жабу',
+	player_name: 'Ойыншы аты',
+	sound_and_vibro: 'Дыбыс және дірілдеу',
+	language: 'Тіл',
+	on: 'Қосу',
+	off: 'Өшіру',
+
+	sec_short: 'с',
+	climb_hint: 'Саусақпен жүргіз',
+	climb_jump: 'Секіру',
+	fork_title: 'Әрі қалай саламыз?',
+	fork_note: 'келесі тіреуішке дейін',
+	boon_support: 'Тіреуіш жиі',
+	boon_support_note: 'Әр 5 қабатта тіреуіш',
+	boon_calm: 'Уақыт қоры',
+	boon_calm_note: 'Жауапқа уақыт ширекке көп',
+	boon_rush: 'Жүгіріс',
+	boon_rush_note: 'Сандар үлкен, уақыт аз — ұпай ×2',
+	help_ops: 'Бұл қандай амалдар?',
+	promo_label: 'Біздің басқа ойын',
+	promo_open: 'Ашу',
+	help_title: 'Амалдар',
 }

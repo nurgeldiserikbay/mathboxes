@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <linearGradient id="mb-trophy-g" x1="16" y1="2" x2="16" y2="30" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffe083"/><stop offset="1" stop-color="#eda322"/>
+    </linearGradient>
+    <linearGradient id="mb-trophy-b" x1="16" y1="2" x2="16" y2="30" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f6c552"/><stop offset="1" stop-color="#d99420"/>
+    </linearGradient>
+  </defs>
+  <path d="M10.2 8h-4v2.2a5.2 5.2 0 0 0 4.2 5.1M21.8 8h4v2.2a5.2 5.2 0 0 1-4.2 5.1" stroke="#a86f13" stroke-width="2.9" stroke-linecap="round"/>
+  <path d="M9.4 4.6h13.2v8.2a6.6 6.6 0 0 1-13.2 0z" fill="url(#mb-trophy-g)" stroke="#a86f13" stroke-width="2.1" stroke-linejoin="round"/>
+  <path d="M12.8 6v6.8a3.4 3.4 0 0 0 1.5 2.8" stroke="#fff3c4" stroke-width="2" stroke-linecap="round" opacity=".55"/>
+  <path d="M16 19.4v3.6" stroke="#a86f13" stroke-width="3.2" stroke-linecap="round"/>
+  <path d="M10.6 28.4h10.8l-1.2-4.8h-8.4z" fill="url(#mb-trophy-b)" stroke="#a86f13" stroke-width="2.1" stroke-linejoin="round"/>
+</svg>

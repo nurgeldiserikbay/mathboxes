@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <defs>
+    <linearGradient id="mb-crown-g" x1="16" y1="2" x2="16" y2="30" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffe083"/><stop offset="1" stop-color="#efa524"/>
+    </linearGradient>
+    <linearGradient id="mb-crown-b" x1="16" y1="2" x2="16" y2="30" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#f6c552"/><stop offset="1" stop-color="#dc9a24"/>
+    </linearGradient>
+  </defs>
+  <path d="M4.6 24.4 3.1 10.2 10.6 15.4 16 5.2 21.4 15.4 28.9 10.2 27.4 24.4Z" fill="url(#mb-crown-g)" stroke="#a86f13" stroke-width="2.1" stroke-linejoin="round"/>
+  <rect x="4.4" y="24.2" width="23.2" height="4.2" rx="2.1" fill="url(#mb-crown-b)" stroke="#a86f13" stroke-width="2.1"/>
+  <circle cx="16" cy="19.4" r="1.9" fill="#fff3c4" opacity=".85"/>
+  <circle cx="8.6" cy="20.4" r="1.4" fill="#fff3c4" opacity=".6"/>
+  <circle cx="23.4" cy="20.4" r="1.4" fill="#fff3c4" opacity=".6"/>
+</svg>

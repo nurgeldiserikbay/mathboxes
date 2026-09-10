@@ -9,24 +9,44 @@ const SCOPE = 'https://nurgeldiserikbay.github.io/'
 const START_URL = './index.html?fullscreen=true'
 
 const VitePWAConf = {
-	injectRegister: 'auto',
+	// The registration script is NOT injected into index.html. The same build is
+	// shipped two ways — as a PWA on GitHub Pages and as the web layer inside the
+	// Android APK — and a service worker is right for exactly one of them.
+	//
+	// Capacitor serves the app from `https://localhost`, which is a secure origin,
+	// so the worker installed there quite happily and precached index.html behind
+	// a NavigationRoute. Cache Storage in the WebView survives an app update, so
+	// the next launch after installing a new build was answered out of the old
+	// cache: new files in the APK, old game on screen, correcting itself only on
+	// the second launch once the worker had swapped itself out.
+	//
+	// So registration is done by hand in `main.ts`, where it can ask what it is
+	// running on. See the note there.
+	injectRegister: null,
 	registerType: 'autoUpdate',
 	workbox: {
-		globPatterns: ['**/*.{js,css,html,ico,png,svg,json,vue,txt,woff2}'],
+		// Audio is in the list because a PWA opened offline with no sounds is a
+		// game that feels broken rather than a game that is quiet. All four files
+		// together are about a hundred kilobytes.
+		globPatterns: ['**/*.{js,css,html,ico,png,svg,json,txt,m4a,mp3}'],
+		// Install-prompt screenshots and launcher icons are fetched by the browser
+		// or the OS when they are needed. Precaching them made the service worker
+		// pull 2.2 MB before the first game.
+		globIgnores: ['**/screenshots/**', '**/icons/**'],
 	},
 	manifest: {
 		id: 'com.thelightcome.mathboxes',
 		name: 'Math Boxes',
 		short_name: 'Math Boxes',
 		description:
-			"Solve exciting equations with missing numbers, choose the correct answer from four options, and earn points! The game features 8 levels, each focusing on a unique mathematical operation: addition, subtraction, multiplication, division, exponentiation, square root, logarithm, and a random mix of all operations. \n Test your skills, beat the timer, and prove you're a math master!",
+			"Solve the equation, build the floor, climb higher. Every answer becomes the start of the next sum, so the tower is one long chain of mental arithmetic: add, subtract, multiply, divide. The difficulty follows you, not the floor number. Checkpoints hold what you have built, a mistake burns three floors, and the only score that matters is how high you got last time.",
 		scope: SCOPE,
 		start_url: START_URL,
 		display: 'fullscreen',
 		orientation: 'portrait',
-		background_color: '#fff',
+		background_color: '#100c24',
 		lang: 'en',
-		theme_color: '#fff',
+		theme_color: '#100c24',
 		protocol_handlers: [],
 		icons: [
 			{
@@ -40,38 +60,13 @@ const VitePWAConf = {
 				sizes: '32x32',
 			},
 			{
-				src: START_PATH + '/icons/mstile-70x70.png',
-				type: 'image/png',
-				sizes: '128x128',
-			},
-			{
-				src: START_PATH + '/icons/mstile-144x144.png',
-				type: 'image/png',
-				sizes: '144x144',
-			},
-			{
-				src: START_PATH + '/icons/mstile-150x150.png',
-				type: 'image/png',
-				sizes: '270x270',
-			},
-			{
-				src: START_PATH + '/icons/mstile-310x150.png',
-				type: 'image/png',
-				sizes: '558x270',
-			},
-			{
-				src: START_PATH + '/icons/mstile-310x310.png',
-				type: 'image/png',
-				sizes: '558x558',
-			},
-			{
 				src: START_PATH + '/icons/android-chrome-192x192.png',
 				type: 'image/png',
 				sizes: '192x192',
 			},
 			{
-				src: START_PATH + '/icons/android-chrome-512x512.png',
-				type: 'image/png',
+				src: START_PATH + '/icons/android-chrome-512x512.webp',
+				type: 'image/webp',
 				sizes: '512x512',
 			},
 			{
@@ -83,74 +78,62 @@ const VitePWAConf = {
 		display_override: ['window-controls-overlay'],
 		screenshots: [
 			{
-				src: START_PATH + '/screenshots/narrow-1.png',
-				type: 'image/png',
+				src: START_PATH + '/screenshots/narrow-1.webp',
+				type: 'image/webp',
 				sizes: '406x720',
 				form_factor: 'narrow',
 			},
 			{
-				src: START_PATH + '/screenshots/narrow-2.png',
-				type: 'image/png',
+				src: START_PATH + '/screenshots/narrow-2.webp',
+				type: 'image/webp',
 				sizes: '406x720',
 				form_factor: 'narrow',
 			},
 			{
-				src: START_PATH + '/screenshots/narrow-3.png',
-				type: 'image/png',
+				src: START_PATH + '/screenshots/narrow-3.webp',
+				type: 'image/webp',
 				sizes: '406x720',
 				form_factor: 'narrow',
 			},
 			{
-				src: START_PATH + '/screenshots/narrow-4.png',
-				type: 'image/png',
+				src: START_PATH + '/screenshots/narrow-4.webp',
+				type: 'image/webp',
 				sizes: '406x720',
 				form_factor: 'narrow',
 			},
 			{
-				src: START_PATH + '/screenshots/narrow-5.png',
-				type: 'image/png',
+				src: START_PATH + '/screenshots/narrow-5.webp',
+				type: 'image/webp',
 				sizes: '406x720',
 				form_factor: 'narrow',
 			},
 			{
-				src: START_PATH + '/screenshots/narrow-6.png',
-				type: 'image/png',
-				sizes: '406x720',
-				form_factor: 'narrow',
-			},
-			{
-				src: START_PATH + '/screenshots/wide-1.png',
-				type: 'image/png',
+				src: START_PATH + '/screenshots/wide-1.webp',
+				type: 'image/webp',
 				sizes: '1024x640',
 				form_factor: 'wide',
 			},
 			{
-				src: START_PATH + '/screenshots/wide-2.png',
-				type: 'image/png',
+				src: START_PATH + '/screenshots/wide-2.webp',
+				type: 'image/webp',
 				sizes: '1024x640',
 				form_factor: 'wide',
 			},
 			{
-				src: START_PATH + '/screenshots/wide-3.png',
-				type: 'image/png',
+				src: START_PATH + '/screenshots/wide-3.webp',
+				type: 'image/webp',
 				sizes: '1024x640',
 				form_factor: 'wide',
 			},
 			{
-				src: START_PATH + '/screenshots/wide-4.png',
-				type: 'image/png',
+				src: START_PATH + '/screenshots/wide-4.webp',
+				type: 'image/webp',
 				sizes: '1024x601',
 				form_factor: 'wide',
 			},
 			{
-				src: START_PATH + '/screenshots/wide-5.png',
-				type: 'image/png',
-				sizes: '1024x601',
-				form_factor: 'wide',
-			},
-			{
-				src: START_PATH + '/screenshots/wide-6.png',
-				type: 'image/png',
+				src: START_PATH + '/screenshots/wide-5.webp',
+				type: 'image/webp',
 				sizes: '1024x601',
 				form_factor: 'wide',
 			},
@@ -159,12 +142,51 @@ const VitePWAConf = {
 }
 
 // https://vitejs.dev/config/
+/**
+ * When this bundle was built, stamped into the app itself.
+ *
+ * "I built it and the old version opened" has cost this project several rounds
+ * of guessing, and every one of them would have been a two-second glance if the
+ * game had said which build it was. It is on the start screen, small enough to
+ * be furniture and precise enough to settle the question.
+ */
+const BUILD_STAMP = new Date()
+	.toLocaleString('sv-SE', { hour12: false })
+	.slice(5, 16)
+	.replace('-', '.')
+
 export default defineConfig({
 	base: './',
+	define: {
+		__BUILD_ID__: JSON.stringify(BUILD_STAMP),
+	},
 	build: {
 		outDir: './docs',
 	},
-	plugins: [vue(), svgLoader(), VitePWA(VitePWAConf)],
+	plugins: [
+		vue(),
+		// `cleanupIds` в SVGO по умолчанию сжимает идентификаторы до `a`, `b`, `c`.
+		// В отдельных файлах это безобидно, но иконки инлайнятся в один документ —
+		// и градиенты всех иконок превращались в `#a`, после чего первый в DOM
+		// перекрашивал остальные: сердца становились золотыми, потому что выше на
+		// экране стояла корона. Идентификаторы в файлах уже уникальны по имени.
+		svgLoader({
+			defaultImport: 'component',
+			svgoConfig: {
+				plugins: [
+					{ name: 'preset-default', params: { overrides: { cleanupIds: false } } },
+				],
+			},
+		}),
+		VitePWA(VitePWAConf),
+	],
+	// Набор миксинов объёма подмешивается в каждый SCSS, включая scoped-блоки
+	// компонентов — иначе фаску пришлось бы переписывать в каждом файле.
+	css: {
+		preprocessorOptions: {
+			scss: { additionalData: '@use "@/styles/kit" as *;' },
+		},
+	},
 	resolve: {
 		alias: [
 			{

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 26" width="140" height="26" preserveAspectRatio="none">
+	<!-- Сосульки растут снизу вверх. Основания слиты в сплошную кромку, иначе
+	     между шипами просвечивал бы фон и ряд рассыпался бы на отдельные
+	     значки. -->
+	<path d="M0 26V19h140v7z" fill="#8fd6f2"/>
+	<g fill="#cdeeff" stroke="#3f8fc0" stroke-width="1.4" stroke-linejoin="round">
+		<path d="M6 20 12 3l6 17z"/>
+		<path d="M26 20 33 9l7 11z"/>
+		<path d="M48 20 55 1l7 19z"/>
+		<path d="M70 20 76 11l6 9z"/>
+		<path d="M90 20 97 5l7 15z"/>
+		<path d="M112 20 118 12l6 8z"/>
+		<path d="M128 20 134 6l6 14z"/>
+	</g>
+	<g fill="#ffffff" opacity=".85">
+		<path d="M11 6 13 5l2 12h-3z"/>
+		<path d="M54 4 56 3l2 15h-3z"/>
+		<path d="M96 8 98 7l2 11h-3z"/>
+	</g>
+</svg>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 180" fill="none">
+  <defs>
+    <linearGradient id="mb-m-body" x1="100" y1="52" x2="100" y2="168" gradientUnits="userSpaceOnUse"><stop stop-color="#5aa8f8"/><stop offset=".55" stop-color="#2f7fe8"/><stop offset="1" stop-color="#1f5bc4"/></linearGradient>
+    <linearGradient id="mb-m-top" x1="100" y1="14" x2="100" y2="56" gradientUnits="userSpaceOnUse"><stop stop-color="#a6d4ff"/><stop offset="1" stop-color="#66b0f8"/></linearGradient>
+    <filter id="mb-m-cast" x="-25%" y="-15%" width="150%" height="150%"><feDropShadow dx="0" dy="9" stdDeviation="8" flood-color="#0d1233" flood-opacity=".4"/></filter>
+  </defs>
+  <g filter="url(#mb-m-cast)">
+    <path d="M30 166 L30 54 L56 26 L170 26 L170 138 L144 166 Z" fill="#152a5c" stroke="#152a5c" stroke-width="12" stroke-linejoin="round"/>
+    <path d="M30 54 L56 26 L170 26 L144 54 Z" fill="url(#mb-m-top)"/>
+    <path d="M144 54 L170 26 L170 138 L144 166 Z" fill="#2461b8"/>
+    <rect x="30" y="54" width="114" height="112" rx="20" fill="url(#mb-m-body)"/>
+    <path d="M44 70 h86" stroke="#ffffff" stroke-opacity=".34" stroke-width="7" stroke-linecap="round"/>
+    <ellipse cx="68" cy="102" rx="15" ry="18" fill="#ffffff"/>
+    <ellipse cx="70" cy="106" rx="7.5" ry="9.5" fill="#16224a"/>
+    <circle cx="66" cy="97" r="3.2" fill="#ffffff"/>
+    <ellipse cx="106" cy="102" rx="15" ry="18" fill="#ffffff"/>
+    <ellipse cx="108" cy="106" rx="7.5" ry="9.5" fill="#16224a"/>
+    <circle cx="104" cy="97" r="3.2" fill="#ffffff"/>
+    <ellipse cx="46" cy="128" rx="9" ry="6" fill="#ff8fa6" opacity=".5"/>
+    <ellipse cx="128" cy="128" rx="9" ry="6" fill="#ff8fa6" opacity=".5"/>
+    <path d="M74 134 q13 13 26 0" stroke="#16224a" stroke-width="7" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

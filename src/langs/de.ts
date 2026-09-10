@@ -1,35 +1,109 @@
 export default {
-	lang: 'German',
-	privacy: 'Datenschutzrichtlinie',
+	lang: 'Deutsch',
+	privacy: 'Datenschutzerklärung',
+
 	addition: 'Addition',
-	addition_desc: `<p>Die Addition ist eine grundlegende mathematische Operation, die verwendet wird, um die Summe von zwei oder mehr Zahlen zu ermitteln.  
-        <br><br><strong>Beispiel:</strong><br> Wenn du 2 Äpfel hast und jemand dir 3 weitere gibt, hast du <br><br><span class="expression"><strong>2 + 3 = 5</strong></span><br> Äpfel.</p>`,
+	addition_desc: `<p>Die Addition bildet die Summe zweier Zahlen.
+        <br><br><strong>Beispiel:</strong><br> Du hast 2 Äpfel und bekommst 3 dazu: <br><br><span class="expression"><strong>2 + 3 = 5</strong></span></p>`,
 	subtraction: 'Subtraktion',
-	subtraction_desc: `<p>Die Subtraktion zeigt den Unterschied zwischen zwei Zahlen. Sie wird häufig verwendet, um zu ermitteln, wie viel übrig ist oder wie groß der Unterschied ist.  
-        <br><br><strong>Beispiel:</strong><br> Du hattest 5 Äpfel und hast 2 gegessen. Wie viele bleiben übrig? <br><br><span class="expression"><strong>5 − 2 = 3</strong></span>.</p>`,
+	subtraction_desc: `<p>Die Subtraktion zeigt den Unterschied zweier Zahlen — wie viel übrig bleibt.
+        <br><br><strong>Beispiel:</strong><br> Du hattest 5 Äpfel und hast 2 gegessen: <br><br><span class="expression"><strong>5 − 2 = 3</strong></span></p>`,
 	multiplication: 'Multiplikation',
-	multiplication_desc: `<p>Die Multiplikation ist eine schnellere Methode, dieselbe Zahl mehrmals zu addieren.  
-        <br><br><strong>Beispiel:</strong><br> Du hast 3 Kisten, und jede Kiste enthält 4 Äpfel. Insgesamt hast du: <br><br><span class="expression"><strong>3 × 4 = 12</strong></span> Äpfel.</p>`,
+	multiplication_desc: `<p>Die Multiplikation ist der schnelle Weg, dieselbe Zahl mehrfach zu addieren.
+        <br><br><strong>Beispiel:</strong><br> 3 Kisten mit je 4 Äpfeln: <br><br><span class="expression"><strong>3 × 4 = 12</strong></span></p>`,
 	division: 'Division',
-	division_desc: `<p>Die Division teilt eine Zahl in gleiche Teile oder ermittelt, wie oft eine Zahl in einer anderen enthalten ist.  
-        <br><br><strong>Beispiel:</strong><br> Du hast 12 Äpfel, die in 3 Körbe aufgeteilt werden sollen. Jeder Korb enthält: <br><br><span class="expression"><strong>12 ÷ 3 = 4</strong></span> Äpfel.</p>`,
-	exponent: 'Potenz',
-	exponent_desc: `<p>Die Potenzierung ist das wiederholte Multiplizieren einer Zahl mit sich selbst.  
-        <br><br><strong>Beispiel:</strong><br> Wenn du 2 hoch 3 nimmst, ergibt das: <br><br><span class="expression"><strong>2³ = 2 × 2 × 2 = 8</strong></span>.
-    </p>`,
-	square_root: 'Quadratwurzel',
-	square_root_desc: `<p>Die Quadratwurzel ist die Umkehroperation der Potenzierung. Sie findet die Zahl, die quadriert die ursprüngliche Zahl ergibt.  
-        <br><br><strong>Beispiel:</strong><br> Die Quadratwurzel von 9 ist: <br><br><span class="expression"><strong>√9 = 3</strong></span>.
-    </p>`,
-	logarithm: 'Logarithmus',
-	logarithm_desc: `<p>Ein Logarithmus zeigt, auf welche Potenz die Basis erhöht werden muss, um eine gegebene Zahl zu erhalten.  
-        <br><br><strong>Beispiel:</strong><br> Der Logarithmus von 8 mit Basis 2 ist 3, da <br><br><span class="expression"><strong>log<sup>2</sup>8 = 3</strong></span><span class="expression"><strong>2<sup>3</sup> = 8</strong></span>.
-    </p>`,
-	all: 'Alle',
-	all_desc: `<p>Hier löst du Aufgaben, die alle vorherigen Operationen beinhalten: Addition, Subtraktion, Multiplikation, Division, Potenz, Quadratwurzel und Logarithmus. Die Aufgaben werden schwieriger, also bleib konzentriert!</p>`,
-	MIN: '1 min',
-	MIN_3: '3 min',
-	MIN_5: '5 min',
-	no_records: 'Keine Aufzeichnungen',
-	your_score: 'Du hast gepunktet',
+	division_desc: `<p>Die Division teilt eine Zahl in gleiche Teile.
+        <br><br><strong>Beispiel:</strong><br> 12 Äpfel auf 3 Körbe: <br><br><span class="expression"><strong>12 ÷ 3 = 4</strong></span></p>`,
+
+	start: 'Spielen',
+	tagline: 'Rechne — bau die Etage — steig höher.',
+	first_climb: 'Dein erster Aufstieg',
+
+	floor: 'Etage',
+	best_floor: 'Beste Etage',
+	new_best: 'Neuer Rekord',
+	previous_best: 'Vorher',
+	next_checkpoint: 'Nächster Halt',
+	checkpoint: 'Checkpoint',
+	checkpoints: 'Checkpoints',
+	checkpoint_held: 'Checkpoint hält',
+	out_of_time: 'Zeit abgelaufen',
+	shield_held: 'Schild hält',
+	new_zone: 'Neue Höhe',
+	score: 'Punkte',
+
+	combo_label: 'Combo',
+	max_combo: 'Beste Combo',
+	correct_answers: 'Richtige Antworten',
+	accuracy: 'Genauigkeit',
+
+	theme: 'Ort',
+	theme_random: 'Zufällig',
+	loc_city: 'Stadt',
+	loc_valley: 'Tal',
+	loc_winter: 'Winter',
+	loc_canyon: 'Canyon',
+	loc_night: 'Nacht',
+	loc_space: 'Weltraum',
+
+	praise_fast: 'Schnell!',
+	praise_good: 'Gut!',
+	praise_streak: 'Serie {n}!',
+	praise_wow: 'Fantastisch!',
+	praise_tier: 'Schwerer!',
+
+	challenge_new: 'Neue Aufgabe',
+	ch_double_goal: '5 richtige in Folge',
+	ch_double_reward: 'Doppelte Punkte',
+	ch_double_done: 'Doppelte Punkte!',
+	ch_shield_goal: '3 richtige in Folge',
+	ch_shield_reward: 'Etagen-Schild',
+	ch_shield_done: 'Etagen-Schild!',
+	ch_bonus_goal: 'Combo ×5 erreichen',
+	ch_bonus_reward: '+100 Punkte',
+	ch_bonus_done: '+100 Punkte!',
+	ch_quick_goal: '3 schnelle Antworten',
+	ch_quick_reward: 'Extraleben',
+	ch_quick_done: 'Blitzschnell!',
+	ch_perfect_goal: '6 ohne Fehler',
+	ch_perfect_reward: '+250 Punkte',
+	ch_perfect_done: 'Fehlerlos!',
+
+	pause: 'Pause',
+	paused: 'Pausiert',
+	resume: 'Weiter',
+	loading: 'Lädt…',
+	play_again: 'Nochmal',
+	game_over: 'Spiel vorbei',
+	main_menu: 'Hauptmenü',
+
+	stat_games: 'Spiele',
+	stat_solved: 'Gelöst',
+
+	sound: 'Ton',
+	vibration: 'Vibration',
+	settings: 'Einstellungen',
+	save: 'Speichern',
+	close: 'Schließen',
+	player_name: 'Spielername',
+	sound_and_vibro: 'Ton und Vibration',
+	language: 'Sprache',
+	on: 'An',
+	off: 'Aus',
+
+	sec_short: 's',
+	climb_hint: 'Ziehen zum Laufen',
+	climb_jump: 'Sprung',
+	fork_title: 'Wie weiterbauen?',
+	fork_note: 'bis zur nächsten Stütze',
+	boon_support: 'Stützen näher',
+	boon_support_note: 'Alle 5 Etagen eine Stütze',
+	boon_calm: 'Mehr Zeit',
+	boon_calm_note: 'Ein Viertel mehr Zeit pro Antwort',
+	boon_rush: 'Tempo',
+	boon_rush_note: 'Größere Zahlen, weniger Zeit — Punkte ×2',
+	help_ops: 'Was sind das für Rechenarten?',
+	promo_label: 'Mehr von uns',
+	promo_open: 'Holen',
+	help_title: 'Rechenarten',
 }

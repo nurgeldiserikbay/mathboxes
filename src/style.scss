@@ -1,117 +1,196 @@
+/* ============================================================== ШРИФТ ==
+   Nunito, подшитый локально. Из трёх гарнитур, названных в дизайн-паке,
+   кириллицу держит только она: Baloo 2 и Poppins на «ЭТАЖ» отдают ширину
+   системного fallback — русских и казахских глиф в них просто нет.
+   Переменное начертание, поэтому один файл на подмножество закрывает все
+   веса от 600 до 900. */
 @font-face {
-	font-family: 'SofiaSans', sans-serif;
-	src: url('@/assets/fonts/SofiaSans-Thin.ttf') format('truetype');
-	font-weight: 100;
+	font-family: 'Nunito';
 	font-style: normal;
+	font-weight: 600 900;
+	font-display: swap;
+	src: url('/fonts/nunito-cyrillic-ext.woff2') format('woff2');
+	unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+	font-family: 'Nunito';
+	font-style: normal;
+	font-weight: 600 900;
+	font-display: swap;
+	src: url('/fonts/nunito-cyrillic.woff2') format('woff2');
+	unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+@font-face {
+	font-family: 'Nunito';
+	font-style: normal;
+	font-weight: 600 900;
+	font-display: swap;
+	src: url('/fonts/nunito-latin-ext.woff2') format('woff2');
+	unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+		U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+		U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+	font-family: 'Nunito';
+	font-style: normal;
+	font-weight: 600 900;
+	font-display: swap;
+	src: url('/fonts/nunito-latin.woff2') format('woff2');
+	unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+		U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191,
+		U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-@font-face {
-	font-family: 'SofiaSans', sans-serif;
-	src: url('@/assets/fonts/SofiaSans-ExtraLight.ttf') format('truetype');
-	font-weight: 200;
-	font-style: normal;
+/* =============================================================== ТОКЕНЫ ==
+   Игра — освещённая башня в открытом небе. Тёмные токены здесь описывают не
+   фон экрана (его рисует небо), а хром: панели HUD, листы модалок, подложки.
+   Цвета операций и этажей живут отдельно, в `utils/`, потому что они часть
+   правил, а не оформления. */
+:root {
+	/* Чернила: от самой глубокой к панельной */
+	--ink-0: #080c22;
+	--ink-1: #0d1233;
+	--ink-2: #141a3d;
+
+	/* Панели HUD и модалок */
+	--panel-top: #1f2856;
+	--panel-bot: #131a3c;
+	--panel-lip: #080c26;
+	--sheet-top: #232c5e;
+	--sheet-bot: #171e44;
+
+	--line: rgba(233, 238, 255, 0.12);
+	--edge: rgba(233, 238, 255, 0.18);
+
+	--text: #f8f7ff;
+	--text-dim: #b9c4e6;
+	--text-faint: #8f9ec9;
+	--text-ink: #141a3d;
+
+	/* Игровая палитра */
+	--blue: #2f80ed;
+	--blue-lip: #1a4d9d;
+	--cyan: #31b8d4;
+	--violet: #7657e8;
+	--violet-lip: #43309a;
+	--magenta: #b658d8;
+	--green: #45c977;
+	--green-lip: #1f7f45;
+	--coral: #f0645d;
+	--coral-lip: #9d2f2c;
+	--gold: #f5b83d;
+	--gold-lip: #a86f13;
+
+	/* Семантика: код обращается к роли, а не к цвету */
+	--success: var(--green);
+	--danger: var(--coral);
+	--checkpoint: var(--gold);
+
+	/* Радиусы: плита строже кнопки, кнопка строже карточки */
+	--r-slab: 15px;
+	--r-panel: 14px;
+	--r-btn: 18px;
+	--r-card: 22px;
+
+	/*
+	   Высота рекламной строки. Резерв, а не факт: место держится с самого
+	   старта, поэтому приход или отсутствие баннера ничего не сдвигает.
+	   Нативный слой переопределяет значение, когда узнаёт настоящую высоту.
+	*/
+	--ad-slot: 56px;
+
+	/*
+	   Насколько нативный баннер отодвинут от верхней кромки.
+
+	   Ноль везде, кроме Android 15+: там плагин AdMob для верхнего баннера сам
+	   добавляет отступ, равный системному инсету, и объявление встаёт ниже
+	   отведённой полосы — накрывая собой HUD. Значение ставит нативный слой,
+	   когда узнаёт версию системы.
+	*/
+	--ad-top: 0px;
+
+	/* Вся рекламная зона: отступ плюс сама полоса. От неё отсчитывается всё,
+	   что не должно под неё попадать. */
+	--ad-band: calc(var(--ad-top) + var(--ad-slot));
+
+	/* Кривые. `pop` с перелётом — для всего, что «приезжает»;
+	   `soft` — для всего, что просто меняет состояние. */
+	--pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+	--soft: cubic-bezier(0.33, 1, 0.68, 1);
+	--fall: cubic-bezier(0.45, 0, 0.9, 0.5);
 }
 
-@font-face {
-	font-family: 'SofiaSans', sans-serif;
-	src: url('@/assets/fonts/SofiaSans-Light.ttf') format('truetype');
-	font-weight: 300;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'SofiaSans', sans-serif;
-	src: url('@/assets/fonts/SofiaSans-Regular.ttf') format('truetype');
-	font-weight: 400;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'SofiaSans', sans-serif;
-	src: url('@/assets/fonts/SofiaSans-Medium.ttf') format('truetype');
-	font-weight: 500;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'SofiaSans', sans-serif;
-	src: url('@/assets/fonts/SofiaSans-SemiBold.ttf') format('truetype');
-	font-weight: 600;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'SofiaSans', sans-serif;
-	src: url('@/assets/fonts/SofiaSans-Bold.ttf') format('truetype');
-	font-weight: 700;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'SofiaSans', sans-serif;
-	src: url('@/assets/fonts/SofiaSans-ExtraBold.ttf') format('truetype');
-	font-weight: 800;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: 'SofiaSans', sans-serif;
-	src: url('@/assets/fonts/SofiaSans-Black.ttf') format('truetype');
-	font-weight: 900;
-	font-style: normal;
+* {
+	box-sizing: border-box;
 }
 
 body {
 	margin: 0;
-	overflow-y: auto;
-	background: rgb(1, 109, 178);
-	background: radial-gradient(
-		circle,
-		rgba(1, 109, 178, 1) 0%,
-		rgba(1, 42, 74, 1) 100%
-	);
-	font-family: 'SofiaSans', sans-serif;
+	overflow: hidden;
+	background: var(--ink-0);
+	color: var(--text);
+	font-family: 'Nunito', system-ui, sans-serif;
+	font-weight: 700;
+	-webkit-font-smoothing: antialiased;
+	-webkit-tap-highlight-color: transparent;
+	overscroll-behavior: none;
 }
 
 i,
 span,
 a,
-button {
-	font-family: 'SofiaSans', sans-serif;
+b,
+button,
+input {
+	font-family: inherit;
+}
+
+button,
+input {
+	color: inherit;
 }
 
 #app {
 	position: relative;
 	min-height: 100dvh;
+	width: 100%;
+	max-width: 680px;
+	margin: 0 auto;
 	overflow: hidden;
-	width: 100%;
-	max-width: 680px;
-	margin: 0 auto;
 }
 
-.page {
-	width: 100%;
-	height: 100%;
-	box-sizing: border-box;
+/* Цифры не должны дёргать вёрстку, пока счёт растёт. */
+.num {
+	font-variant-numeric: tabular-nums;
 }
 
-.container {
-	box-sizing: border-box;
-	max-width: 680px;
-	margin: 0 auto;
-	box-sizing: border-box;
-}
-
-::-webkit-scrollbar-track {
-	-webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-	background-color: #f5f5f5;
+/* Заголовок-капитель: одна роль, один вид — во всех панелях. */
+.cap {
+	font-size: 9px;
+	font-weight: 900;
+	letter-spacing: 1.6px;
+	text-transform: uppercase;
+	color: var(--text-faint);
+	line-height: 1.2;
 }
 
 ::-webkit-scrollbar {
-	width: 6px;
-	background-color: #f5f5f5;
+	width: 5px;
+	background-color: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-	background-color: #000000;
+	border-radius: 5px;
+	background-color: rgba(233, 238, 255, 0.22);
+}
+
+/* Кому больно от движения — тому только состояния, без полётов и тряски. */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.06s !important;
+	}
 }

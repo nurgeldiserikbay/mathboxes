@@ -1,35 +1,109 @@
 export default {
-	lang: 'Russian',
+	lang: 'Русский',
 	privacy: 'Политика конфиденциальности',
+
 	addition: 'Сложение',
-	addition_desc: `<p>Операция сложения - это базовая математическая операция, используемая для нахождения общей суммы двух или более чисел.
-       <br><br><strong>Пример:</strong><br> Если у вас есть 2 яблока, и кто-то дает вам еще 3, то у вас становится <br><br><span class="expression"><strong>2 + 3 = 5</strong></span><br> яблок.</p>`,
+	addition_desc: `<p>Сложение — это нахождение суммы двух чисел.
+        <br><br><strong>Пример:</strong><br> У вас 2 яблока, вам дали ещё 3: <br><br><span class="expression"><strong>2 + 3 = 5</strong></span></p>`,
 	subtraction: 'Вычитание',
-	subtraction_desc: `<p>Вычитание позволяет определить разницу между двумя числами. Эта операция часто применяется, чтобы понять, сколько осталось или какова разница. 
-        <br><br><strong>Пример:</strong><br> У вас было 5 яблок, и вы съели 2. Сколько осталось? <br><br><span class="expression"><strong>5 − 2 = 3</strong></span>.</p>`,
+	subtraction_desc: `<p>Вычитание показывает разницу между числами — сколько осталось.
+        <br><br><strong>Пример:</strong><br> Было 5 яблок, съели 2: <br><br><span class="expression"><strong>5 − 2 = 3</strong></span></p>`,
 	multiplication: 'Умножение',
-	multiplication_desc: `<p>Умножение - это ускоренное сложение одинаковых чисел. Оно используется, когда нужно сложить одно и то же число несколько раз. 
-        <br><br><strong>Пример:</strong><br> У вас 3 коробки, и в каждой коробке по 4 яблока. Общее количество яблок: <br><br><span class="expression"><strong>3 × 4 = 12</strong></span>.</p>`,
+	multiplication_desc: `<p>Умножение — быстрый способ сложить одно и то же число несколько раз.
+        <br><br><strong>Пример:</strong><br> 3 коробки по 4 яблока: <br><br><span class="expression"><strong>3 × 4 = 12</strong></span></p>`,
 	division: 'Деление',
-	division_desc: `<p>Деление позволяет распределить одно число на равные части или узнать, сколько раз одно число содержится в другом. 
-        <br><br><strong>Пример:</strong><br> У вас есть 12 яблок, которые нужно разложить в 3 корзины. В каждой корзине будет: <br><br><span class="expression"><strong>12 ÷ 3 = 4</strong></span>.</p>`,
-	exponent: 'Возведение в степень',
-	exponent_desc: `<p>Возведение в степень - это умножение числа само на себя заданное количество раз. 
-        <br><br><strong>Пример:</strong><br> Если 2 возвести в степень 3, получится: <br><br><span class="expression"><strong>2³ = 2 × 2 × 2 = 8</strong></span>.
-    </p>`,
-	square_root: 'Извлечение корня',
-	square_root_desc: `<p>Извлечение корня - это обратная операция возведения в степень. Она показывает, какое число при возведении в квадрат дает исходное значение. 
-        <br><br><strong>Пример:</strong><br> Корень квадратный из 9 равен: <br><br><span class="expression"><strong>√9 = 3</strong></span>.
-    </p>`,
-	logarithm: 'Логарифм',
-	logarithm_desc: `<p>Логарифм показывает, до какой степени нужно возвести основание, чтобы получить заданное число. 
-        <br><br><strong>Пример:</strong><br> Логарифм числа 8 по основанию 2 равен 3, так как <br><br><span class="expression"><strong>log<sup>2</sup>8 = 3</strong></span><span class="expression"><strong>2<sup>3</sup> = 8</strong></span>.
-    </p>`,
-	all: 'Все',
-	all_desc: `<p>Здесь вам предстоит решить примеры, включающие все ранее изученные операции: сложение, вычитание, умножение, деление, степень, корень и логарифм. Задания становятся более сложными, так что будьте внимательны!</p>`,
-	MIN: '1 мин',
-	MIN_3: '3 мин',
-	MIN_5: '5 мин',
-	no_records: 'Нет записей',
-	your_score: 'Вы набрали',
+	division_desc: `<p>Деление разбивает число на равные части.
+        <br><br><strong>Пример:</strong><br> 12 яблок в 3 корзины: <br><br><span class="expression"><strong>12 ÷ 3 = 4</strong></span></p>`,
+
+	start: 'Играть',
+	tagline: 'Решай пример — строй этаж — поднимайся выше.',
+	first_climb: 'Первый подъём',
+
+	floor: 'Этаж',
+	best_floor: 'Лучший этаж',
+	new_best: 'Новый рекорд',
+	previous_best: 'Было',
+	next_checkpoint: 'Следующая опора',
+	checkpoint: 'Опора',
+	checkpoints: 'Опоры',
+	checkpoint_held: 'Опора выдержала',
+	out_of_time: 'Время вышло',
+	shield_held: 'Щит выдержал',
+	new_zone: 'Новая высота',
+	score: 'Очки',
+
+	combo_label: 'Комбо',
+	max_combo: 'Лучшее комбо',
+	correct_answers: 'Верных ответов',
+	accuracy: 'Точность',
+
+	theme: 'Локация',
+	theme_random: 'Случайно',
+	loc_city: 'Город',
+	loc_valley: 'Долина',
+	loc_winter: 'Зима',
+	loc_canyon: 'Каньон',
+	loc_night: 'Ночь',
+	loc_space: 'Космос',
+
+	praise_fast: 'Быстро!',
+	praise_good: 'Хорошо!',
+	praise_streak: 'Серия {n}!',
+	praise_wow: 'Невероятно!',
+	praise_tier: 'Сложнее!',
+
+	challenge_new: 'Новое задание',
+	ch_double_goal: '5 верных подряд',
+	ch_double_reward: 'Двойные очки',
+	ch_double_done: 'Двойные очки!',
+	ch_shield_goal: '3 верных подряд',
+	ch_shield_reward: 'Щит этажей',
+	ch_shield_done: 'Щит этажей!',
+	ch_bonus_goal: 'Дойти до комбо ×5',
+	ch_bonus_reward: '+100 очков',
+	ch_bonus_done: '+100 очков!',
+	ch_quick_goal: '3 быстрых ответа',
+	ch_quick_reward: 'Лишняя жизнь',
+	ch_quick_done: 'Быстро!',
+	ch_perfect_goal: '6 без ошибки',
+	ch_perfect_reward: '+250 очков',
+	ch_perfect_done: 'Безупречно!',
+
+	pause: 'Пауза',
+	paused: 'Пауза',
+	resume: 'Продолжить',
+	loading: 'Загрузка…',
+	play_again: 'Играть ещё',
+	game_over: 'Игра окончена',
+	main_menu: 'Главное меню',
+
+	stat_games: 'Игр',
+	stat_solved: 'Решено',
+
+	sound: 'Звук',
+	vibration: 'Вибрация',
+	settings: 'Настройки',
+	save: 'Сохранить',
+	close: 'Закрыть',
+	player_name: 'Имя игрока',
+	sound_and_vibro: 'Звук и вибрация',
+	language: 'Язык',
+	on: 'Вкл',
+	off: 'Выкл',
+
+	sec_short: 'с',
+	climb_hint: 'Веди пальцем',
+	climb_jump: 'Прыжок',
+	fork_title: 'Как строить дальше?',
+	fork_note: 'до следующей опоры',
+	boon_support: 'Опоры чаще',
+	boon_support_note: 'Опора каждые 5 этажей',
+	boon_calm: 'Запас времени',
+	boon_calm_note: 'Времени на ответ больше на четверть',
+	boon_rush: 'Разгон',
+	boon_rush_note: 'Числа выше и время короче — очки ×2',
+	help_ops: 'Что это за действия?',
+	promo_label: 'Ещё наша игра',
+	promo_open: 'Открыть',
+	help_title: 'Действия',
 }

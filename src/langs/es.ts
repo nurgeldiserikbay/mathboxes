@@ -1,35 +1,109 @@
 export default {
-	lang: 'Spanish',
+	lang: 'Español',
 	privacy: 'Política de privacidad',
+
 	addition: 'Suma',
-	addition_desc: `<p>La suma es una operación matemática básica utilizada para encontrar el total de dos o más números. 
-        <br><br><strong>Ejemplo:</strong><br> Si tienes 2 manzanas y alguien te da 3 más, tendrás <br><br><span class="expression"><strong>2 + 3 = 5</strong></span><br> manzanas.</p>`,
+	addition_desc: `<p>La suma halla el total de dos números.
+        <br><br><strong>Ejemplo:</strong><br> Tienes 2 manzanas y te dan 3 más: <br><br><span class="expression"><strong>2 + 3 = 5</strong></span></p>`,
 	subtraction: 'Resta',
-	subtraction_desc: `<p>La resta permite determinar la diferencia entre dos números. Se utiliza para saber cuánto queda o cuál es la diferencia. 
-        <br><br><strong>Ejemplo:</strong><br> Tenías 5 manzanas y comiste 2. ¿Cuántas quedan? <br><br><span class="expression"><strong>5 − 2 = 3</strong></span>.</p>`,
+	subtraction_desc: `<p>La resta muestra la diferencia entre dos números — cuánto queda.
+        <br><br><strong>Ejemplo:</strong><br> Tenías 5 manzanas y comiste 2: <br><br><span class="expression"><strong>5 − 2 = 3</strong></span></p>`,
 	multiplication: 'Multiplicación',
-	multiplication_desc: `<p>La multiplicación es una forma rápida de sumar un mismo número varias veces. 
-        <br><br><strong>Ejemplo:</strong><br> Tienes 3 cajas, y cada caja contiene 4 manzanas. El total de manzanas es: <br><br><span class="expression"><strong>3 × 4 = 12</strong></span>.</p>`,
+	multiplication_desc: `<p>Multiplicar es la forma rápida de sumar el mismo número varias veces.
+        <br><br><strong>Ejemplo:</strong><br> 3 cajas con 4 manzanas cada una: <br><br><span class="expression"><strong>3 × 4 = 12</strong></span></p>`,
 	division: 'División',
-	division_desc: `<p>La división permite dividir un número en partes iguales o determinar cuántas veces un número está contenido en otro. 
-        <br><br><strong>Ejemplo:</strong><br> Tienes 12 manzanas para dividir en 3 cestas. Cada cesta tendrá: <br><br><span class="expression"><strong>12 ÷ 3 = 4</strong></span>.</p>`,
-	exponent: 'Exponentes',
-	exponent_desc: `<p>Los exponentes multiplican un número por sí mismo una cantidad específica de veces.  
-        <br><br><strong>Ejemplo:</strong><br> Si elevas 2 a la potencia de 3, el resultado es: <br><br><span class="expression"><strong>2³ = 2 × 2 × 2 = 8</strong></span>.
-    </p>`,
-	square_root: 'Raíz cuadrada',
-	square_root_desc: `<p>La raíz cuadrada es la operación inversa de elevar al cuadrado. Muestra qué número, al elevarlo al cuadrado, da el valor original.  
-        <br><br><strong>Ejemplo:</strong><br> La raíz cuadrada de 9 es: <br><br><span class="expression"><strong>√9 = 3</strong></span>.
-    </p>`,
-	logarithm: 'Logaritmo',
-	logarithm_desc: `<p>El logaritmo indica la potencia a la que debe elevarse la base para obtener un número dado.  
-				<br><br><strong>Ejemplo:</strong><br> El logaritmo de 8 en base 2 es 3, porque <br><br><span class="expression"><strong>log<sup>2</sup>8 = 3</strong></span><span class="expression"><strong>2<sup>3</sup> = 8</strong></span>.
-    </p>`,
-	all: 'Toda',
-	all_desc: `<p>Aquí resolverás problemas que incluyen todas las operaciones estudiadas anteriormente: suma, resta, multiplicación, división, exponentes, raíces y logaritmos. ¡Los desafíos serán más complicados, así que prepárate!</p>`,
-	MIN: '1 min',
-	MIN_3: '3 min',
-	MIN_5: '5 min',
-	no_records: 'Sin registros',
-	your_score: 'Tu anotaste',
+	division_desc: `<p>La división reparte un número en partes iguales.
+        <br><br><strong>Ejemplo:</strong><br> 12 manzanas en 3 cestas: <br><br><span class="expression"><strong>12 ÷ 3 = 4</strong></span></p>`,
+
+	start: 'Jugar',
+	tagline: 'Resuelve — construye el piso — sube más alto.',
+	first_climb: 'Tu primera subida',
+
+	floor: 'Piso',
+	best_floor: 'Mejor piso',
+	new_best: 'Nuevo récord',
+	previous_best: 'Antes',
+	next_checkpoint: 'Próximo apoyo',
+	checkpoint: 'Apoyo',
+	checkpoints: 'Apoyos',
+	checkpoint_held: 'El apoyo aguantó',
+	out_of_time: 'Se acabó el tiempo',
+	shield_held: 'El escudo aguantó',
+	new_zone: 'Nueva altura',
+	score: 'Puntos',
+
+	combo_label: 'Combo',
+	max_combo: 'Mejor combo',
+	correct_answers: 'Respuestas correctas',
+	accuracy: 'Precisión',
+
+	theme: 'Lugar',
+	theme_random: 'Aleatorio',
+	loc_city: 'Ciudad',
+	loc_valley: 'Valle',
+	loc_winter: 'Invierno',
+	loc_canyon: 'Cañón',
+	loc_night: 'Noche',
+	loc_space: 'Espacio',
+
+	praise_fast: '¡Rápido!',
+	praise_good: '¡Bien!',
+	praise_streak: '¡Serie {n}!',
+	praise_wow: '¡Increíble!',
+	praise_tier: '¡Más difícil!',
+
+	challenge_new: 'Nuevo reto',
+	ch_double_goal: '5 correctas seguidas',
+	ch_double_reward: 'Puntos dobles',
+	ch_double_done: '¡Puntos dobles!',
+	ch_shield_goal: '3 correctas seguidas',
+	ch_shield_reward: 'Escudo de pisos',
+	ch_shield_done: '¡Escudo de pisos!',
+	ch_bonus_goal: 'Llegar a combo ×5',
+	ch_bonus_reward: '+100 puntos',
+	ch_bonus_done: '¡+100 puntos!',
+	ch_quick_goal: '3 respuestas rápidas',
+	ch_quick_reward: 'Vida extra',
+	ch_quick_done: '¡Rapidísimo!',
+	ch_perfect_goal: '6 sin fallar',
+	ch_perfect_reward: '+250 puntos',
+	ch_perfect_done: '¡Impecable!',
+
+	pause: 'Pausa',
+	paused: 'En pausa',
+	resume: 'Continuar',
+	loading: 'Cargando…',
+	play_again: 'Jugar de nuevo',
+	game_over: 'Fin de la partida',
+	main_menu: 'Menú principal',
+
+	stat_games: 'Partidas',
+	stat_solved: 'Resueltos',
+
+	sound: 'Sonido',
+	vibration: 'Vibración',
+	settings: 'Ajustes',
+	save: 'Guardar',
+	close: 'Cerrar',
+	player_name: 'Nombre del jugador',
+	sound_and_vibro: 'Sonido y vibración',
+	language: 'Idioma',
+	on: 'Sí',
+	off: 'No',
+
+	sec_short: 's',
+	climb_hint: 'Arrastra para correr',
+	climb_jump: 'Saltar',
+	fork_title: '¿Cómo seguir?',
+	fork_note: 'hasta el próximo apoyo',
+	boon_support: 'Apoyos más cerca',
+	boon_support_note: 'Un apoyo cada 5 pisos',
+	boon_calm: 'Más tiempo',
+	boon_calm_note: 'Un cuarto más de tiempo por respuesta',
+	boon_rush: 'Impulso',
+	boon_rush_note: 'Números mayores, menos tiempo — puntos ×2',
+	help_ops: '¿Qué operaciones son estas?',
+	promo_label: 'Más de nosotros',
+	promo_open: 'Abrir',
+	help_title: 'Operaciones',
 }

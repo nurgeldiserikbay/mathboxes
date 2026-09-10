@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 200" fill="none">
+  <defs>
+    <linearGradient id="mb-cloud" x1="0" y1="0" x2="0" y2="1"><stop stop-color="var(--cloud-hi, #ffffff)"/><stop offset=".72" stop-color="var(--cloud-hi, #ffffff)"/><stop offset="1" stop-color="var(--cloud-lo, #dbe7fa)"/></linearGradient>
+  </defs>
+  <g fill="url(#mb-cloud)"><circle cx="-8.8" cy="62.0" r="17.4"/><circle cx="21.6" cy="54.6" r="30.6"/><circle cx="52.0" cy="50.0" r="35.2"/><circle cx="82.4" cy="53.9" r="33.7"/><circle cx="112.8" cy="62.0" r="18.9"/><rect x="-19.2" y="50.6" width="142.5" height="24.7" rx="12.3"/></g>
+  <rect x="-13.6" y="67.7" width="131.1" height="8.5" rx="4.8" fill="var(--cloud-lo, #dbe7fa)" opacity=".5"/>
+
+  <g fill="url(#mb-cloud)"><circle cx="144.6" cy="40.0" r="14.3"/><circle cx="168.3" cy="34.2" r="24.1"/><circle cx="192.0" cy="31.1" r="26.3"/><circle cx="215.7" cy="34.2" r="24.2"/><circle cx="239.4" cy="40.0" r="15.8"/><rect x="136.5" y="31.1" width="111.0" height="19.2" rx="9.6"/></g>
+  <rect x="140.9" y="44.4" width="102.1" height="6.7" rx="3.7" fill="var(--cloud-lo, #dbe7fa)" opacity=".5"/>
+
+  <g fill="url(#mb-cloud)"><circle cx="254.2" cy="76.0" r="21.5"/><circle cx="281.3" cy="69.5" r="32.4"/><circle cx="308.4" cy="64.6" r="35.2"/><circle cx="335.6" cy="64.3" r="36.2"/><circle cx="362.7" cy="68.3" r="38.4"/><circle cx="389.8" cy="76.0" r="21.4"/><rect x="242.5" y="63.3" width="159.0" height="27.6" rx="13.8"/></g>
+  <rect x="248.9" y="82.4" width="146.3" height="9.5" rx="5.3" fill="var(--cloud-lo, #dbe7fa)" opacity=".5"/>
+
+  <g fill="url(#mb-cloud)"><circle cx="73.6" cy="138.0" r="12.8"/><circle cx="89.0" cy="134.3" r="18.5"/><circle cx="104.3" cy="129.6" r="26.1"/><circle cx="119.7" cy="129.7" r="25.6"/><circle cx="135.0" cy="134.5" r="17.4"/><circle cx="150.4" cy="138.0" r="11.0"/><rect x="67.0" y="130.8" width="90.0" height="15.6" rx="7.8"/></g>
+  <rect x="70.6" y="141.6" width="82.8" height="5.4" rx="3.0" fill="var(--cloud-lo, #dbe7fa)" opacity=".5"/>
+
+  <g fill="url(#mb-cloud)"><circle cx="240.5" cy="154.0" r="15.1"/><circle cx="257.9" cy="149.8" r="21.2"/><circle cx="275.3" cy="144.8" r="28.6"/><circle cx="292.7" cy="145.3" r="26.8"/><circle cx="310.1" cy="149.8" r="21.3"/><circle cx="327.5" cy="154.0" r="15.4"/><rect x="233.0" y="145.8" width="102.0" height="17.7" rx="8.8"/></g>
+  <rect x="237.1" y="158.1" width="93.8" height="6.1" rx="3.4" fill="var(--cloud-lo, #dbe7fa)" opacity=".5"/>
+
+</svg>
