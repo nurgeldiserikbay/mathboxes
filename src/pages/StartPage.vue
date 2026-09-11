@@ -10,6 +10,7 @@ import GameSky from '@/components/GameSky.vue'
 import LogoItem from '@/components/LogoItem.vue'
 import SettingBlock from '@/components/SettingBlock.vue'
 import OtherGames from '@/components/OtherGames.vue'
+import OtherGamesIcon from '@/components/OtherGamesIcon.vue'
 import HelpSheet from '@/components/HelpSheet.vue'
 
 import Mascot from '@/assets/mascot/cube.svg?component'
@@ -58,14 +59,27 @@ function openSettings() {
 		<GameSky zone="day" />
 
 		<header class="start__top">
-			<button
-				class="round"
-				type="button"
-				:aria-label="$t('settings')"
-				@click="openSettings"
-			>
-				<AppIcon name="gear" :size="20" />
-			</button>
+			<div class="start__tools">
+				<button
+					class="round"
+					type="button"
+					:aria-label="$t('settings')"
+					@click="openSettings"
+				>
+					<AppIcon name="gear" :size="20" />
+				</button>
+
+				<!-- Вход в «Другие игры». Рядом с настройками, но без их веса:
+				     плоский и приглушённый, чтобы не спорить за внимание с Play. -->
+				<button
+					class="quiet-round"
+					type="button"
+					:aria-label="$t('other_games')"
+					@click="isOtherGames = true"
+				>
+					<OtherGamesIcon />
+				</button>
+			</div>
 
 			<!-- The one number that carries over between runs, in the corner where
 			     a coin counter lives in every game of this shape. -->
@@ -120,13 +134,6 @@ function openSettings() {
 					<span class="num">{{ gameStore.records.gamesPlayed }}</span>
 					{{ $t('stat_games').toLowerCase() }}
 				</span>
-				<button
-					class="link link--quiet"
-					type="button"
-					@click="isOtherGames = true"
-				>
-					{{ $t('other_games') }}
-				</button>
 				<a
 					href="https://docs.google.com/document/d/1zsuymqEMonMRWg1RoEIqpQpo4ThFwEOoOYgnL060GQk/edit?usp=sharing"
 					target="_blank"
@@ -510,14 +517,42 @@ function openSettings() {
 	}
 }
 
-/* Вход в «Другие игры» стоит в том же ряду, что ссылка на политику, и выглядит
-   так же: это служебная ссылка, а не действие. Кнопка, а не <a>, потому что
-   ведёт внутрь приложения — уход в Play возможен только через гейт. */
-button.link {
+/* Настройки и «Другие игры» держатся вместе у левого края шапки. */
+.start__tools {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+/*
+   Вход в «Другие игры»: форма кнопки настроек, но без её объёма и цвета.
+
+   Раздел служебный, а не игровой, и второй выпуклый фиолетовый кружок в шапке
+   читался бы как ещё одно главное действие.
+*/
+.quiet-round {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
 	padding: 0;
 	border: none;
-	background: none;
-	font: inherit;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.12);
+	box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.16);
 	cursor: pointer;
+	opacity: 0.75;
+	color: #fff;
+}
+
+.quiet-round svg {
+	width: 20px;
+	height: 20px;
+}
+
+.quiet-round:active {
+	opacity: 1;
+	transform: translateY(1px);
 }
 </style>
