@@ -105,5 +105,11 @@ export default {
 	help_ops: 'Бұл қандай амалдар?',
 	promo_label: 'Біздің басқа ойын',
 	promo_open: 'Ашу',
+	other_games: 'Басқа ойындар',
+	other_games_note: 'Біздің басқа ойындарымыз. Ашу үшін ересектен сұра.',
+	gate_title: 'Тек ересектер үшін',
+	gate_hint: 'Ойын бетін Google Play-де ашу үшін мысалды шеш',
+	gate_open: 'Google Play-де ашу',
+	gate_cancel: 'Болдырмау',
 	help_title: 'Амалдар',
 }

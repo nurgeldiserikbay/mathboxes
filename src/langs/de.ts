@@ -105,5 +105,11 @@ export default {
 	help_ops: 'Was sind das für Rechenarten?',
 	promo_label: 'Mehr von uns',
 	promo_open: 'Holen',
+	other_games: 'Weitere Spiele',
+	other_games_note: 'Mehr Spiele von uns. Frag einen Erwachsenen.',
+	gate_title: 'Nur für Erwachsene',
+	gate_hint: 'Löse die Aufgabe, um die Spielseite in Google Play zu öffnen',
+	gate_open: 'In Google Play öffnen',
+	gate_cancel: 'Abbrechen',
 	help_title: 'Rechenarten',
 }

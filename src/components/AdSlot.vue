@@ -4,7 +4,7 @@ import { computed, ref } from 'vue'
 import AppIcon from '@/components/AppIcon.vue'
 
 import { useAdsStore } from '@/store/adsStore'
-import { pickPromo, storeUrl } from '@/utils/promo'
+import { pickPromo } from '@/utils/promo'
 
 /**
  * Место под баннер — всегда занятое.
@@ -21,7 +21,23 @@ import { pickPromo, storeUrl } from '@/utils/promo'
  * Игра выбирается один раз при создании слота, а не по таймеру: строка стоит
  * над доской, на которой идёт счёт времени, и ничего мелькающего там быть не
  * должно.
+ *
+ * Касание ведёт не в Play, а в наш же список игр внутри приложения, и только
+ * когда это разрешено (`interactive`). Раньше здесь стояла прямая ссылка в
+ * магазин: это детское приложение, и Google в отказе прямо пишет про
+ * «inadvertent clicks from child users» — одно случайное касание уводило
+ * ребёнка из игры. Теперь уход возможен только через родительский гейт внутри
+ * OtherGames.vue.
  */
+const $props = withDefaults(
+	defineProps<{
+		/** Разрешено ли открывать список игр прямо сейчас. */
+		interactive?: boolean
+	}>(),
+	{ interactive: false }
+)
+
+const $emits = defineEmits(['open'])
 const adsStore = useAdsStore()
 
 const game = ref(pickPromo())
@@ -34,23 +50,20 @@ const icons = import.meta.glob('../assets/promo/*.webp', {
 }) as Record<string, string>
 
 const icon = computed(() => icons[`../assets/promo/${game.value.slug}.webp`] ?? '')
-const href = computed(() => storeUrl(game.value))
+
+function tap() {
+	if ($props.interactive) $emits('open')
+}
 </script>
 
 <template>
 	<div class="slot">
-		<!--
-			`target="_blank"` — так же, как ссылка на политику на главной: Capacitor
-			отдаёт внешний адрес системному браузеру, и никакого плагина для этого
-			не нужно. Уход из приложения скрывает вебвью, а на это доска уже
-			реагирует паузой — случайное касание не стоит игроку партии.
-		-->
-		<a
+		<component
+			:is="interactive ? 'button' : 'div'"
 			v-if="!adsStore.bannerLive"
 			class="house"
-			:href="href"
-			target="_blank"
-			rel="noopener"
+			:class="{ 'house--tap': interactive }"
+			@click="tap"
 		>
 			<img class="house__icon" :src="icon" :alt="game.title" width="40" height="40" />
 
@@ -63,7 +76,7 @@ const href = computed(() => storeUrl(game.value))
 				{{ $t('promo_open') }}
 				<AppIcon name="play" :size="11" />
 			</span>
-		</a>
+		</component>
 	</div>
 </template>
 
@@ -103,8 +116,16 @@ const href = computed(() => storeUrl(game.value))
 	right: 0;
 	bottom: 0;
 	height: var(--ad-slot, 56px);
+	width: 100%;
 	padding: 0 12px;
+	border: none;
+	background: transparent;
+	text-align: left;
 	text-decoration: none;
+
+	&--tap {
+		cursor: pointer;
+	}
 
 	&__icon {
 		flex: 0 0 40px;
@@ -154,7 +175,7 @@ const href = computed(() => storeUrl(game.value))
 		@include raised(#3f2ba0, 3px, 0.5, 0.2, 0.4);
 	}
 
-	&:active .house__go {
+	&--tap:active .house__go {
 		@include press(3px);
 	}
 }

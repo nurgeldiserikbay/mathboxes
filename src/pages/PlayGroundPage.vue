@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 
 import AppIcon from '@/components/AppIcon.vue'
 import AdSlot from '@/components/AdSlot.vue'
+import OtherGames from '@/components/OtherGames.vue'
 import GameSky from '@/components/GameSky.vue'
 import TowerFloor from '@/components/TowerFloor.vue'
 import ChallengeBar from '@/components/ChallengeBar.vue'
@@ -41,6 +42,8 @@ import Admob from '@/utils/admob'
 const gameStore = useGameStore()
 const pageStore = usePageStore()
 const adsStore = useAdsStore()
+
+const isOtherGames = ref(false)
 const { playAudio, vibrate } = useAudio()
 const { t } = useI18n()
 
@@ -576,7 +579,9 @@ onBeforeUnmount(() => {
 
 		<!-- Строка под рекламу. Стоит всегда: нативный баннер закрывает её
 		     собой, а пока его нет — в ней наши же игры. -->
-		<AdSlot />
+		<!-- Касание разрешено только по концу партии: полоса стоит над доской, на
+		     которой идёт счёт времени, и тап во время партии стоил бы её игроку. -->
+		<AdSlot :interactive="isEnd" @open="isOtherGames = true" />
 
 		<!--
 			The top bar. The height is the hero and sits in the middle where the eye
@@ -837,6 +842,8 @@ onBeforeUnmount(() => {
 			@again="playAgain"
 			@home="goHome"
 		/>
+
+		<OtherGames v-if="isOtherGames" @close="isOtherGames = false" />
 	</div>
 </template>
 

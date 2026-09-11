@@ -105,5 +105,11 @@ export default {
 	help_ops: 'Что это за действия?',
 	promo_label: 'Ещё наша игра',
 	promo_open: 'Открыть',
+	other_games: 'Другие игры',
+	other_games_note: 'Наши другие игры. Открыть — попроси взрослого.',
+	gate_title: 'Только для взрослых',
+	gate_hint: 'Реши пример, чтобы открыть страницу игры в Google Play',
+	gate_open: 'Открыть в Google Play',
+	gate_cancel: 'Отмена',
 	help_title: 'Действия',
 }

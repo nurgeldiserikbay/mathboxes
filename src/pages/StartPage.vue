@@ -9,6 +9,7 @@ import AppIcon from '@/components/AppIcon.vue'
 import GameSky from '@/components/GameSky.vue'
 import LogoItem from '@/components/LogoItem.vue'
 import SettingBlock from '@/components/SettingBlock.vue'
+import OtherGames from '@/components/OtherGames.vue'
 import HelpSheet from '@/components/HelpSheet.vue'
 
 import Mascot from '@/assets/mascot/cube.svg?component'
@@ -29,6 +30,7 @@ const pageStore = usePageStore()
 const { playAudio, vibrate } = useAudio()
 
 const settings = ref(false)
+const isOtherGames = ref(false)
 const help = ref(false)
 
 const bestFloor = computed(() => gameStore.bestFloor)
@@ -118,6 +120,13 @@ function openSettings() {
 					<span class="num">{{ gameStore.records.gamesPlayed }}</span>
 					{{ $t('stat_games').toLowerCase() }}
 				</span>
+				<button
+					class="link link--quiet"
+					type="button"
+					@click="isOtherGames = true"
+				>
+					{{ $t('other_games') }}
+				</button>
 				<a
 					href="https://docs.google.com/document/d/1zsuymqEMonMRWg1RoEIqpQpo4ThFwEOoOYgnL060GQk/edit?usp=sharing"
 					target="_blank"
@@ -130,6 +139,8 @@ function openSettings() {
 		</footer>
 
 		<SettingBlock :open="settings" @close="settings = false" />
+
+		<OtherGames v-if="isOtherGames" @close="isOtherGames = false" />
 		<HelpSheet v-if="help" @close="help = false" />
 	</div>
 </template>
@@ -497,5 +508,16 @@ function openSettings() {
 		margin-top: 24px;
 		padding: 9px 18px;
 	}
+}
+
+/* Вход в «Другие игры» стоит в том же ряду, что ссылка на политику, и выглядит
+   так же: это служебная ссылка, а не действие. Кнопка, а не <a>, потому что
+   ведёт внутрь приложения — уход в Play возможен только через гейт. */
+button.link {
+	padding: 0;
+	border: none;
+	background: none;
+	font: inherit;
+	cursor: pointer;
 }
 </style>

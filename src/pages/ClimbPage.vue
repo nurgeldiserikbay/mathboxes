@@ -4,6 +4,7 @@ import { Capacitor } from '@capacitor/core'
 
 import AppIcon from '@/components/AppIcon.vue'
 import AdSlot from '@/components/AdSlot.vue'
+import OtherGames from '@/components/OtherGames.vue'
 import GameHazard from '@/components/GameHazard.vue'
 import GameSky from '@/components/GameSky.vue'
 import GameOverCard from '@/components/GameOverCard.vue'
@@ -51,6 +52,8 @@ const gameStore = useGameStore()
 const { t: translate } = useI18n()
 const pageStore = usePageStore()
 const adsStore = useAdsStore()
+
+const isOtherGames = ref(false)
 const { playAudio, holdAudio, holdSilence, vibrate } = useAudio()
 
 const game = useClimbGame()
@@ -226,7 +229,19 @@ let glideTimer: ReturnType<typeof setTimeout> | undefined
  * и всё оказывается там же, где было кадром раньше. Двигается только следующий
  * кадр.
  */
-const SLIDE_MS = 340
+/**
+ * Сколько едет камера на один этаж.
+ *
+ * Пятьсот двадцать, а не триста сорок. Расстояние тут фиксированное — шаг
+ * этажа, около ста десяти пикселей, — и на трёхстах сорока это выходило больше
+ * трёхсот пикселей в секунду: мир не съезжал, а падал. Теперь около двухсот
+ * десяти, и спуск читается спуском.
+ *
+ * Платится за это темпом: от нажатия до появления нового ряда выходит около
+ * секунды. Для игры, где над примером думают две-пять секунд, это незаметно, но
+ * быстрее чем раз в секунду отвечать уже нельзя.
+ */
+const SLIDE_MS = 520
 
 /**
  * Пауза между приземлением и началом переезда.
@@ -277,6 +292,32 @@ function glide(camFrom: number, hopFrom: number, falling: boolean, moveTo?: numb
 	gliding.value = false
 	dropping.value = falling
 	moving.value = true
+
+	/*
+	   Оседание отдаёт свой шаг камере.
+
+	   К приземлению запас меняется рывком, и цель оседания смещается сразу на
+	   весь накопленный дрейф. Дать оседанию отыграть этот шаг самому нельзя:
+	   его кривая экспоненциальная, то есть быстрее всего в самом начале, а
+	   камера в это время только трогается со своей мягкой. Первую десятую долю
+	   секунды подъём перебивает спуск — мир заметно приподнимается и лишь потом
+	   едет вниз. Замер: 14 px вверх за 115 мс, при том что камера прошла за них
+	   всего 8 из 108.
+
+	   Поэтому шаг оседания ставится мгновенно, а камера берёт его на себя:
+	   начинает на столько же ниже и приезжает в ноль одним движением. Кадр не
+	   дрогнет — сумма двух слоёв та же, меняется только то, кто из них едет.
+
+	   Делается это лишь когда оседание собиралось ВВЕРХ. На промахе оно идёт
+	   вниз, в одну сторону с падением, спорить там нечему — и пусть отыгрывает
+	   само.
+	*/
+	const lift = sink.value - sinkTo.value
+	if (lift > 0) {
+		sink.value = sinkTo.value
+		camFrom += lift
+	}
+
 	// Сдвиг ставится сразу, а едет — после паузы. Кадр при этом не дрогнет: он
 	// ровно тот же, что был в последнем кадре прыжка.
 	cam.value = camFrom
@@ -403,15 +444,27 @@ let sinkRaf = 0
 
 function sinkFrame() {
 	sinkRaf = requestAnimationFrame(sinkFrame)
+
+	/*
+	   Пауза после приземления держит кадр целиком — и камеру, и оседание.
+
+	   Без этого выходило вот что. В миг приземления запас прыгает на этаж
+	   вверх, оседание отыгрывает назад весь накопленный дрейф, и мир вместе с
+	   блоком уходит ВВЕРХ — а следом камера везёт его ВНИЗ. Два движения в
+	   противоположные стороны подряд, и именно они читались неправильной
+	   анимацией: «прыгнул, поднялся вместе с блоком, снова опустился».
+	*/
+	if (moving.value && !gliding.value) return
+
 	const delta = sinkTo.value - sink.value
 	// Порога «доехали» нет намеренно: он отсекал как раз тот дрейф, ради
 	// которого всё и затевалось, — за кадр набегает пятая доля пикселя.
 	//
-	// Доля большая: подъём от верного ответа должен успеть внутрь приземления,
-	// иначе он читается отдельным движением после прыжка, а не его концом. На
-	// медленный дрейф это не влияет — там цель уползает медленнее, чем догоняет
-	// сглаживание.
-	sink.value = Math.abs(delta) < 0.01 ? sinkTo.value : sink.value + delta * 0.26
+	// Доля маленькая, и это тоже про то же самое: подъём от верного ответа
+	// должен растянуться на весь переезд и сложиться с ним в одно движение
+	// вниз, а не отыграть до его начала. Медленному дрейфу это не мешает —
+	// цель уползает медленнее, чем догоняет сглаживание.
+	sink.value = Math.abs(delta) < 0.01 ? sinkTo.value : sink.value + delta * 0.09
 }
 
 const sinkStyle = computed(() => ({
@@ -794,7 +847,9 @@ onBeforeUnmount(() => {
 <template>
 	<div class="climb">
 		<GameSky :floor="game.floor.value" :zone="location.id" />
-		<AdSlot />
+		<!-- Касание разрешено только по концу партии: полоса стоит над доской, на
+		     которой идёт счёт времени, и тап во время партии стоил бы её игроку. -->
+		<AdSlot :interactive="isEnd" @open="isOtherGames = true" />
 
 		<header class="hud">
 			<button class="round" type="button" :aria-label="$t('pause')" @click="togglePause(true)">
@@ -1068,6 +1123,8 @@ onBeforeUnmount(() => {
 			@again="playAgain"
 			@home="goHome"
 		/>
+
+		<OtherGames v-if="isOtherGames" @close="isOtherGames = false" />
 	</div>
 </template>
 
@@ -1238,7 +1295,7 @@ onBeforeUnmount(() => {
 	   Резкое начало сразу после прыжка и было половиной той обрывистости.
 	*/
 	&.is-gliding {
-		transition: transform 340ms cubic-bezier(0.4, 0.02, 0.3, 1);
+		transition: transform 520ms cubic-bezier(0.4, 0.02, 0.3, 1);
 	}
 
 	/* Падение: тот же курс и та же длительность, что у персонажа. Разойдись

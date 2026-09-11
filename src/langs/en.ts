@@ -105,5 +105,11 @@ export default {
 	help_ops: 'What are these operations?',
 	promo_label: 'More from us',
 	promo_open: 'Get',
+	other_games: 'Other games',
+	other_games_note: 'More games from us. Ask a grown-up to open one.',
+	gate_title: 'For grown-ups only',
+	gate_hint: 'Solve to open the game page in Google Play',
+	gate_open: 'Open in Google Play',
+	gate_cancel: 'Cancel',
 	help_title: 'Operations',
 }

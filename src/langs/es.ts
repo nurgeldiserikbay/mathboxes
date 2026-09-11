@@ -105,5 +105,11 @@ export default {
 	help_ops: '¿Qué operaciones son estas?',
 	promo_label: 'Más de nosotros',
 	promo_open: 'Abrir',
+	other_games: 'Otros juegos',
+	other_games_note: 'Más juegos nuestros. Pide a un adulto que lo abra.',
+	gate_title: 'Solo para adultos',
+	gate_hint: 'Resuelve la operación para abrir la página del juego en Google Play',
+	gate_open: 'Abrir en Google Play',
+	gate_cancel: 'Cancelar',
 	help_title: 'Operaciones',
 }

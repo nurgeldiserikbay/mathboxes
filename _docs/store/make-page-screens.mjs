@@ -232,8 +232,9 @@ for (let i = 0; i < 7; i++) {
 		continue
 	}
 	if (!(await pick(true))) break
-	// Ход теперь три такта: прыжок, пауза, переезд — и только потом ряд.
-	await page.waitForTimeout(1100)
+	// Ход теперь три такта: прыжок 340, пауза 120, переезд 520 — и только
+	// потом выходит ряд.
+	await page.waitForTimeout(1250)
 	if (i === 5) await shot('07-climb-tower')
 }
 
