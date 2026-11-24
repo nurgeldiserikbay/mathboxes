@@ -14,6 +14,8 @@ import ru from './langs/ru'
 
 import './style.scss'
 
+import { watchScale } from './utils/scale'
+
 import App from './App.vue'
 
 const i18n = createI18n({
@@ -31,6 +33,10 @@ const i18n = createI18n({
 
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
+
+// Масштаб ставится до монтирования: иначе первый кадр успевает лечь
+// телефонной вёрсткой в угол планшета, и это видно как рывок.
+watchScale()
 
 const app = createApp(App)
 

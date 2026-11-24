@@ -8,10 +8,10 @@ import {
 	InterstitialAdPluginEvents,
 	AdLoadInfo,
 	AdOptions,
+	AdMobError,
 	MaxAdContentRating,
 } from '@capacitor-community/admob'
 import { Capacitor } from '@capacitor/core'
-import type { PluginListenerHandle } from '@capacitor/core'
 import { Device } from '@capacitor/device'
 import { StatusBar } from '@capacitor/status-bar'
 import { Fullscreen } from '@boengli/capacitor-fullscreen'
@@ -35,14 +35,18 @@ const AdMobInitializationOptions = {
 const INTERSTITIAL_MIN_INTERVAL_MS = 90 * 1000
 let lastInterstitialShownAt = 0
 
+// No interstitial in the first minutes after launch.
+const INTERSTITIAL_GRACE_MS = 180 * 1000
+
 // Место под баннер держится всегда, а не появляется вместе с рекламой: иначе
 // приход объявления сдвигает вёрстку, а его отсутствие оставляет сверху пустую
 // полосу. Это высота резерва — примерно столько занимает адаптивный баннер на
 // телефоне; пока настоящая высота неизвестна, слот стоит на ней.
 const BANNER_FALLBACK_HEIGHT = 56
 
-// The game must never sit blocked behind an ad: cap how long we wait for a load,
-// and keep a watchdog in case the Dismissed event never arrives. A frozen screen
+// The game must never sit blocked behind an ad: interstitials are preloaded and
+// skipped when not ready, and a watchdog covers a Dismissed event that never
+// arrives. A frozen screen
 // where the ad should be is what "Broken functionality" / "unclosable ads"
 // rejections look like from the reviewer's side.
 /**
@@ -60,24 +64,7 @@ const BANNER_FALLBACK_HEIGHT = 56
  */
 const SAFE_AREA_BANNER_SDK = 35
 
-const PREPARE_TIMEOUT_MS = 5 * 1000
 const DISMISS_WATCHDOG_MS = 25 * 1000
-
-function withTimeout<T>(promise: Promise<T>, ms: number, label: string) {
-	return new Promise<T>((resolve, reject) => {
-		const timer = setTimeout(() => reject(new Error(`${label} timed out`)), ms)
-		promise.then(
-			(value) => {
-				clearTimeout(timer)
-				resolve(value)
-			},
-			(error) => {
-				clearTimeout(timer)
-				reject(error)
-			}
-		)
-	})
-}
 
 class Admob {
 	// Guard so banner event listeners are registered only once (prevents a
@@ -101,6 +88,16 @@ class Admob {
 	// await the same initialization instead of starting a second one.
 	private initPromise: Promise<void> | null = null
 	private initialized = false
+
+	// Interstitial state: the preloaded ad and the show currently on screen.
+	private readonly startedAt = Date.now()
+	private interstitialListenersRegistered = false
+	private interstitialReady = false
+	private interstitialLoading = false
+	private interstitialClosed = true
+	private onInterstitialClosed: (() => void) | null = null
+	private watchdogID: ReturnType<typeof setTimeout> | undefined
+	private barsShownForAd = false
 
 	private get isNative() {
 		return Capacitor.isNativePlatform()
@@ -170,6 +167,20 @@ class Admob {
 
 	/** Кому сообщать, стоит ли в слоте настоящее объявление. */
 	private bannerListener: ((live: boolean, height: number) => void) | null = null
+
+	/**
+	 * Почему баннера нет — последним известным словом плагина.
+	 *
+	 * Нужно не игре, а нам: «объявления нет» выглядит одинаково при отсутствии
+	 * спроса, при неверном блоке и при сломанном вызове, а разница между этими
+	 * тремя — это разница между «подождать» и «чинить». Показывается только в
+	 * отладочной сборке, см. `AdSlot.vue`.
+	 */
+	private bannerFault: ((reason: string) => void) | null = null
+
+	onBannerFault(listener: (reason: string) => void) {
+		this.bannerFault = listener
+	}
 
 	/**
 	 * Пришло ли объявление. Ставится только по `Loaded` и снимается только по
@@ -250,6 +261,9 @@ class Admob {
 		// система, и вёрстке надо это повторить.
 		await this.applyBannerSafeArea()
 
+		// Warm up the first interstitial so a game over never waits on a load.
+		void this.preloadInterstitial()
+
 		// The UMP consent form is deliberately never requested. Every request is
 		// tagged tagForUnderAgeOfConsent, and a user below the age of consent is not
 		// asked to consent to ad personalisation — showing them a personalisation
@@ -312,7 +326,15 @@ class Admob {
 			// Нет заполнения, нет сети, нет объявления: место остаётся за слотом,
 			// но рисует в нём снова кросс-промо. Раньше здесь резерв обнулялся —
 			// и вёрстка прыгала вверх ровно так же, как раньше прыгала вниз.
-			await AdMob.addListener(BannerAdPluginEvents.FailedToLoad, () => {
+			await AdMob.addListener(BannerAdPluginEvents.FailedToLoad, (error?: AdMobError) => {
+				// Причину видно только здесь, и раньше она терялась молча —
+				// «объявления нет» выглядело одинаково и при отсутствии спроса, и
+				// при неверной настройке. Коды AdMob: 0 — внутренняя ошибка,
+				// 1 — неверный запрос (чаще всего чужой или опечатанный блок),
+				// 2 — нет сети, 3 — нет заполнения. Третий на детском инвентаре
+				// и новом приложении — норма, остальные три означают поломку.
+				console.warn('[admob] баннер не загрузился', error?.code, error?.message)
+				this.bannerFault?.(`${error?.code ?? '?'} ${error?.message ?? 'нет причины'}`)
 				this.clearBanner()
 				// Ничего не показано — значит следующий заход имеет право
 				// попробовать снова, а не считать баннер уже стоящим.
@@ -333,8 +355,17 @@ class Admob {
 			npa: true,
 		}
 
-		await AdMob.showBanner(options)
-		this.bannerVisible = true
+		try {
+			await AdMob.showBanner(options)
+			this.bannerVisible = true
+		} catch (error) {
+			// Отказ самого вызова, а не отсутствие спроса: неверный размер, мёртвый
+			// блок, плагин без нативной части. Событие `FailedToLoad` в этом случае
+			// не приходит вовсе, и без своей ветки причина терялась.
+			console.warn('[admob] showBanner отклонён', error)
+			this.bannerFault?.(String((error as Error)?.message ?? error))
+			throw error
+		}
 	}
 
 	async resumeBanner() {
@@ -358,6 +389,102 @@ class Admob {
 		})
 	}
 
+	private interstitialOptions(): AdOptions {
+		return {
+			adId: 'ca-app-pub-9702825788968948/8253981889',
+			isTesting: import.meta.env.VITE_APP_MODE === 'TEST',
+			npa: true,
+			// Deliberately not setting immersiveMode: since Android 15 forces
+			// edge-to-edge it pushes the ad's close button under the navigation bar
+			// or cutout, making the ad unclosable — a Families policy rejection.
+		}
+	}
+
+	// Interstitial listeners are registered once for the app's lifetime; the
+	// per-show state lives in the fields above.
+	private registerInterstitialListeners() {
+		if (this.interstitialListenersRegistered) return
+		this.interstitialListenersRegistered = true
+
+		void AdMob.addListener(InterstitialAdPluginEvents.Loaded, (info: AdLoadInfo) => {
+			console.log(info)
+			this.interstitialReady = true
+			this.interstitialLoading = false
+		})
+		void AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => {
+			console.log('Dismissed')
+			this.interstitialReady = false
+			this.handleInterstitialClosed()
+		})
+		void AdMob.addListener(
+			InterstitialAdPluginEvents.FailedToLoad,
+			(error?: AdMobError) => {
+				console.warn('[admob] межстраничная не загрузилась', error?.code, error?.message)
+				this.interstitialReady = false
+				this.interstitialLoading = false
+				this.handleInterstitialClosed()
+			}
+		)
+		void AdMob.addListener(InterstitialAdPluginEvents.FailedToShow, () => {
+			console.log('FailedToShow')
+			this.interstitialReady = false
+			this.handleInterstitialClosed()
+		})
+	}
+
+	/**
+	 * Loads the next interstitial in the background, so that at a game over the
+	 * ad is either already there or skipped — the result screen never waits on a
+	 * network load. Called after initialize() and after every dismiss.
+	 */
+	async preloadInterstitial() {
+		if (!this.isNative || !this.initialized) return
+		if (this.interstitialReady || this.interstitialLoading) return
+		this.registerInterstitialListeners()
+
+		this.interstitialLoading = true
+		try {
+			await AdMob.prepareInterstitial(this.interstitialOptions())
+			this.interstitialReady = true
+		} catch (error) {
+			console.log(error)
+			this.interstitialReady = false
+		} finally {
+			this.interstitialLoading = false
+		}
+	}
+
+	// The ad is definitely gone: release the game and put the bars back.
+	private handleInterstitialClosed() {
+		this.releaseInterstitialFlow()
+		this.restoreBarsAfterAd()
+	}
+
+	// Releasing the game flow and putting the system bars back are separate on
+	// purpose. The watchdog fires while the ad may still be on screen, and
+	// re-hiding the bars at that moment would push the ad's close button under
+	// the navigation bar — the exact "unclosable ads" rejection this file goes
+	// out of its way to avoid. The callback fires exactly once per show.
+	private releaseInterstitialFlow() {
+		if (this.interstitialClosed) return
+		this.interstitialClosed = true
+		if (this.watchdogID) {
+			clearTimeout(this.watchdogID)
+			this.watchdogID = undefined
+		}
+		const cb = this.onInterstitialClosed
+		this.onInterstitialClosed = null
+		if (cb) cb()
+
+		void this.preloadInterstitial()
+	}
+
+	private restoreBarsAfterAd() {
+		if (!this.barsShownForAd) return
+		this.barsShownForAd = false
+		void this.restoreImmersiveMode()
+	}
+
 	async interstitial({
 		isFirst,
 		onInterstitialAdClosed,
@@ -378,120 +505,56 @@ class Admob {
 			return
 		}
 
-		// The very first game never shows an ad, and the frequency cap skips one that
-		// would come too soon. Either way the close callback still fires so the
-		// caller's loading state is cleared. isFirst used to mean "prepare an ad but
-		// do not show it", and on that path the callback was never invoked at all —
-		// a caller waiting on it waited forever.
+		// The very first game never shows an ad, the first minutes after launch
+		// are ad-free (most players who leave do so early in the first session),
+		// the frequency cap skips one that would come too soon, and a show already
+		// on screen is never doubled. Either way the close callback still fires so
+		// the caller's loading state is cleared.
+		const now = Date.now()
 		if (
 			isFirst ||
-			Date.now() - lastInterstitialShownAt < INTERSTITIAL_MIN_INTERVAL_MS
+			now - this.startedAt < INTERSTITIAL_GRACE_MS ||
+			now - lastInterstitialShownAt < INTERSTITIAL_MIN_INTERVAL_MS ||
+			!this.interstitialClosed
 		) {
 			onInterstitialAdClosed()
+			void this.preloadInterstitial()
 			return
 		}
 
-		const handles: PluginListenerHandle[] = []
-		let isClosed = false
-		let watchdogID: ReturnType<typeof setTimeout> | null = null
-		let barsRaised = false
-
-		const cleanup = async () => {
-			for (const handle of handles) {
-				try {
-					await handle.remove()
-				} catch {
-					// ignore
-				}
-			}
-			handles.length = 0
-		}
-
-		// Releasing the game flow and putting the system bars back are separate on
-		// purpose. The watchdog fires while the ad may still be on screen, and
-		// re-hiding the bars at that moment would push the ad's close button under
-		// the navigation bar — the exact "unclosable ads" rejection this file goes
-		// out of its way to avoid.
-		const releaseFlow = () => {
-			if (isClosed) return
-			isClosed = true
-			if (watchdogID) clearTimeout(watchdogID)
+		// Not loaded yet: never load on demand — that is what kept the result
+		// screen behind a loading overlay. Skip this one and warm up the next.
+		if (!this.interstitialReady) {
 			onInterstitialAdClosed()
-			// Remove this call's listeners so they don't accumulate across games.
-			void cleanup()
+			void this.preloadInterstitial()
+			return
 		}
 
-		const restoreBars = () => {
-			if (!barsRaised) return
-			barsRaised = false
-			void this.restoreImmersiveMode()
-		}
+		// Claim the slot before the first await, so a second call arriving while
+		// this one is in flight is capped instead of showing a second ad.
+		lastInterstitialShownAt = now
+		this.interstitialReady = false
+		this.onInterstitialClosed = onInterstitialAdClosed
+		this.interstitialClosed = false
 
-		const closeAds = () => {
-			releaseFlow()
-			restoreBars()
-		}
+		// Restore the system bars for the duration of the ad so its close button
+		// can never sit under the navigation bar (Families policy).
+		await this.showSystemBars()
+		this.barsShownForAd = true
 
-		handles.push(
-			await AdMob.addListener(
-				InterstitialAdPluginEvents.Loaded,
-				(info: AdLoadInfo) => {
-					console.log(info)
-				}
-			)
-		)
-		handles.push(
-			await AdMob.addListener(InterstitialAdPluginEvents.Dismissed, () => {
-				console.log('Dismissed')
-				closeAds()
-			})
-		)
-		handles.push(
-			await AdMob.addListener(InterstitialAdPluginEvents.FailedToLoad, () => {
-				console.log('FailedToLoad')
-				closeAds()
-			})
-		)
-		handles.push(
-			await AdMob.addListener(InterstitialAdPluginEvents.FailedToShow, () => {
-				console.log('FailedToShow')
-				closeAds()
-			})
-		)
-
-		const options: AdOptions = {
-			adId: 'ca-app-pub-9702825788968948/8253981889',
-			isTesting: import.meta.env.VITE_APP_MODE === 'TEST',
-			npa: true,
-			// Deliberately not setting immersiveMode: since Android 15 forces
-			// edge-to-edge it pushes the ad's close button under the navigation bar
-			// or cutout, making the ad unclosable — a Families policy rejection.
-		}
+		// Close is driven by the Dismissed/Failed listeners; the watchdog covers
+		// the case where neither event ever fires. It only releases the game flow
+		// — the bars go back when the ad is actually gone.
+		this.watchdogID = setTimeout(() => {
+			console.log('Interstitial dismiss watchdog fired')
+			this.releaseInterstitialFlow()
+		}, DISMISS_WATCHDOG_MS)
 
 		try {
-			// A slow or hanging load must not keep the result screen behind a
-			// loading overlay — give up after PREPARE_TIMEOUT_MS and continue.
-			await withTimeout(
-				AdMob.prepareInterstitial(options),
-				PREPARE_TIMEOUT_MS,
-				'prepareInterstitial'
-			)
-
-			// Restore the system bars for the duration of the ad so its close
-			// button can never sit under the navigation bar (Families policy).
-			await this.showSystemBars()
-			barsRaised = true
-
 			await AdMob.showInterstitial()
-			lastInterstitialShownAt = Date.now()
-
-			// Close is driven by the Dismissed/Failed listeners above; the watchdog
-			// covers the case where neither event ever fires. It only releases the
-			// game flow — the bars go back when the ad is actually gone.
-			watchdogID = setTimeout(releaseFlow, DISMISS_WATCHDOG_MS)
 		} catch (error) {
 			console.log(error)
-			closeAds()
+			this.handleInterstitialClosed()
 		}
 	}
 }

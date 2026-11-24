@@ -41,6 +41,14 @@ export const useAdsStore = defineStore('adsStore', () => {
 	function setBanner(live: boolean, height = 0) {
 		bannerLive.value = live
 		bannerHeight.value = live ? height : 0
+		if (live) bannerFault.value = ''
+	}
+
+	/** Последняя причина, по которой баннера нет. Видна только в dev-сборке. */
+	const bannerFault = ref('')
+
+	function setBannerFault(reason: string) {
+		bannerFault.value = reason
 	}
 
 	/** Games finished since the last interstitial, and the gap to the next one. */
@@ -97,6 +105,8 @@ export const useAdsStore = defineStore('adsStore', () => {
 		loading,
 		toggleLoading,
 		bannerLive,
+		bannerFault,
+		setBannerFault,
 		bannerHeight,
 		setBanner,
 		gamesSinceAd,

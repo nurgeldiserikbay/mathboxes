@@ -39,7 +39,7 @@ const VitePWAConf = {
 		name: 'Math Boxes',
 		short_name: 'Math Boxes',
 		description:
-			"Solve the equation, build the floor, climb higher. Every answer becomes the start of the next sum, so the tower is one long chain of mental arithmetic: add, subtract, multiply, divide. The difficulty follows you, not the floor number. Checkpoints hold what you have built, a mistake burns three floors, and the only score that matters is how high you got last time.",
+			'Mental math with a climb. An equation appears, you pick the answer, and your cube hops onto that block — while the water keeps rising below. Add, subtract, multiply, divide; twelve steps of difficulty that follow how you answer, not how long you have played. Six places to climb, no timer, no lives, no sign-up. Works offline.',
 		scope: SCOPE,
 		start_url: START_URL,
 		display: 'fullscreen',
@@ -76,68 +76,17 @@ const VitePWAConf = {
 			},
 		],
 		display_override: ['window-controls-overlay'],
-		screenshots: [
-			{
-				src: START_PATH + '/screenshots/narrow-1.webp',
-				type: 'image/webp',
-				sizes: '406x720',
-				form_factor: 'narrow',
-			},
-			{
-				src: START_PATH + '/screenshots/narrow-2.webp',
-				type: 'image/webp',
-				sizes: '406x720',
-				form_factor: 'narrow',
-			},
-			{
-				src: START_PATH + '/screenshots/narrow-3.webp',
-				type: 'image/webp',
-				sizes: '406x720',
-				form_factor: 'narrow',
-			},
-			{
-				src: START_PATH + '/screenshots/narrow-4.webp',
-				type: 'image/webp',
-				sizes: '406x720',
-				form_factor: 'narrow',
-			},
-			{
-				src: START_PATH + '/screenshots/narrow-5.webp',
-				type: 'image/webp',
-				sizes: '406x720',
-				form_factor: 'narrow',
-			},
-			{
-				src: START_PATH + '/screenshots/wide-1.webp',
-				type: 'image/webp',
-				sizes: '1024x640',
-				form_factor: 'wide',
-			},
-			{
-				src: START_PATH + '/screenshots/wide-2.webp',
-				type: 'image/webp',
-				sizes: '1024x640',
-				form_factor: 'wide',
-			},
-			{
-				src: START_PATH + '/screenshots/wide-3.webp',
-				type: 'image/webp',
-				sizes: '1024x640',
-				form_factor: 'wide',
-			},
-			{
-				src: START_PATH + '/screenshots/wide-4.webp',
-				type: 'image/webp',
-				sizes: '1024x601',
-				form_factor: 'wide',
-			},
-			{
-				src: START_PATH + '/screenshots/wide-5.webp',
-				type: 'image/webp',
-				sizes: '1024x601',
-				form_factor: 'wide',
-			},
-		],
+		// Кадры для окна установки. Собираются `_docs/store/make-brand.mjs` из тех
+		// же снимков, что уходят в Play, и в том же соотношении 9:16.
+		//
+		// Широких кадров здесь нет намеренно: игра заблокирована в портрете, и
+		// лежащие на боку скриншоты показывали бы то, чего на устройстве не бывает.
+		screenshots: [1, 2, 3, 4, 5].map((n) => ({
+			src: `${START_PATH}/screenshots/narrow-${n}.webp`,
+			type: 'image/webp',
+			sizes: '405x720',
+			form_factor: 'narrow' as const,
+		})),
 	},
 }
 

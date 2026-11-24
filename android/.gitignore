@@ -99,3 +99,9 @@ app/src/main/assets/public
 app/src/main/assets/capacitor.config.json
 app/src/main/assets/capacitor.plugins.json
 app/src/main/res/xml/config.xml
+
+# Ключ подписи и пароли к нему. Попадание сюда чужих глаз означает, что ключ
+# скомпрометирован, а сменить его у уже выложенного приложения нельзя.
+keystore.properties
+*.jks
+*.keystore

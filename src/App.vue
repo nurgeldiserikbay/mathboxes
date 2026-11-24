@@ -45,6 +45,7 @@ onMounted(async () => {
 	// Нативный слой сообщает, стоит ли в слоте настоящее объявление. Пока не
 	// стоит — слот рисует кросс-промо наших игр, а место под него занято всегда.
 	Admob.onBannerChange((live, height) => adsStore.setBanner(live, height))
+	Admob.onBannerFault((reason) => adsStore.setBannerFault(reason))
 
 	await step('records', () => gameStore.loadData())
 	// How many games have passed since the last interstitial. Restored from disk
@@ -84,8 +85,13 @@ watch(
 	() => pageStore.currentPage,
 	(page) => {
 		if (!isAndroid) return
-		if (page === PAGES.PLAYGROUND) void Admob.showBanner().catch(() => {})
-		else void Admob.removeBanner().catch(() => {})
+		// Ошибку здесь раньше глотали молча, и «баннера нет» выглядело одинаково
+		// при отсутствии спроса и при сломанном вызове. Разницу видно только так.
+		if (page === PAGES.PLAYGROUND) {
+			void Admob.showBanner().catch((error) => console.warn('[admob] showBanner', error))
+		} else {
+			void Admob.removeBanner().catch((error) => console.warn('[admob] removeBanner', error))
+		}
 	}
 )
 
@@ -116,6 +122,6 @@ async function applyLocale() {
 <style lang="scss" scoped>
 .wrapper {
 	width: 100%;
-	min-height: 100dvh;
+	min-height: var(--vh);
 }
 </style>

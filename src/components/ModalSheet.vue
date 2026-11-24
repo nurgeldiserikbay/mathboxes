@@ -89,7 +89,7 @@ onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
 		flex-direction: column;
 		width: 100%;
 		max-width: 360px;
-		max-height: calc(100dvh - 36px);
+		max-height: calc(var(--vh) - 36px);
 		border-radius: var(--r-card);
 		background: linear-gradient(180deg, var(--sheet-top), var(--sheet-bot));
 		box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.16),

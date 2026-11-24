@@ -92,7 +92,7 @@ export default {
 	off: 'Aus',
 
 	sec_short: 's',
-	climb_hint: 'Ziehen zum Laufen',
+	teach_move: 'Block antippen oder wischen',
 	climb_jump: 'Sprung',
 	fork_title: 'Wie weiterbauen?',
 	fork_note: 'bis zur nächsten Stütze',

@@ -92,7 +92,7 @@ export default {
 	off: 'Өшіру',
 
 	sec_short: 'с',
-	climb_hint: 'Саусақпен жүргіз',
+	teach_move: 'Блокты бас немесе сырғыт',
 	climb_jump: 'Секіру',
 	fork_title: 'Әрі қалай саламыз?',
 	fork_note: 'келесі тіреуішке дейін',

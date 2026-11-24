@@ -51,16 +51,36 @@ const icons = import.meta.glob('../assets/promo/*.webp', {
 
 const icon = computed(() => icons[`../assets/promo/${game.value.slug}.webp`] ?? '')
 
+/**
+ * Показывать ли нашу игру в полосе.
+ *
+ * Не всегда, когда нет баннера, а только по концу партии. Пока идёт счёт,
+ * строка всё равно не нажимается — уводить ребёнка из игры посреди партии
+ * нельзя, — и получалось объявление, которое висит весь сеанс и ничего не
+ * делает. Читается это ровно как назойливая реклама, тем более что своё
+ * объявление от чужого игрок не отличает.
+ *
+ * Место под полосу при этом остаётся занятым всегда: пропадёт оно — вёрстка
+ * снова начнёт прыгать, а ради этого всё и затевалось.
+ *
+ * Расходится с тем, как кросс-промо раскатано в остальных играх: там полоса
+ * занята постоянно.
+ */
+const showHouse = computed(() => !adsStore.bannerLive && $props.interactive)
+
+/** Причина отказа — только для отладочной сборки. */
+const fault = computed(() => (import.meta.env.DEV ? adsStore.bannerFault : ''))
+
 function tap() {
 	if ($props.interactive) $emits('open')
 }
 </script>
 
 <template>
-	<div class="slot">
+	<div class="slot" :class="{ 'slot--filled': showHouse || adsStore.bannerLive }">
 		<component
 			:is="interactive ? 'button' : 'div'"
-			v-if="!adsStore.bannerLive"
+			v-if="showHouse"
 			class="house"
 			:class="{ 'house--tap': interactive }"
 			@click="tap"
@@ -77,10 +97,30 @@ function tap() {
 				<AppIcon name="play" :size="11" />
 			</span>
 		</component>
+
+		<!-- Почему настоящего объявления нет. В релизной сборке `fault` всегда
+		     пустой, поэтому строка не появляется никогда; видна она только в
+		     сборке `build:android`, которой и проверяют устройство. -->
+		<p v-if="fault" class="fault">{{ fault }}</p>
 	</div>
 </template>
 
 <style lang="scss" scoped>
+/* Строка отладки. Мелкая и поверх всего: она не оформление, а показание
+   прибора, и жить ей до первого удачного объявления. */
+.fault {
+	position: absolute;
+	left: 6px;
+	right: 6px;
+	bottom: 2px;
+	z-index: 2;
+	margin: 0;
+	font-size: 9px;
+	line-height: 1.2;
+	color: #ffb4b4;
+	text-align: center;
+}
+
 .slot {
 	position: absolute;
 	left: 0;
@@ -96,11 +136,21 @@ function tap() {
 	   инсет входит в её высоту, а не в её отступ.
 	*/
 	top: 0;
-	height: var(--ad-band, 56px);
+	height: var(--ad-band-k, 56px);
 	z-index: 4;
 	overflow: hidden;
-	/* Слот темнее неба: строка должна читаться как техническая полоса, а не как
-	   часть игры, иначе игрок принимает её за элемент интерфейса. */
+}
+
+/*
+   Тёмной полоса становится только когда в ней что-то есть.
+
+   Раньше она была тёмной всегда — и на месте отсутствующего объявления
+   оставалась глухая планка во всю ширину. Читать её как «техническую полосу»
+   игрок не обязан: он видит чёрную кромку над небом и считает, что так и
+   задумано, только некрасиво. Пустая же полоса, прозрачная, не видна вовсе:
+   место под баннер занято по-прежнему, просто сквозь него видно небо.
+*/
+.slot--filled {
 	background: linear-gradient(180deg, #10173a, #0a0e26);
 	box-shadow: inset 0 -2px 0 rgba(255, 255, 255, 0.08);
 }
@@ -115,7 +165,7 @@ function tap() {
 	left: 0;
 	right: 0;
 	bottom: 0;
-	height: var(--ad-slot, 56px);
+	height: var(--ad-slot-k, 56px);
 	width: 100%;
 	padding: 0 12px;
 	border: none;

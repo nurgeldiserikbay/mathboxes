@@ -64,7 +64,7 @@ function pick(kind: TYPE_BOON) {
 	position: absolute;
 	/* Ниже рекламной строки, как пауза и итог: `inset: 0` отсчитывается от
 	   padding-box и попал бы под баннер. */
-	top: var(--ad-band, 56px);
+	top: var(--ad-band-k, 56px);
 	left: 0;
 	right: 0;
 	bottom: 0;

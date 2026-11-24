@@ -13,6 +13,8 @@ const KEY_RECORDS = 'records4'
 const KEY_LANG = 'lang'
 /** Где играть: идентификатор локации или `random`. */
 const KEY_THEME = 'theme'
+/** Показывали ли, как ходить. Один раз за всё время. */
+const KEY_TAUGHT = 'taught'
 
 function emptyRecords(): I_Records {
 	return { bestFloor: 0, bestScore: 0, gamesPlayed: 0, totalCorrect: 0 }
@@ -27,6 +29,21 @@ export const useGameStore = defineStore('GameStore', () => {
 	 * удивлять, а лезть за ним в настройки перед каждой партией никто не станет.
 	 */
 	const theme = ref<string>(THEME_RANDOM)
+
+	/**
+	 * Видел ли игрок подсказку про управление.
+	 *
+	 * Отдельный признак, а не «первая партия»: свайп появился в этой версии, и
+	 * тем, у кого игра уже стояла, узнать о нём иначе неоткуда — по счётчику
+	 * партий они давно не новички, а жест для них новый.
+	 */
+	const taught = ref(false)
+
+	function markTaught() {
+		if (taught.value) return
+		taught.value = true
+		void Preferences.set({ key: KEY_TAUGHT, value: '1' })
+	}
 
 	/** The only history the game keeps: how high, how much, how often. */
 	const records = ref<I_Records>(emptyRecords())
@@ -75,16 +92,18 @@ export const useGameStore = defineStore('GameStore', () => {
 	}
 
 	async function loadData() {
-		const [stored, nameData, langData, themeData] = await Promise.all([
+		const [stored, nameData, langData, themeData, taughtData] = await Promise.all([
 			Preferences.get({ key: KEY_RECORDS }),
 			Preferences.get({ key: KEY_NAME }),
 			Preferences.get({ key: KEY_LANG }),
 			Preferences.get({ key: KEY_THEME }),
+			Preferences.get({ key: KEY_TAUGHT }),
 		])
 
 		name.value = nameData.value || DEFAULT_NAME
 		locale.value = langData.value || ''
 		theme.value = themeData.value || THEME_RANDOM
+		taught.value = taughtData.value === '1'
 
 		if (!stored.value) return
 		try {
@@ -104,6 +123,8 @@ export const useGameStore = defineStore('GameStore', () => {
 		setLocale,
 		theme,
 		setTheme,
+		taught,
+		markTaught,
 		records,
 		bestFloor,
 		bestScore,

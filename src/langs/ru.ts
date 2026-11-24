@@ -92,7 +92,7 @@ export default {
 	off: 'Выкл',
 
 	sec_short: 'с',
-	climb_hint: 'Веди пальцем',
+	teach_move: 'Нажми на блок или проведи пальцем',
 	climb_jump: 'Прыжок',
 	fork_title: 'Как строить дальше?',
 	fork_note: 'до следующей опоры',

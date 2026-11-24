@@ -92,7 +92,7 @@ export default {
 	off: 'Non',
 
 	sec_short: 's',
-	climb_hint: 'Glisse pour courir',
+	teach_move: 'Touche un bloc ou glisse',
 	climb_jump: 'Saut',
 	fork_title: 'Comment continuer ?',
 	fork_note: "jusqu'au prochain appui",

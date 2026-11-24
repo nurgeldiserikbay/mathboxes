@@ -157,7 +157,7 @@ function openSettings() {
 	position: relative;
 	display: flex;
 	flex-direction: column;
-	min-height: 100dvh;
+	min-height: var(--vh);
 	padding: 12px 18px calc(18px + env(safe-area-inset-bottom, 0px));
 	max-width: 430px;
 	margin: 0 auto;

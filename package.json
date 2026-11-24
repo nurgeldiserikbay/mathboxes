@@ -11,8 +11,8 @@
     "build:prod": "vite build --mode production",
     "verify:apk": "node scripts/verify-apk.mjs",
     "preview": "pnpm preview",
-    "build:android": "pnpm build && npx capacitor-assets generate && npx cap sync && node scripts/strip-sw.mjs && npx cap open android",
-    "build:android:prod": "pnpm build:prod && npx capacitor-assets generate && npx cap sync && node scripts/strip-sw.mjs && npx cap open android"
+    "build:android": "pnpm build && npx capacitor-assets generate && node scripts/trim-splash.mjs && npx cap sync && node scripts/strip-sw.mjs && npx cap open android",
+    "build:android:prod": "pnpm build:prod && npx capacitor-assets generate && node scripts/trim-splash.mjs && npx cap sync && node scripts/strip-sw.mjs && npx cap open android"
   },
   "dependencies": {
     "@boengli/capacitor-fullscreen": "^0.0.19",

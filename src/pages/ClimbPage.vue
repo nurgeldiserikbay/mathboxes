@@ -262,6 +262,32 @@ const HOLD_MS = 120
 const moving = ref(false)
 
 /**
+ * Скрыт ли ряд кандидатов. Раньше это решал `moving`, и в этом была ошибка.
+ *
+ * Ряд прятали, чтобы ход читался по тактам: прыгнул, мир сдвинулся, и только
+ * потом вышли новые блоки. Но `moving` держится до самого конца сдвига, а
+ * отвечать игроку нечем ровно столько же — вода при этом идёт. Складывалось
+ * почти полторы секунды от нажатия до последнего появившегося блока, и всё это
+ * время игрок ждал.
+ *
+ * Теперь ряд возвращается на середине сдвига. Такты по-прежнему различимы:
+ * кривая сдвига — ease-out, вторую половину мир проходит почти стоя, и блоки
+ * выходят уже на затухании, а не поперёк движения.
+ *
+ * На падении затвор остаётся прежним, во всю длину. Там причина другая и
+ * никуда не делась: свежий ряд появлялся там, где персонаж в этот момент
+ * висит, и выглядело, будто он стоит на блоке, которого секунду назад не было.
+ */
+/** Когда закончится текущий переезд. Нужно итогу: он ждёт падения. */
+let glideEndsAt = 0
+
+const rowHidden = ref(false)
+let rowTimer: ReturnType<typeof setTimeout> | undefined
+
+/** Какую долю сдвига ряд ещё пережидает. */
+const ROW_AFTER = 0.45
+
+/**
  * Насколько персонаж поднят над своей плитой сверх дуги прыжка, в шагах этажа.
  *
  * Обычно ноль. В начале падения — столько, сколько ему предстоит пролететь:
@@ -294,29 +320,54 @@ function glide(camFrom: number, hopFrom: number, falling: boolean, moveTo?: numb
 	moving.value = true
 
 	/*
-	   Оседание отдаёт свой шаг камере.
+	   Оседание отдаёт свой шаг камере — всегда, в обе стороны.
 
-	   К приземлению запас меняется рывком, и цель оседания смещается сразу на
-	   весь накопленный дрейф. Дать оседанию отыграть этот шаг самому нельзя:
-	   его кривая экспоненциальная, то есть быстрее всего в самом начале, а
-	   камера в это время только трогается со своей мягкой. Первую десятую долю
-	   секунды подъём перебивает спуск — мир заметно приподнимается и лишь потом
-	   едет вниз. Замер: 14 px вверх за 115 мс, при том что камера прошла за них
-	   всего 8 из 108.
+	   Мир держат два слоя. Камера возит его на этаж за ход и возвращается в
+	   ноль; оседание показывает, насколько близко вода, и с каждым потерянным
+	   этажом уезжает вниз насовсем. Событие у них одно и то же — ход, — но
+	   масштаб разный (этаж камеры это `pitch`, этаж оседания — своя, сжатая
+	   доля экрана) и длительность разная: камера укладывается в переезд,
+	   оседание ползёт секундами.
+
+	   Пока они играли порознь, выходило вот что. На верном ответе — мир
+	   приподнимался и тут же ехал вниз: замер давал 14 px вверх за 115 мс при
+	   8 из 108 у камеры. На промахе — камера дотаскивала мир вверх за время
+	   падения, а оседание продолжало тянуть его вниз ещё секунды после
+	   приземления. Второе и читалось как «блоки продавило весом»: движение,
+	   которое началось от касания и не кончается.
 
 	   Поэтому шаг оседания ставится мгновенно, а камера берёт его на себя:
-	   начинает на столько же ниже и приезжает в ноль одним движением. Кадр не
-	   дрогнет — сумма двух слоёв та же, меняется только то, кто из них едет.
-
-	   Делается это лишь когда оседание собиралось ВВЕРХ. На промахе оно идёт
-	   вниз, в одну сторону с падением, спорить там нечему — и пусть отыгрывает
-	   само.
+	   начинает ровно настолько же в стороне и приезжает в ноль одним
+	   движением. Сумма двух слоёв в первом кадре та же, конечная точка та же —
+	   меняется только то, что вместо двух движений разной длины остаётся одно,
+	   и кончается оно вместе с приземлением.
 	*/
 	const lift = sink.value - sinkTo.value
-	if (lift > 0) {
-		sink.value = sinkTo.value
-		camFrom += lift
+	sink.value = sinkTo.value
+	camFrom += lift
+
+	/*
+	   Слишком быстрым это движение быть не должно.
+
+	   Забрав себе шаг оседания, камера может получить путь длиннее, чем
+	   рассчитано под падение, — и тогда мир пролетит его рывком. Поэтому
+	   падение растягивается настолько, чтобы мир не шёл быстрее, чем на
+	   обычном ходе: `pitch` за `SLIDE_MS`. Эта скорость игроку уже знакома,
+	   он видит её после каждого верного ответа.
+	*/
+	if (falling) {
+		const known = Math.abs(camFrom) / (pitch.value / SLIDE_MS)
+		fallMs.value = Math.round(Math.max(fallMs.value, known))
 	}
+
+	// Затвор ряда ставится здесь, а не выше: длительность падения только что
+	// могла вырасти, и ряд обязан пережидать её целиком.
+	rowHidden.value = true
+	if (rowTimer) clearTimeout(rowTimer)
+	rowTimer = setTimeout(
+		() => (rowHidden.value = false),
+		HOLD_MS + (falling ? fallMs.value + 30 : Math.round(SLIDE_MS * ROW_AFTER))
+	)
 
 	// Сдвиг ставится сразу, а едет — после паузы. Кадр при этом не дрогнет: он
 	// ровно тот же, что был в последнем кадре прыжка.
@@ -333,15 +384,15 @@ function glide(camFrom: number, hopFrom: number, falling: boolean, moveTo?: numb
 
 	void nextTick(() => setTimeout(start, HOLD_MS))
 
+	const span = HOLD_MS + (falling ? fallMs.value : SLIDE_MS) + 30
+	glideEndsAt = performance.now() + span
+
 	if (glideTimer) clearTimeout(glideTimer)
-	glideTimer = setTimeout(
-		() => {
-			gliding.value = false
-			dropping.value = false
-			moving.value = false
-		},
-		HOLD_MS + (falling ? fallMs.value : SLIDE_MS) + 30
-	)
+	glideTimer = setTimeout(() => {
+		gliding.value = false
+		dropping.value = false
+		moving.value = false
+	}, span)
 }
 
 /** Персонаж: горизонталь от прыжка, вертикаль — дуга плюс запас на падение. */
@@ -410,6 +461,34 @@ const waterY = computed(() => Math.round(stageBox.value.height - 48))
 const praiseY = computed(() => Math.max(4, Math.round((baseY.value - pitch.value) / 2 - 16)))
 
 /**
+ * Показывать ли, как ходить.
+ *
+ * Объяснения не было вовсе: по блокам ещё догадываются нажать, а про свайп
+ * узнать неоткуда — он ничем не обозначен. Поэтому подсказка висит до первого
+ * действия и больше не возвращается никогда.
+ *
+ * Признак отдельный, а не «первая партия»: жест появился в этой версии, и у
+ * тех, у кого игра уже стояла, партий сыграно много, а видеть его они не
+ * видели ни разу.
+ */
+const teaching = ref(!gameStore.taught)
+
+/**
+ * Над рядом кандидатов, в полосе неба между карточкой примера и блоками.
+ *
+ * Под рядом её ставить нельзя, хотя там и логичнее: ровно в этом промежутке
+ * стоит персонаж — шаг этажа и равен высоте блока плюс его рост, — и надпись
+ * ложилась ему на голову.
+ */
+const teachY = computed(() => Math.max(4, baseY.value - pitch.value - 56))
+
+function stopTeaching() {
+	if (!teaching.value) return
+	teaching.value = false
+	gameStore.markTaught()
+}
+
+/**
  * Где идёт эта партия.
  *
  * Решается один раз, при заходе на доску, и до конца партии не меняется. Из
@@ -441,9 +520,37 @@ const sinkTo = computed(() => {
  */
 const sink = ref(0)
 let sinkRaf = 0
+let sinkLast = 0
 
-function sinkFrame() {
+/**
+ * Быстрее этого мир не оседает — пикселей в секунду.
+ *
+ * Есть ровно один случай, когда цель оседания прыгает разом: промах. Игрок
+ * теряет этаж, а если терять нечего — за промах платит вода, и запас в любом
+ * случае падает сразу на целый этаж. В пикселях это около трёх четвертей
+ * сотни, и сглаживание отыгрывало их за треть секунды: замер дал триста
+ * пикселей в секунду при обычном дрейфе в десять. Тридцатикратный рывок ровно
+ * в миг приземления читался так, будто блоки продавило весом упавшего.
+ *
+ * Потолок подобран так, чтобы этаж расходился примерно за время одного ответа:
+ * на полторы-две секунды. Спокойного дрейфа он не задевает вовсе — там доли
+ * пикселя за кадр, — а скачок превращает в ровное движение с постоянной
+ * скоростью. Медленнее делать нельзя: вода уже рядом, и показывать это через
+ * пять секунд значит врать игроку о том, насколько он в опасности.
+ *
+ * Верного ответа это не касается: там шаг оседания забирает себе камера (см.
+ * `lift` в `glide`), и к этому месту разницы уже нет.
+ */
+const SINK_MAX_PER_SEC = 45
+
+function sinkFrame(now: number) {
 	sinkRaf = requestAnimationFrame(sinkFrame)
+
+	// Шаг во времени, а не в кадрах. Прежнее «девять процентов за кадр» на
+	// экране в 120 Гц отыгрывало вдвое быстрее, чем на шестидесяти, — и
+	// подобранные по ощущению доли секунды означали разное на разных телефонах.
+	const dt = sinkLast ? Math.min(0.05, (now - sinkLast) / 1000) : 0
+	sinkLast = now
 
 	/*
 	   Пауза после приземления держит кадр целиком — и камеру, и оседание.
@@ -457,6 +564,11 @@ function sinkFrame() {
 	if (moving.value && !gliding.value) return
 
 	const delta = sinkTo.value - sink.value
+	if (Math.abs(delta) < 0.01) {
+		sink.value = sinkTo.value
+		return
+	}
+
 	// Порога «доехали» нет намеренно: он отсекал как раз тот дрейф, ради
 	// которого всё и затевалось, — за кадр набегает пятая доля пикселя.
 	//
@@ -464,7 +576,9 @@ function sinkFrame() {
 	// должен растянуться на весь переезд и сложиться с ним в одно движение
 	// вниз, а не отыграть до его начала. Медленному дрейфу это не мешает —
 	// цель уползает медленнее, чем догоняет сглаживание.
-	sink.value = Math.abs(delta) < 0.01 ? sinkTo.value : sink.value + delta * 0.09
+	const eased = delta * (1 - Math.pow(1 - 0.09, dt * 60))
+	const cap = SINK_MAX_PER_SEC * dt
+	sink.value += Math.abs(eased) > cap ? Math.sign(eased) * cap : eased
 }
 
 const sinkStyle = computed(() => ({
@@ -533,6 +647,9 @@ function columnAt(clientX: number): I_Slot | null {
 }
 
 function onStageDown(event: PointerEvent) {
+	// Подсказка уходит по касанию, а не по сделанному ходу: игрок уже понял,
+	// что доска отзывается, и держать надпись дальше значит мешать.
+	stopTeaching()
 	gestureFrom = { x: event.clientX, y: event.clientY, t: performance.now() }
 	pressing.value = columnAt(event.clientX)?.id ?? 0
 }
@@ -754,7 +871,27 @@ watch([dangerOn, dangerRate], ([on, rate]) => {
 	holdAudio('danger', on, { rate, volume: 0.55 })
 })
 
-game.onDrowned(() => endGame())
+let endTimer: ReturnType<typeof setTimeout> | undefined
+
+/*
+   Итог ждёт, пока персонаж долетит.
+
+   Утонуть можно и на промахе: неверный ответ поднимает воду, и она достаёт
+   игрока прямо в падении. Раньше карточка выскакивала в тот же миг — падение
+   обрывалось на середине, и выглядело это так, будто игра проглотила ход.
+   Сама петля к этому моменту уже остановлена (`checkDrown` зовёт `finish`
+   раньше обратного вызова), так что ожидание ничего не меняет в счёте: вода
+   стоит, очки посчитаны, ждёт только картинка.
+*/
+game.onDrowned(() => {
+	const left = Math.max(0, glideEndsAt - performance.now())
+	if (!left) {
+		endGame()
+		return
+	}
+	if (endTimer) clearTimeout(endTimer)
+	endTimer = setTimeout(endGame, left)
+})
 
 /* -------------------------------------------------------------- жизненный */
 
@@ -840,6 +977,8 @@ onBeforeUnmount(() => {
 	if (glideTimer) clearTimeout(glideTimer)
 	if (ghostTimer) clearTimeout(ghostTimer)
 	if (debrisTimer) clearTimeout(debrisTimer)
+	if (rowTimer) clearTimeout(rowTimer)
+	if (endTimer) clearTimeout(endTimer)
 	game.destroy()
 })
 </script>
@@ -958,7 +1097,7 @@ onBeforeUnmount(() => {
 					назад не было.
 				-->
 				<button
-					v-for="(slot, index) in moving ? [] : game.slots.value"
+					v-for="(slot, index) in rowHidden ? [] : game.slots.value"
 					:key="slot.id"
 					class="block"
 					type="button"
@@ -974,7 +1113,7 @@ onBeforeUnmount(() => {
 						class="slab"
 						:class="{ 'is-pressed': pressing === slot.id }"
 						:style="{
-							animationDelay: `${index * 55}ms`,
+							animationDelay: `${index * 28}ms`,
 							'--face': brickTint(game.floor.value + 1),
 							'--cap': lighten(brickTint(game.floor.value + 1), 0.2),
 							'--bot': darken(brickTint(game.floor.value + 1), 0.16),
@@ -1098,6 +1237,25 @@ onBeforeUnmount(() => {
 				:kind="location.hazard"
 				:style="{ transform: `translate3d(0, ${waterY}px, 0)` }"
 			/>
+
+			<!--
+				Как ходить. Только до первого касания и только один раз за всё время.
+
+				Стоит вне `sink`, то есть не едет вместе с миром: это подпись
+				интерфейса, а не предмет на сцене. За несколько секунд, что она
+				живёт, мир уезжает на считаные пиксели, и разъехаться они не
+				успевают.
+			-->
+			<transition name="fade">
+				<div v-if="teaching" class="teach" :style="{ top: `${teachY}px` }">
+					<div class="teach__track" aria-hidden="true">
+						<AppIcon name="chevron-left" :size="14" />
+						<i class="teach__dot" />
+						<AppIcon name="chevron-right" :size="14" />
+					</div>
+					<p class="teach__text">{{ $t('teach_move') }}</p>
+				</div>
+			</transition>
 		</main>
 
 		<transition name="fade">
@@ -1133,9 +1291,9 @@ onBeforeUnmount(() => {
 	position: relative;
 	display: flex;
 	flex-direction: column;
-	height: 100dvh;
+	height: var(--vh);
 	overflow: hidden;
-	padding-top: var(--ad-band, 56px);
+	padding-top: var(--ad-band-k, 56px);
 }
 
 /* ==================================================================== HUD */
@@ -1349,7 +1507,7 @@ onBeforeUnmount(() => {
 	@include raised(var(--lip), 5px, 0.46, 0.2, 0.3, 2.5px);
 	/* Новый ряд не возникает, а приходит: с задержкой по порядку, чтобы это
 	   читалось как «выложили», а не как «подменили». */
-	animation: slab-in 320ms var(--pop) both;
+	animation: slab-in 220ms var(--pop) both;
 
 	b {
 		font-size: 22px;
@@ -1455,6 +1613,64 @@ onBeforeUnmount(() => {
 		&.is-air {
 			transform: scaleY(1.08) scaleX(0.94);
 		}
+	}
+}
+
+/* ============================================================== ОБУЧЕНИЕ */
+.teach {
+	position: absolute;
+	left: 0;
+	right: 0;
+	z-index: 25;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	pointer-events: none;
+
+	&__track {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 5px 10px;
+		border-radius: 999px;
+		color: rgba(255, 255, 255, 0.75);
+		background: rgba(16, 23, 58, 0.45);
+	}
+
+	/* Палец. Ездит между колонками — это и есть весь показ жеста: словами
+	   «проведите пальцем» объясняют хуже, чем одним движением. */
+	&__dot {
+		width: 14px;
+		height: 14px;
+		border-radius: 50%;
+		background: #fff;
+		box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.25);
+		animation: teach-sweep 1.9s var(--soft) infinite;
+	}
+
+	&__text {
+		margin: 0;
+		font-size: 13px;
+		font-weight: 800;
+		color: #fff;
+		text-shadow: 0 2px 0 rgba(13, 18, 51, 0.7);
+	}
+}
+
+@keyframes teach-sweep {
+	0%,
+	100% {
+		transform: translateX(-26px);
+	}
+	50% {
+		transform: translateX(26px);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.teach__dot {
+		animation: none;
 	}
 }
 
@@ -1564,7 +1780,7 @@ onBeforeUnmount(() => {
 /* ================================================================== ПАУЗА */
 .overlay {
 	position: absolute;
-	top: var(--ad-band, 56px);
+	top: var(--ad-band-k, 56px);
 	left: 0;
 	right: 0;
 	bottom: 0;

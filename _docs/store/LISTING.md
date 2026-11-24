@@ -1,51 +1,66 @@
 # Карточка Google Play — единый источник
 
 Всё, что уходит в консоль, лежит здесь. Правится этот файл, потом копируется в
-Play Console. Картинки — рядом, в этой же папке.
+Play Console. Картинки — не здесь: они собираются скриптом и лежат готовыми к
+загрузке в [`upload/`](upload/), там же инструкция, что куда грузить.
 
-| Что | Файл | Требование Play |
+| Что | Откуда взять | Требование Play |
 |---|---|---|
-| Иконка | `icon-512.png` | 512×512, PNG, 32-бит |
-| Исходник иконки | `icon.svg` | правится он, PNG пересобирается скриптом |
-| Графика функции | `feature-graphic-1024x500.png` | 1024×500, PNG или JPEG |
-| Скриншоты телефона | `screenshots/phone/` | 1080×1920, PNG, от 2 до 8 штук |
-| Скриншоты 7" планшета | `screenshots/tablet7/` | 1200×1920, PNG |
-| Скриншоты 10" планшета | `screenshots/tablet10/` | 1600×2560, PNG |
+| Значок | `upload/icon-512.png` | 512×512, PNG, 32-бит |
+| Графика функции | `upload/feature-graphic-1024x500.png` | 1024×500, PNG или JPEG |
+| Скриншоты телефона | `upload/phone-{ru,en}/` | 1080×1920, 9:16, 2–8 шт |
+| Скриншоты 7″ планшета | `upload/tablet7-{ru,en}/` | 1440×2560, 9:16 |
+| Скриншоты 10″ планшета | `upload/tablet10-{ru,en}/` | 1620×2880, 9:16 |
 
-Пересобрать иконки и графику функции (обновляет и лаунчер-иконки Android, и
-иконки PWA):
+Пересобрать всё, что рисуется, из двух исходников в `brand/`:
 
 ```
-node _docs/store/make-icons.mjs
+node _docs/store/make-brand.mjs
 ```
 
-Переснять скриншоты — все три формата сразу (нужен запущенный `vite preview` на
-порту 4217):
+Переснять скриншоты (нужен запущенный dev-сервер на 4236):
 
 ```
-node node_modules/vite/bin/vite.js preview --port 4217
-node _docs/store/make-screenshots.mjs
+node node_modules/vite/bin/vite.js --mode development --port 4236
+node _docs/store/make-store-shots.mjs 4236
 ```
 
-Скрипт сам играет правильно, вычисляя ответы из разметки, поэтому на кадрах
-живая партия, а не первый вопрос.
+Скрипт играет по-настоящему, вычисляя верный ответ из разметки, поэтому на
+кадрах живая партия, а не первый экран.
+
+---
+
+## Название
+
+```
+Math Boxes: Solve and Climb
+```
+
+27 знаков из 30. «Math Boxes» оставлено намеренно: под этим именем приложение
+уже стоит у людей, оно нарисовано на баннере и на логотипе внутри игры, а хвост
+после двоеточия делает ровно то, ради чего это поле и существует, — объясняет,
+что за игра, тому, кто видит её впервые.
+
+Заголовок можно локализовать: Play разрешает свой на каждый язык. Ниже у каждого
+языка стоит свой вариант — бренд английский, хвост на языке витрины. Если решите
+держать один заголовок на всех, берите английский.
 
 ---
 
 ## Иконка
 
-Старая иконка была из прежнего оформления: неоновые градиенты, розовый и
-бирюзовый. Приложение с тех пор стало светлым и приглушённым, и иконка перестала
-совпадать с тем, что игрок видит после установки.
+Нарисована, а не собрана кодом: синий кубик-персонаж стоит на стопке цветных
+блоков со знаками действий, за ним городское небо. Исходник — `brand/icon-source.png`,
+всё остальное выводится из него.
 
-Новая — четыре изометрические коробки со знаками `+ − × ÷` в тех же четырёх
-тонах, что и операции в игре (`#b3705a`, `#4f8f8a`, `#7b7bb5`, `#5f9169`), на
-светлом фоне. Коробка это и название, и главный объект на экране.
+Букв в иконке нет намеренно. Прежняя несла «M» и «B», а иконку видят в списке
+приложений на 48 пикселях, где буквы превращаются в кашу. Читаться она должна
+силуэтом.
 
-Собираются: `mipmap-*/ic_launcher.png`, `ic_launcher_round.png`,
-`ic_launcher_foreground.png` (с запасом под обрезку адаптивной иконки),
-`ic_launcher_background.png`, весь набор `public/icons/*`, плюс `icon-512.png`
-для консоли.
+Передний слой адаптивной иконки идёт **во весь холст, без полей**: разметка
+Android, которую пишет `capacitor-assets`, уже вкладывает слой внутрь видимой
+области, и свой запас поверх этого давал двойное уменьшение — рисунок выглядел
+наклейкой на синем диске.
 
 ---
 
@@ -53,12 +68,19 @@ node _docs/store/make-screenshots.mjs
 
 **Язык в самой игре.** Приложение открывается на языке устройства, если он один
 из шести; во всех остальных случаях — на английском. Язык меняется в настройках
-и запоминается. Скриншоты для витрины сняты на английском (`LANG` в начале
-`make-screenshots.mjs`).
+и запоминается.
 
-Правило по ключам: они должны стоять в живых фразах. Play ранжирует и по
+**Правило по ключам:** они должны стоять в живых фразах. Play ранжирует и по
 названию, и по короткому, и по полному описанию, но набор слов через запятую
 снижает конверсию, а конверсия — тоже фактор ранжирования.
+
+**Чего в текстах нет и не должно быть.** Ни степеней, ни корней, ни логарифмов:
+их вырезали, в игре ровно четыре действия. Ни уровней по операциям, ни таймера,
+ни жизней — ничего этого в игре больше нет, и обещать это в витрине нельзя не
+только из вежливости: заявка на то, чего в приложении не найти, — повод для
+претензии к листингу, а под Families-политикой к таким вещам относятся строже.
+
+---
 
 ### English — язык карточки по умолчанию
 
@@ -69,344 +91,459 @@ Play показывает этот текст всем, у кого нет ка�
 **Title** (30)
 
 ```
-Math Boxes: Mental Math
+Math Boxes: Solve and Climb
 ```
 
 **Short description** (80)
 
 ```
-Mental math drills: add, multiply, divide, powers and roots. Works offline.
+Solve, jump, climb higher. Mental math with the water rising below you.
 ```
 
 **Full description**
 
 ```
-Math Boxes is a mental math trainer. Solve an equation against the clock and
-pick the right answer out of four boxes. One tap and you are playing — no
-sign-up, no settings, no internet needed.
+Math Boxes is a mental math climber. An equation appears at the top, you pick
+the answer, and your cube hops onto that block. The tower grows under you — and
+the water keeps rising.
 
-ONE CHAIN
+HOW IT PLAYS
 
-Every answer starts the next equation: 2 − 1 = 1 + 9 = 10 × 3 = ?
-No modes to pick, no settings — one tap and the chain begins.
+Tap the column you want, or swipe left and right. One correct answer, one floor
+higher. Answer wrong and you drop down the column you jumped into, until a block
+catches you — while the water climbs on.
 
-SEVEN OPERATIONS
+No countdown, no lives, no "level failed". The only pressure is the water, and
+it moves one way.
 
-Addition, subtraction, multiplication, division, exponents, square roots and
-logarithms. It opens on single-digit sums and unlocks new operations as you are
-ready for them.
+FOUR OPERATIONS
 
-DIFFICULTY THAT FOLLOWS YOU
+Addition, subtraction, multiplication, division — and nothing else. It starts at
+5 + 3 and grows with you through twelve steps, up to three-digit arithmetic if
+you get that far.
 
-Sixteen steps. Answer quickly and the numbers grow; slip and the game steps back
-with you. No level picker — it finds your edge and stays next to it.
+The game reads how you answer, not how long you have played: answer quickly and
+cleanly and it steps up, stumble and it eases off. Two answer blocks at the
+start, three and then four as you get better.
 
-ALSO
+SIX PLACES TO CLIMB
 
-• A timer on every equation, counted in tenths
-• A combo multiplier for a run of correct answers
-• A record for every mode and every operation
-• Works offline
-• Six languages: English, Russian, Kazakh, German, French, Spanish
+City, valley, winter, canyon, night and space. Each has its own sky and its own
+thing rising below — water, spores, ice or lava. Pick one in the settings, or
+let the game choose.
 
-For a pupil drilling the times tables and for an adult who wants their mental
-arithmetic back. Five minutes a day changes how fast you count without a
-calculator.
+MADE TO BE PICKED UP
+
+Works offline. No sign-up, no account, nothing to sync. One tap from the home
+screen to the first equation.
+
+Six languages: English, Русский, Қазақша, Deutsch, Français, Español.
 ```
+
+---
 
 ### Русский
 
-**Название** (30 знаков)
+**Название** (30)
 
 ```
-Math Boxes: устный счёт
+Math Boxes: решай и поднимайся
 ```
 
-**Краткое описание** (80 знаков)
+**Краткое описание** (80)
 
 ```
-Тренажёр устного счёта: сложение, умножение, степени и корни. Без интернета.
+Решай в уме, прыгай выше. Вода поднимается — не отставай.
 ```
 
 **Полное описание**
 
 ```
-Math Boxes — тренажёр устного счёта, в котором нужно решать примеры на скорость
-и выбирать верный ответ из четырёх коробок. Одно нажатие — и вы уже играете:
-ни регистрации, ни настроек, ни интернета.
+Math Boxes — устный счёт с подъёмом. Наверху появляется пример, вы выбираете
+ответ, и кубик прыгает на этот блок. Башня растёт под вами — а вода всё время
+поднимается.
 
-ОДНА ЦЕПОЧКА
+КАК ИГРАТЬ
 
-Ответ становится началом следующего примера: 2 − 1 = 1 + 9 = 10 × 3 = ?
-Никаких режимов и настроек — одно нажатие, и цепочка пошла.
+Нажмите на нужную колонку или проведите пальцем влево-вправо. Верный ответ —
+этаж вверх. Ошиблись — падаете вниз по той колонке, в которую прыгнули, пока вас
+не поймает блок. Вода тем временем не ждёт.
 
-СЕМЬ ОПЕРАЦИЙ
+Ни обратного отсчёта, ни жизней, ни «уровень не пройден». Давление здесь одно —
+вода, и она идёт только в одну сторону.
 
-Сложение, вычитание, умножение, деление, возведение в степень, квадратный корень
-и логарифм. Начинается всё с однозначных примеров, а новые действия открываются
-по мере того, как вы к ним готовы.
+ЧЕТЫРЕ ДЕЙСТВИЯ
 
-СЛОЖНОСТЬ ПОДСТРАИВАЕТСЯ
+Сложение, вычитание, умножение, деление — и больше ничего. Начинается с 5 + 3 и
+растёт вместе с вами через двенадцать ступеней, до трёхзначных чисел, если
+дойдёте.
 
-Шестнадцать ступеней. Отвечаете быстро — примеры растут, ошибаетесь — игра
-отступает на шаг назад. Никакого выбора уровня вручную: игра сама находит вашу
-границу и держится рядом с ней.
+Игра смотрит, как вы отвечаете, а не сколько играли: отвечаете быстро и без
+ошибок — становится сложнее, запнулись — отпускает. В начале два блока с
+ответами, дальше три и четыре.
 
-ЧТО ЕЩЁ
+ШЕСТЬ МЕСТ
 
-• Таймер на каждый пример — счёт идёт на десятые
-• Комбо-множитель за серию верных ответов
-• Рекорд для каждого режима и каждой операции
-• Работает без интернета
-• Шесть языков: русский, английский, казахский, немецкий, французский,
-  испанский
+Город, долина, зима, каньон, ночь и космос. У каждого своё небо и своё, что
+поднимается снизу: вода, споры, лёд или лава. Выберите в настройках или доверьте
+жребию.
 
-Подходит и школьнику, который отрабатывает таблицу умножения, и взрослому,
-которому нужно вернуть скорость счёта в уме. Пять минут в день заметно меняют
-то, как быстро вы считаете без калькулятора.
+ЧТОБЫ ВЗЯТЬ И ИГРАТЬ
+
+Работает без интернета. Без регистрации, без аккаунта, ничего никуда не
+отправляется. Одно нажатие с главного экрана — и вы уже считаете.
+
+Шесть языков: English, Русский, Қазақша, Deutsch, Français, Español.
 ```
+
+---
 
 ### Қазақша
 
-**Атауы**
+**Атауы** (30)
 
 ```
-Math Boxes: ауызша есеп
+Math Boxes: шеш және өрле
 ```
 
-**Қысқаша сипаттама**
+**Қысқаша сипаттама** (80)
 
 ```
-Ауызша есептеу жаттықтырғышы: қосу, көбейту, бөлу, дәреже. Интернетсіз.
+Ойша есепте, жоғары сек. Су көтеріліп келеді — қалып қойма.
 ```
 
 **Толық сипаттама**
 
 ```
-Math Boxes — ауызша есептеу жаттықтырғышы. Мысалды уақытпен жарысып шығарасыз
-да, төрт қорапшаның ішінен дұрысын таңдайсыз. Бір рет басасыз — ойын басталды:
-тіркелу де, баптау да, интернет те қажет емес.
+Math Boxes — ойша есептеу мен өрлеу. Жоғарыда мысал шығады, сен жауабын
+таңдайсың, текшең сол блокқа секіреді. Мұнара астыңда өседі — ал су үнемі
+көтеріліп отырады.
 
-БІР ТІЗБЕК
+ҚАЛАЙ ОЙНАЙДЫ
 
-Жауап келесі мысалдың басы болады: 2 − 1 = 1 + 9 = 10 × 3 = ?
-Режим таңдаудың қажеті жоқ — бір басасыз да, тізбек басталады.
+Керекті бағанды бас немесе саусақты солға-оңға сырғыт. Дұрыс жауап — бір қабат
+жоғары. Қателессең, секірген бағанмен төмен құлайсың, әлдебір блок ұстап
+қалғанша. Су ол кезде күтіп тұрмайды.
 
-ЖЕТІ АМАЛ
+Кері санақ жоқ, жан жоқ, «деңгей өтілмеді» деген де жоқ. Мұндағы жалғыз қысым —
+су, әрі ол бір ғана бағытқа жүреді.
 
-Қосу, азайту, көбейту, бөлу, дәрежелеу, квадрат түбір және логарифм. Бәрі бір
-таңбалы сандардан басталады, жаңа амалдар сіз дайын болған сайын ашылады.
+ТӨРТ АМАЛ
 
-КҮРДЕЛІЛІК ӨЗІ БЕЙІМДЕЛЕДІ
+Қосу, азайту, көбейту, бөлу — басқа ештеңе жоқ. 5 + 3-тен басталып, он екі
+сатымен сенімен бірге өседі; жетсең, үш таңбалы сандарға дейін жетеді.
 
-Он алты саты. Жылдам жауап берсеңіз — сандар өседі, қателессеңіз — ойын бір
-қадам артқа шегінеді. Деңгейді қолмен таңдау жоқ.
+Ойын қанша ойнағаныңды емес, қалай жауап бергеніңді қарайды: жылдам әрі қатесіз
+жауап берсең — қиындайды, сүрінсең — жеңілдейді. Басында жауабы бар екі блок,
+кейін үшеу, сосын төртеу.
 
-ТАҒЫ НЕ БАР
+АЛТЫ ОРЫН
 
-• Әр мысалға таймер
-• Дұрыс жауаптар қатары үшін комбо-көбейткіш
-• Әр режим мен әр амалға рекорд
-• Интернетсіз жұмыс істейді
-• Алты тіл
+Қала, аңғар, қыс, шатқал, түн және ғарыш. Әрқайсысының өз аспаны және астынан
+көтерілетін өз нәрсесі бар: су, спора, мұз немесе лава. Баптауда таңда немесе
+жеребеге қалдыр.
+
+АЛЫП ОЙНАЙ БЕРУГЕ
+
+Интернетсіз жұмыс істейді. Тіркелусіз, аккаунтсыз, ешқайда ештеңе жіберілмейді.
+Басты экраннан бір басу — және сен есептеп жатырсың.
+
+Алты тіл: English, Русский, Қазақша, Deutsch, Français, Español.
 ```
+
+---
 
 ### Deutsch
 
-**Titel**
+**Titel** (30)
 
 ```
-Math Boxes: Kopfrechnen
+Math Boxes: Rechnen & Steigen
 ```
 
-**Kurzbeschreibung**
+**Kurzbeschreibung** (80)
 
 ```
-Kopfrechnen üben: Addieren, Multiplizieren, Dividieren, Potenzen. Offline.
+Rechne im Kopf und steig höher. Das Wasser steigt mit — bleib nicht zurück.
 ```
 
 **Vollständige Beschreibung**
 
 ```
-Math Boxes ist ein Trainer fürs Kopfrechnen. Löse eine Aufgabe gegen die Uhr und
-wähle die richtige Antwort aus vier Kisten. Ein Tippen und du spielst — keine
-Anmeldung, keine Einstellungen, kein Internet nötig.
+Math Boxes ist Kopfrechnen mit Aufstieg. Oben erscheint eine Aufgabe, du wählst
+die Antwort, und dein Würfel springt auf diesen Block. Der Turm wächst unter dir
+— und das Wasser steigt weiter.
 
-EINE KETTE
+SO WIRD GESPIELT
 
-Jede Antwort beginnt die nächste Aufgabe: 2 − 1 = 1 + 9 = 10 × 3 = ?
-Keine Modi, keine Einstellungen — ein Tippen und die Kette läuft.
+Tippe auf die gewünschte Spalte oder wische nach links und rechts. Eine richtige
+Antwort, ein Stockwerk höher. Bei einer falschen fällst du die Spalte hinunter,
+in die du gesprungen bist, bis dich ein Block auffängt. Das Wasser wartet
+derweil nicht.
 
-SIEBEN RECHENARTEN
+Kein Countdown, keine Leben, kein "Level nicht geschafft". Der einzige Druck ist
+das Wasser, und es kennt nur eine Richtung.
 
-Addition, Subtraktion, Multiplikation, Division, Potenzen, Quadratwurzeln und
-Logarithmen. Es beginnt einstellig, neue Rechenarten kommen dazu, sobald du so
-weit bist.
+VIER RECHENARTEN
 
-SCHWIERIGKEIT, DIE MITWÄCHST
+Addition, Subtraktion, Multiplikation, Division — und sonst nichts. Es beginnt
+bei 5 + 3 und wächst über zwölf Stufen mit dir, bis zu dreistelligen Zahlen,
+wenn du so weit kommst.
 
-Sechzehn Stufen. Schnelle Antworten lassen die Zahlen wachsen, ein Fehler nimmt
-einen Schritt zurück. Keine Levelauswahl von Hand.
+Das Spiel schaut darauf, wie du antwortest, nicht wie lange du spielst:
+antwortest du schnell und sauber, wird es schwerer; stolperst du, lässt es
+nach. Am Anfang zwei Antwortblöcke, später drei und vier.
 
-AUSSERDEM
+SECHS ORTE
 
-• Ein Timer für jede Aufgabe
-• Combo-Multiplikator für eine Serie richtiger Antworten
-• Ein Rekord pro Modus und pro Rechenart
-• Funktioniert offline
-• Sechs Sprachen
+Stadt, Tal, Winter, Schlucht, Nacht und Weltraum. Jeder mit eigenem Himmel und
+eigenem Etwas, das von unten steigt: Wasser, Sporen, Eis oder Lava. Wähle in den
+Einstellungen oder überlass es dem Zufall.
+
+ZUM EINFACH LOSSPIELEN
+
+Funktioniert offline. Keine Anmeldung, kein Konto, nichts wird übertragen. Ein
+Tippen vom Startbildschirm bis zur ersten Aufgabe.
+
+Sechs Sprachen: English, Русский, Қазақша, Deutsch, Français, Español.
 ```
+
+---
 
 ### Français
 
-**Titre**
+**Titre** (30)
 
 ```
-Math Boxes : calcul mental
+Math Boxes: calcule et grimpe
 ```
 
-**Description courte**
+**Description courte** (80)
 
 ```
-Calcul mental : addition, multiplication, division, puissances. Hors ligne.
+Calcule de tête et grimpe. L'eau monte sous toi — ne reste pas en arrière.
 ```
 
 **Description complète**
 
 ```
-Math Boxes est un entraîneur de calcul mental. Résolvez une équation contre la
-montre et choisissez la bonne réponse parmi quatre boîtes. Une pression et vous
-jouez : sans inscription, sans réglages, sans connexion.
+Math Boxes, c'est du calcul mental avec de la grimpe. Une opération apparaît en
+haut, tu choisis la réponse, et ton cube saute sur ce bloc. La tour grandit sous
+toi — et l'eau, elle, continue de monter.
 
-UNE CHAÎNE
+COMMENT ON JOUE
 
-Chaque réponse commence l'équation suivante : 2 − 1 = 1 + 9 = 10 × 3 = ?
-Pas de modes, pas de réglages — une pression et la chaîne démarre.
+Touche la colonne voulue, ou glisse le doigt à gauche et à droite. Une bonne
+réponse, un étage de plus. En cas d'erreur, tu tombes le long de la colonne où
+tu as sauté, jusqu'à ce qu'un bloc te rattrape. L'eau, pendant ce temps,
+n'attend pas.
 
-SEPT OPÉRATIONS
+Pas de compte à rebours, pas de vies, pas de "niveau échoué". La seule pression,
+c'est l'eau, et elle ne va que dans un sens.
 
-Addition, soustraction, multiplication, division, puissances, racines carrées et
-logarithmes. On commence à un chiffre, les nouvelles opérations s'ouvrent quand
-vous êtes prêt.
+QUATRE OPÉRATIONS
 
-UNE DIFFICULTÉ QUI VOUS SUIT
+Addition, soustraction, multiplication, division — et rien d'autre. Ça commence
+à 5 + 3 et grandit avec toi sur douze paliers, jusqu'aux nombres à trois
+chiffres si tu vas jusque-là.
 
-Seize paliers. Répondez vite et les nombres grandissent ; une erreur et le jeu
-recule d'un pas. Pas de choix de niveau à la main.
+Le jeu regarde comment tu réponds, pas combien de temps tu joues : réponds vite
+et juste, ça monte ; hésite, ça redescend. Deux blocs de réponse au début, puis
+trois, puis quatre.
 
-ET AUSSI
+SIX LIEUX
 
-• Un chronomètre sur chaque équation
-• Un multiplicateur de série
-• Un record par mode et par opération
-• Fonctionne hors ligne
-• Six langues
+Ville, vallée, hiver, canyon, nuit et espace. Chacun avec son ciel et sa propre
+chose qui monte d'en bas : eau, spores, glace ou lave. Choisis dans les
+réglages, ou laisse faire le hasard.
+
+FAIT POUR ÊTRE PRIS EN MAIN
+
+Fonctionne hors ligne. Sans inscription, sans compte, rien n'est envoyé nulle
+part. Une touche depuis l'écran d'accueil et tu calcules déjà.
+
+Six langues : English, Русский, Қазақша, Deutsch, Français, Español.
 ```
+
+---
 
 ### Español
 
-**Título**
+**Título** (30)
 
 ```
-Math Boxes: cálculo mental
+Math Boxes: calcula y sube
 ```
 
-**Descripción corta**
+**Descripción corta** (80)
 
 ```
-Cálculo mental: sumar, multiplicar, dividir, potencias y raíces. Sin conexión.
+Calcula de cabeza y sube. El agua sube contigo: no te quedes abajo.
 ```
 
 **Descripción completa**
 
 ```
-Math Boxes es un entrenador de cálculo mental. Resuelve una ecuación contra el
-reloj y elige la respuesta correcta entre cuatro cajas. Un toque y ya estás
-jugando: sin registro, sin ajustes, sin internet.
+Math Boxes es cálculo mental con escalada. Arriba aparece una operación, eliges
+la respuesta y tu cubo salta a ese bloque. La torre crece bajo tus pies — y el
+agua no deja de subir.
 
-UNA CADENA
+CÓMO SE JUEGA
 
-Cada respuesta empieza la siguiente: 2 − 1 = 1 + 9 = 10 × 3 = ?
-Sin modos ni ajustes: un toque y la cadena empieza.
+Toca la columna que quieras, o desliza el dedo a izquierda y derecha. Una
+respuesta correcta, un piso más. Si fallas, caes por la columna a la que
+saltaste hasta que un bloque te atrape. El agua, mientras tanto, no espera.
 
-SIETE OPERACIONES
+Sin cuenta atrás, sin vidas, sin "nivel fallido". La única presión es el agua, y
+solo va en una dirección.
 
-Suma, resta, multiplicación, división, potencias, raíces cuadradas y logaritmos.
-Empieza con una cifra y abre operaciones nuevas cuando estás listo.
+CUATRO OPERACIONES
 
-DIFICULTAD QUE TE SIGUE
+Suma, resta, multiplicación, división — y nada más. Empieza en 5 + 3 y crece
+contigo a lo largo de doce escalones, hasta números de tres cifras si llegas tan
+lejos.
 
-Dieciséis escalones. Responde rápido y los números crecen; falla y el juego
-retrocede un paso. Sin selector de nivel.
+El juego mira cómo respondes, no cuánto llevas jugando: responde rápido y limpio
+y sube; tropieza y afloja. Dos bloques de respuesta al principio, luego tres y
+cuatro.
 
-ADEMÁS
+SEIS LUGARES
 
-• Un cronómetro en cada ecuación
-• Multiplicador por racha
-• Un récord por modo y por operación
-• Funciona sin conexión
-• Seis idiomas
+Ciudad, valle, invierno, cañón, noche y espacio. Cada uno con su cielo y con lo
+suyo subiendo desde abajo: agua, esporas, hielo o lava. Elige en los ajustes o
+déjalo al azar.
+
+HECHO PARA COGERLO Y JUGAR
+
+Funciona sin conexión. Sin registro, sin cuenta, no se envía nada a ninguna
+parte. Un toque desde la pantalla de inicio hasta la primera operación.
+
+Seis idiomas: English, Русский, Қазақша, Deutsch, Français, Español.
 ```
 
 ---
 
-## Что нового (версия 7.0)
+## Что нового
+
+Это не обновление, а другая игра под тем же именем, и текст должен это сказать
+прямо: человек, у которого стоит прежняя версия, иначе не поймёт, почему у него
+пропали уровни и режимы.
+
+Play даёт на этот текст 500 знаков.
 
 **Русский**
 
 ```
-• Новый режим «Цепь»: ответ становится началом следующего примера
-• Плавный разгон: игра начинается с маленьких чисел, операции открываются
-  постепенно
-• 16 ступеней сложности вместо 13
-• Новая иконка
-• Реклама реже: межстраничная раз в 3–4 партии, баннер больше не перекрывает
-  кнопки ответов
-• Приложение легче на 2 МБ и быстрее запускается
+• Игра переделана целиком: вместо уровней по операциям — бесконечный подъём по
+  башне, снизу подступает вода
+• Управление: нажатие по колонке или свайп влево-вправо
+• Сложность подстраивается под вас — двенадцать ступеней, от 5 + 3 до
+  трёхзначных чисел
+• Шесть мест на выбор: город, долина, зима, каньон, ночь, космос
+• Звуки прыжка, серии и опасности
+• Новая иконка и оформление
+• Нормальная работа на планшетах
 ```
 
 **English**
 
 ```
-• New Chain mode: every answer starts the next equation
-• Gentler ramp: small numbers first, operations unlock as you go
-• 16 difficulty steps instead of 13
-• New icon
-• Fewer ads: one interstitial per 3–4 games, and the banner no longer covers the
-  answer buttons
-• 2 MB smaller and quicker to start
+• Rebuilt from scratch: no more operation levels — an endless climb up the
+  tower, with the water rising below
+• Controls: tap a column or swipe left and right
+• Difficulty adapts to you — twelve steps, from 5 + 3 to three-digit arithmetic
+• Six places to climb: city, valley, winter, canyon, night, space
+• Sounds for the jump, the streak and the danger
+• New icon and artwork
+• Works properly on tablets
+```
+
+**Қазақша**
+
+```
+• Ойын толық қайта жасалды: амалдар бойынша деңгейлердің орнына — мұнарамен
+  шексіз өрлеу, астынан су көтеріледі
+• Басқару: бағанды басу немесе солға-оңға сырғыту
+• Қиындық саған бейімделеді — он екі саты, 5 + 3-тен үш таңбалы сандарға дейін
+• Алты орын: қала, аңғар, қыс, шатқал, түн, ғарыш
+• Секіру, серия және қауіп дыбыстары
+• Жаңа белгіше және безендіру
+• Планшеттерде дұрыс жұмыс істейді
+```
+
+**Deutsch**
+
+```
+• Komplett neu gebaut: keine Level nach Rechenarten mehr — ein endloser Aufstieg
+  über den Turm, während unten das Wasser steigt
+• Steuerung: Spalte antippen oder nach links und rechts wischen
+• Die Schwierigkeit passt sich an — zwölf Stufen, von 5 + 3 bis zu dreistelligen
+  Zahlen
+• Sechs Orte: Stadt, Tal, Winter, Schlucht, Nacht, Weltraum
+• Sounds für Sprung, Serie und Gefahr
+• Neues Icon und neue Gestaltung
+• Läuft jetzt richtig auf Tablets
+```
+
+**Français**
+
+```
+• Jeu entièrement refait : plus de niveaux par opération — une grimpe sans fin le
+  long de la tour, avec l'eau qui monte en dessous
+• Commandes : touche une colonne ou glisse à gauche et à droite
+• La difficulté s'adapte à toi — douze paliers, de 5 + 3 aux nombres à trois
+  chiffres
+• Six lieux : ville, vallée, hiver, canyon, nuit, espace
+• Sons pour le saut, la série et le danger
+• Nouvelle icône et nouveaux graphismes
+• Fonctionne correctement sur tablette
+```
+
+**Español**
+
+```
+• Juego rehecho por completo: se acabaron los niveles por operación — una
+  escalada sin fin por la torre, con el agua subiendo por debajo
+• Controles: toca una columna o desliza a izquierda y derecha
+• La dificultad se adapta a ti: doce escalones, de 5 + 3 a números de tres cifras
+• Seis lugares: ciudad, valle, invierno, cañón, noche, espacio
+• Sonidos del salto, la racha y el peligro
+• Icono y aspecto nuevos
+• Funciona bien en tablets
 ```
 
 ---
 
 ## Скриншоты
 
-Три набора по шесть кадров, все портретные PNG:
+Три набора по шесть кадров на каждом из двух языков, все портретные PNG,
+соотношение ровно 9:16 — Play принимает только 16:9 или 9:16.
 
 | Папка | Размер | Куда в консоли |
 |---|---|---|
-| `screenshots/phone/` | 1080×1920 | Скриншоты телефона |
-| `screenshots/tablet7/` | 1200×1920 | Скриншоты 7-дюймового планшета |
-| `screenshots/tablet10/` | 1600×2560 | Скриншоты 10-дюймового планшета |
+| `upload/phone-{ru,en}/` | 1080×1920 | Скриншоты телефона |
+| `upload/tablet7-{ru,en}/` | 1440×2560 | Скриншоты 7-дюймового планшета |
+| `upload/tablet10-{ru,en}/` | 1620×2880 | Скриншоты 10-дюймового планшета |
 
-Кадры одинаковые во всех наборах:
+Кадры одинаковые во всех наборах, порядок задан именами — Play показывает их в
+том порядке, в каком загрузили:
 
 | Файл | Что показывает | Подпись, если добавлять |
 |---|---|---|
-| `1-home.png` | Главный экран, два режима и уровни | Одно нажатие — и вы играете |
-| `2-chain.png` | Башня в разгаре | Ответ становится фундаментом следующего |
-| `3-correct.png` | Ответ встал в кладку | Верно — зелёный блок, мимо — красный |
-| `4-levels.png` | Уровни по операциям | Видно, что открыто и что впереди |
-| `5-streak.png` | Серия горит | Не ошибайтесь — и башня светится |
-| `6-result.png` | Итог партии | Заработанные уровни остаются |
+| `1-home.png` | Главный экран с рекордом | Считай в уме |
+| `2-climb.png` | Подъём в городе, вода внизу | Ответил — поднялся |
+| `3-streak.png` | Похвала за серию | Серия без ошибок |
+| `4-winter.png` | Зима с сосульками | Шесть разных мест |
+| `5-lava.png` | Каньон с лавой | Внизу не ждут |
+| `6-result.png` | Итог партии | Побей свой рекорд |
 
 Подписи Play не накладывает сам — если они нужны, их запекают в картинку. Сейчас
-скриншоты чистые, без текста.
+кадры чистые, без текста, и без рекламной полосы: место под объявление на
+витрине показывать нечего.
 
-**Планшетные кадры потребовали правки самой игры.** Вёрстка была рассчитана на
-телефон и упиралась в 460 px: на 10-дюймовом экране игра занимала 57 % ширины и
-выглядела узкой полосой посреди пустоты. Теперь на экранах от 600 px колонка
-шире, крупнее шрифт уравнения, кнопки ответов, логотип и кнопка «Играть», а
-коробка может вырасти до 260 px. Заполнение: 100 % на телефоне, 93–100 % на 7",
-70–78 % на 10". Это не только про витрину — так игру видят реальные владельцы
-планшетов.
+**Планшетные кадры потребовали правки самой игры.** Вёрстка была в пикселях под
+телефон и тянулась только по ширине: блоки разъезжались в полосы, высота этажа
+не росла, а вокруг колонки в 680px оставались тёмные поля в треть экрана.
+Теперь интерфейс масштабируется целиком (`src/utils/scale.ts`), и планшет
+показывает ту же доску, только крупнее. На телефонах масштаб равен единице, то
+есть там не изменилось ничего.

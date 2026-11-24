@@ -852,7 +852,7 @@ onBeforeUnmount(() => {
 	position: relative;
 	display: flex;
 	flex-direction: column;
-	height: 100dvh;
+	height: var(--vh);
 	overflow: hidden;
 	/*
 	   Место под рекламу — паддингом, а не просто элементом.
@@ -863,7 +863,7 @@ onBeforeUnmount(() => {
 	   флекс-элементом они начинались бы от нуля и снова уезжали под баннер —
 	   ровно то, из-за чего статистика была не видна.
 	*/
-	padding-top: var(--ad-band, 56px);
+	padding-top: var(--ad-band-k, 56px);
 }
 
 /* ==================================================================== HUD == */
@@ -1524,7 +1524,7 @@ onBeforeUnmount(() => {
 .overlay {
 	position: absolute;
 	/* Как и карточка итога: ниже рекламной строки, а не от нуля. */
-	top: var(--ad-band, 56px);
+	top: var(--ad-band-k, 56px);
 	left: 0;
 	right: 0;
 	bottom: 0;

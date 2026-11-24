@@ -92,7 +92,7 @@ export default {
 	off: 'No',
 
 	sec_short: 's',
-	climb_hint: 'Arrastra para correr',
+	teach_move: 'Toca un bloque o desliza',
 	climb_jump: 'Saltar',
 	fork_title: '¿Cómo seguir?',
 	fork_note: 'hasta el próximo apoyo',

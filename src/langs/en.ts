@@ -92,7 +92,7 @@ export default {
 	off: 'Off',
 
 	sec_short: 's',
-	climb_hint: 'Drag to run',
+	teach_move: 'Tap a block or swipe',
 	climb_jump: 'Jump',
 	fork_title: 'How to build on?',
 	fork_note: 'until the next support',
